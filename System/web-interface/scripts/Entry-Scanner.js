@@ -9,6 +9,8 @@
   let scanning = false;
   let studentCache = {};
   let reconnectTimer = null;
+  let offlineQueue = []; // Queue for offline registrations
+  let isOnline = false;
 
   async function init() {
     document.getElementById('btn-start').addEventListener('click', start);
@@ -26,6 +28,7 @@
     document.getElementById('entry-scanner-container').style.display = 'flex';
     
     await loadCache();
+    loadOfflineQueue(); // Load offline queue on startup
     setupWS();
     setupUI();
     await startCamera();
@@ -61,12 +64,18 @@
     
     ws.addEventListener('open', () => {
       console.log('WebSocket connected');
+      isOnline = true;
       updateConnectionStatus(true);
       ws.send(JSON.stringify({ 
         type: 'register_device', 
         role: 'first_scan', 
         name: deviceName 
       }));
+      
+      // Process offline queue when connection is restored
+      setTimeout(() => {
+        processOfflineQueue();
+      }, 1000);
       
       // Send heartbeat every 10 seconds
       setInterval(() => {
@@ -160,12 +169,14 @@
     
     ws.addEventListener('close', () => {
       console.log('WebSocket disconnected, attempting reconnect in 3s...');
+      isOnline = false;
       updateConnectionStatus(false);
       reconnectTimer = setTimeout(setupWS, 3000);
     });
     
     ws.addEventListener('error', (error) => {
       console.error('WebSocket error:', error);
+      isOnline = false;
       updateConnectionStatus(false);
       try { ws.close(); } catch(e) {}
     });
@@ -196,6 +207,11 @@
       });
     }
     
+    // Setup manual entry button
+    const manualEntryBtn = document.getElementById('manual-entry-btn');
+    if (manualEntryBtn) {
+      manualEntryBtn.addEventListener('click', showManualEntryForm);
+    }
     
     video = document.getElementById('camera');
     canvas = document.getElementById('canvas');
@@ -303,6 +319,17 @@
         <input id="extra" type="number" min="0" value="0" placeholder="Number of extra sessions" />
       </div>
       
+      <div class="payment-section">
+        <h4><i class="fas fa-dollar-sign"></i> Payment Information</h4>
+        <div class="form-group payment-amount">
+          <label for="payment-amount">
+            <i class="fas fa-money-bill-wave"></i>
+            Payment Amount
+          </label>
+          <input id="payment-amount" type="number" step="0.01" min="0" placeholder="0.00" />
+        </div>
+      </div>
+      
       <div class="form-group">
         <label for="comment">
           <i class="fas fa-comment"></i>
@@ -337,6 +364,8 @@
   }
 
   function registerStudent(studentId, student) {
+    const paymentAmount = document.getElementById('payment-amount').value;
+    
     const record = {
       id: Date.now(),
       student_id: studentId,
@@ -356,9 +385,11 @@
       guest_info: student.guest_info,
       phone: student.phone,
       parent_phone: student.parent_phone,
+      payment_amount: paymentAmount ? parseFloat(paymentAmount) : 0,
       timestamp: new Date().toISOString(),
       device_name: deviceName,
-      registered: true
+      registered: true,
+      entry_method: 'qr_scan'
     };
     
     persistLocal(record);
@@ -393,27 +424,180 @@
     }
   }
 
+  // Offline Queue Management
+  function addToOfflineQueue(record) {
+    try {
+      const key = 'entryScanOfflineQueue';
+      const queue = JSON.parse(localStorage.getItem(key) || '[]');
+      queue.push({
+        ...record,
+        queuedAt: new Date().toISOString(),
+        retryCount: 0
+      });
+      localStorage.setItem(key, JSON.stringify(queue));
+      offlineQueue = queue;
+      console.log(`Added to offline queue: ${record.student_name} (${record.student_id})`);
+      updateOfflineIndicator();
+    } catch (error) {
+      console.error('Failed to add to offline queue:', error);
+    }
+  }
+
+  function loadOfflineQueue() {
+    try {
+      const key = 'entryScanOfflineQueue';
+      offlineQueue = JSON.parse(localStorage.getItem(key) || '[]');
+      console.log(`Loaded ${offlineQueue.length} offline queue items`);
+      updateOfflineIndicator();
+    } catch (error) {
+      console.error('Failed to load offline queue:', error);
+    }
+  }
+
+  function clearOfflineQueue() {
+    try {
+      const key = 'entryScanOfflineQueue';
+      localStorage.removeItem(key);
+      offlineQueue = [];
+      updateOfflineIndicator();
+      console.log('Offline queue cleared');
+    } catch (error) {
+      console.error('Failed to clear offline queue:', error);
+    }
+  }
+
+  function removeFromOfflineQueue(recordId) {
+    try {
+      const key = 'entryScanOfflineQueue';
+      const queue = JSON.parse(localStorage.getItem(key) || '[]');
+      const filteredQueue = queue.filter(item => item.id !== recordId);
+      localStorage.setItem(key, JSON.stringify(filteredQueue));
+      offlineQueue = filteredQueue;
+      updateOfflineIndicator();
+    } catch (error) {
+      console.error('Failed to remove from offline queue:', error);
+    }
+  }
+
+  async function processOfflineQueue() {
+    if (offlineQueue.length === 0 || !isOnline) {
+      return;
+    }
+
+    console.log(`Processing ${offlineQueue.length} offline queue items...`);
+    
+    for (let i = offlineQueue.length - 1; i >= 0; i--) {
+      const queuedRecord = offlineQueue[i];
+      
+      try {
+        // Send the record to server
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ 
+            type: 'student_registered', 
+            record: queuedRecord 
+          }));
+          
+          console.log(`✅ Sent queued record: ${queuedRecord.student_name} (${queuedRecord.student_id})`);
+          
+          // Remove from queue after successful send
+          removeFromOfflineQueue(queuedRecord.id);
+          
+          // Show notification
+          showNotification(`✅ Synced: ${queuedRecord.student_name}`, 'success');
+          
+        } else {
+          console.log('WebSocket not ready, keeping in queue');
+          break;
+        }
+      } catch (error) {
+        console.error(`Failed to send queued record ${queuedRecord.student_id}:`, error);
+        
+        // Increment retry count
+        queuedRecord.retryCount = (queuedRecord.retryCount || 0) + 1;
+        
+        // Remove if too many retries
+        if (queuedRecord.retryCount >= 3) {
+          console.log(`Removing record ${queuedRecord.student_id} after ${queuedRecord.retryCount} retries`);
+          removeFromOfflineQueue(queuedRecord.id);
+        }
+      }
+    }
+  }
+
+  function updateOfflineIndicator() {
+    const statusElement = document.getElementById('connection-status');
+    if (!statusElement) return;
+
+    if (isOnline) {
+      if (offlineQueue.length > 0) {
+        statusElement.innerHTML = `
+          <i class="fas fa-circle"></i>
+          <span>Connected (${offlineQueue.length} pending)</span>
+        `;
+        statusElement.className = 'status-syncing';
+      } else {
+        statusElement.innerHTML = `
+          <i class="fas fa-circle"></i>
+          <span>Connected</span>
+        `;
+        statusElement.className = 'status-online';
+      }
+    } else {
+      statusElement.innerHTML = `
+        <i class="fas fa-circle"></i>
+        <span>Offline (${offlineQueue.length} queued)</span>
+      `;
+      statusElement.className = 'status-offline';
+    }
+  }
+
+  function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
+      <span>${message}</span>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
   function sendToManager(record) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (ws && ws.readyState === WebSocket.OPEN && isOnline) {
       ws.send(JSON.stringify({ 
         type: 'student_registered', 
         record 
       }));
       console.log('Record sent to manager');
     } else {
-      console.warn('WebSocket not connected, record saved locally only');
+      console.warn('WebSocket not connected, adding to offline queue');
+      addToOfflineQueue(record);
+      showNotification(`📱 ${record.student_name} queued for sync`, 'info');
     }
   }
 
   function sendNewStudent(student) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (ws && ws.readyState === WebSocket.OPEN && isOnline) {
       ws.send(JSON.stringify({ 
         type: 'new_student', 
         student 
       }));
       console.log('New student sent to manager');
     } else {
-      console.warn('WebSocket not connected, cannot add new student');
+      console.warn('WebSocket not connected, adding to offline queue');
+      addToOfflineQueue(student);
+      showNotification(`📱 ${student.name} queued for sync`, 'info');
     }
   }
 
@@ -452,6 +636,8 @@
             <div><strong>Grade:</strong> ${record.grade}</div>
             <div><strong>Homework:</strong> ${record.homework_score}/10</div>
             <div><strong>Extra Sessions:</strong> ${record.extra_sessions}</div>
+            <div><strong>Payment Amount:</strong> ${record.payment_amount ? `$${record.payment_amount.toFixed(2)}` : 'No payment'}</div>
+            <div><strong>Entry Method:</strong> ${record.entry_method === 'manual' ? 'Manual Entry' : 'QR Scan'}</div>
             <div><strong>Device:</strong> ${record.device_name}</div>
             <div><strong>Registered:</strong> ${new Date(record.timestamp).toLocaleString()}</div>
           </div>
@@ -481,6 +667,163 @@
       `;
     }
   }
+
+  // Manual Entry Functions
+  function showManualEntryForm() {
+    const studentForm = document.getElementById('student-form');
+    const currentResult = document.getElementById('current-result');
+    
+    // Hide current result and show manual form
+    currentResult.style.display = 'none';
+    studentForm.style.display = 'block';
+    
+    // Create manual entry form
+    studentForm.innerHTML = `
+      <div class="manual-entry-form">
+        <h3><i class="fas fa-keyboard"></i> Manual Student Entry</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="manual-student-id">Student ID *</label>
+            <input type="text" id="manual-student-id" placeholder="Enter student ID" required>
+          </div>
+          <div class="form-group">
+            <label for="manual-student-name">Student Name *</label>
+            <input type="text" id="manual-student-name" placeholder="Enter student name" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="manual-center">Center</label>
+            <input type="text" id="manual-center" placeholder="Enter center name">
+          </div>
+          <div class="form-group">
+            <label for="manual-grade">Grade</label>
+            <input type="text" id="manual-grade" placeholder="Enter grade">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="manual-phone">Phone</label>
+            <input type="tel" id="manual-phone" placeholder="Enter phone number">
+          </div>
+          <div class="form-group">
+            <label for="manual-parent-phone">Parent Phone</label>
+            <input type="tel" id="manual-parent-phone" placeholder="Enter parent phone">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="manual-subject">Subject</label>
+          <input type="text" id="manual-subject" placeholder="Enter subject">
+        </div>
+        
+        <div class="payment-section">
+          <h4><i class="fas fa-dollar-sign"></i> Payment Information</h4>
+          <div class="form-row">
+            <div class="form-group payment-amount">
+              <label for="manual-payment-amount">Payment Amount</label>
+              <input type="number" id="manual-payment-amount" placeholder="0.00" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label for="manual-homework">Homework</label>
+              <input type="text" id="manual-homework" placeholder="Enter homework details">
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="manual-comments">Comments</label>
+          <textarea id="manual-comments" placeholder="Enter any additional comments"></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="cancelManualEntry()">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" onclick="submitManualEntry()">
+            <i class="fas fa-check"></i>
+            Register Student
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function cancelManualEntry() {
+    const studentForm = document.getElementById('student-form');
+    const currentResult = document.getElementById('current-result');
+    
+    // Clear form and show waiting state
+    studentForm.style.display = 'none';
+    currentResult.style.display = 'block';
+    studentForm.innerHTML = '';
+  }
+
+  async function submitManualEntry() {
+    // Get form data
+    const studentId = document.getElementById('manual-student-id').value.trim();
+    const studentName = document.getElementById('manual-student-name').value.trim();
+    const center = document.getElementById('manual-center').value.trim();
+    const grade = document.getElementById('manual-grade').value.trim();
+    const phone = document.getElementById('manual-phone').value.trim();
+    const parentPhone = document.getElementById('manual-parent-phone').value.trim();
+    const subject = document.getElementById('manual-subject').value.trim();
+    const paymentAmount = document.getElementById('manual-payment-amount').value.trim();
+    const homework = document.getElementById('manual-homework').value.trim();
+    const comments = document.getElementById('manual-comments').value.trim();
+    
+    // Validate required fields
+    if (!studentId || !studentName) {
+      alert('Please fill in Student ID and Student Name');
+      return;
+    }
+    
+    // Create student object with all details
+    const studentData = {
+      id: studentId,
+      name: studentName,
+      center: center || 'Manual Entry',
+      grade: grade || '',
+      phone: phone || '',
+      parentPhone: parentPhone || '',
+      subject: subject || '',
+      paymentAmount: paymentAmount ? parseFloat(paymentAmount) : 0,
+      homework: homework || '',
+      comments: comments || '',
+      registered: true,
+      timestamp: new Date().toISOString(),
+      entryMethod: 'manual',
+      deviceName: deviceName
+    };
+    
+    try {
+      // Send to server
+      await sendNewStudent(studentData);
+      
+      // Show success message
+      showResult('success', `Student ${studentName} registered successfully!`, {
+        id: studentId,
+        name: studentName,
+        paymentAmount: paymentAmount ? `$${paymentAmount}` : 'No payment',
+        method: 'Manual Entry'
+      });
+      
+      // Clear form and return to waiting state
+      cancelManualEntry();
+      
+    } catch (error) {
+      console.error('Failed to register student:', error);
+      showResult('error', 'Failed to register student. Please try again.');
+    }
+  }
+
+  // Make functions globally available
+  window.cancelManualEntry = cancelManualEntry;
+  window.submitManualEntry = submitManualEntry;
 
 
   // Initialize when page loads
