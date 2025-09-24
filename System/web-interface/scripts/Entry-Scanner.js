@@ -234,9 +234,6 @@
       <label>Homework Score (0-10):</label>
       <input id="hw" type="number" min="0" max="10" step="0.5" />
       
-      <label>Exam Score (0-10):</label>
-      <input id="ex" type="number" min="0" max="10" step="0.5" />
-      
       <label>Extra Sessions:</label>
       <input id="extra" type="number" min="0" value="0" />
       
@@ -266,12 +263,24 @@
       id: Date.now(),
       student_id: studentId,
       student_name: student.name,
+      center: student.center,
+      fees: student.fees,
       homework_score: Number(document.getElementById('hw').value || 0),
-      exam_score: Number(document.getElementById('ex').value || 0),
+      exam_score: null, // No exam score in first scan
+      error: null,
       extra_sessions: Number(document.getElementById('extra').value || 0),
       comment: String(document.getElementById('comment').value || '').trim(),
+      error_detail: null,
+      fees_1: student.fees_1,
+      subject: student.subject,
+      grade: student.grade,
+      session_sequence: student.session_sequence,
+      guest_info: student.guest_info,
+      phone: student.phone,
+      parent_phone: student.parent_phone,
       timestamp: new Date().toISOString(),
-      device_name: deviceName
+      device_name: deviceName,
+      registered: true
     };
     
     persistLocal(record);

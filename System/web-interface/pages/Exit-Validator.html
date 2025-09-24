@@ -7,9 +7,91 @@
   <link rel="stylesheet" href="/styles/main-styles.css" />
 </head>
 <body>
-  <div id="result"></div>
-  <video id="camera" autoplay></video>
-  <canvas id="canvas" style="display:none;"></canvas>
+  <div id="exit-validator-container">
+    <!-- Header -->
+    <div id="header">
+      <h1>Exit Validator</h1>
+      <div id="header-controls">
+        <button id="export-btn" class="export-button" title="Export all student data to Excel">
+          📊 Export to Excel
+        </button>
+        <div id="connection-status" class="status-offline">● Disconnected</div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main-content">
+      <!-- Camera Section (Left Half) -->
+      <div id="camera-section">
+        <div id="camera-container">
+          <video id="camera" autoplay></video>
+          <canvas id="canvas" style="display:none;"></canvas>
+          <div id="scan-overlay">
+            <div id="scan-frame"></div>
+            <div id="scan-text">Point camera at QR code</div>
+          </div>
+        </div>
+        <div id="scan-status">Ready to scan...</div>
+      </div>
+
+      <!-- Results Section (Right Half) -->
+      <div id="results-section">
+        <div id="current-result" class="result-placeholder">
+          <div class="result-icon">📱</div>
+          <div class="result-text">Waiting for scan...</div>
+        </div>
+        
+        <!-- Student Data Table -->
+        <div id="student-table-container">
+          <h3>Today's Registered Students</h3>
+          <div id="table-wrapper">
+            <table id="students-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Center</th>
+                  <th>Fees</th>
+                  <th>Homework</th>
+                  <th>Exam</th>
+                  <th>Error</th>
+                  <th>Timestamp</th>
+                  <th>Extra Sessions</th>
+                  <th>Comment</th>
+                  <th>Error Detail</th>
+                  <th>Fees.1</th>
+                  <th>Subject</th>
+                  <th>Grade</th>
+                  <th>Session Sequence</th>
+                  <th>Guest Info</th>
+                  <th>Phone</th>
+                  <th>Parent Phone</th>
+                </tr>
+              </thead>
+              <tbody id="students-table-body">
+                <!-- Student data will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Popup -->
+    <div id="result-popup" class="result-popup">
+      <div class="result-content">
+        <div class="result-header">
+          <h2 id="result-title">Result</h2>
+          <button id="close-result" class="close-btn">×</button>
+        </div>
+        <div id="result-details"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="/libraries/qr-scanner-library.js"></script>
   <script src="/scripts/Exit-Validator.js"></script>
 </body>
