@@ -44,6 +44,15 @@ function logToSystem(level, message, data = null) {
     systemLogs.shift();
   }
   
+  // Broadcast log to admin dashboards
+  broadcastToAdmins({
+    type: 'log_entry',
+    level: level,
+    message: message,
+    timestamp: timestamp,
+    data: data
+  });
+  
   // Console output with colors
   const colors = {
     info: '\x1b[36m',    // Cyan
@@ -249,6 +258,24 @@ app.post('/api/validation-log', (req, res) => {
     const arr = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : [];
     arr.push(req.body);
     fs.writeFileSync(file, JSON.stringify(arr, null, 2), 'utf8');
+    
+    // Increment validation counter
+    totalValidations++;
+    
+    // Broadcast validation result to admin dashboards
+    broadcastToAdmins({
+      type: 'validation_result',
+      result: {
+        status: req.body.status,
+        student_id: req.body.student_id,
+        student_name: req.body.student_name,
+        timestamp: req.body.timestamp
+      }
+    });
+    
+    // Log the validation
+    logToSystem('info', `Exit validation: ${req.body.status} for student ${req.body.student_id} (${req.body.student_name})`);
+    
     res.json({ ok: true });
   } catch (error) {
     console.error('Error logging validation:', error);
@@ -596,36 +623,6 @@ if (wssHttps) {
 
 // WebSocket servers are now attached to both HTTP and HTTPS servers
 
-// Add API endpoint for validation logs (from Exit Validator)
-app.post('/api/validation-log', (req, res) => {
-  try {
-    const logEntry = req.body;
-    totalValidations++;
-    
-    logToSystem(
-      logEntry.status === 'PASSED' ? 'success' : 'warning',
-      `Exit validation: ${logEntry.status} for student ${logEntry.student_id}`,
-      {
-        studentId: logEntry.student_id,
-        status: logEntry.status,
-        timestamp: logEntry.timestamp,
-        record: logEntry.record
-      }
-    );
-    
-    // Notify admins about validation result
-    broadcastToAdmins({
-      type: 'validation_result',
-      result: logEntry,
-      timestamp: new Date().toISOString()
-    });
-    
-    res.json({ success: true });
-  } catch (error) {
-    logToSystem('error', `Failed to log validation: ${error.message}`);
-    res.status(500).json({ error: 'Failed to log validation' });
-  }
-});
 
 // Add API endpoint to get system logs for admin
 app.get('/api/system-logs', (req, res) => {

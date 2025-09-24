@@ -3,20 +3,129 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Entry Scanner</title>
-  <link rel="stylesheet" href="/styles/main-styles.css" />
+  <title>Entry Scanner - Student Lab System</title>
+  <link rel="stylesheet" href="/styles/common.css" />
+  <link rel="stylesheet" href="/styles/entry-scanner.css" />
+  <link href="/libraries/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
   <div id="setup-screen">
-    <input id="device-name" placeholder="Device Name (e.g., Lab-01)" />
-    <button id="btn-start">Start Scanning</button>
+    <div class="setup-container">
+      <div class="setup-header">
+        <i class="fas fa-qrcode"></i>
+        <h1>Entry Scanner Setup</h1>
+        <p>Configure your device for student registration</p>
+      </div>
+      <div class="setup-form">
+        <div class="form-group">
+          <label for="device-name">
+            <i class="fas fa-desktop"></i>
+            Device Name
+          </label>
+          <input id="device-name" placeholder="e.g., Lab-01, Reception-Desk" />
+        </div>
+        <button id="btn-start" class="btn btn-primary">
+          <i class="fas fa-play"></i>
+          <span>Start Scanning</span>
+        </button>
+      </div>
+    </div>
   </div>
-  <div id="scanner-screen" style="display:none;">
-    <video id="camera" autoplay></video>
-    <canvas id="canvas" style="display:none;"></canvas>
-    <div id="scan-status">Ready</div>
-    <div id="student-form" style="display:none;"></div>
+  
+  <div id="entry-scanner-container" style="display:none;">
+    <!-- Header -->
+    <div id="header">
+      <div class="header-left">
+        <div class="logo">
+          <i class="fas fa-qrcode"></i>
+          <h1>Entry Scanner</h1>
+        </div>
+        <div class="header-info">
+          <span class="system-name">Student Lab System</span>
+        </div>
+      </div>
+      <div id="header-controls">
+        <div id="connection-status" class="status-offline">
+          <i class="fas fa-circle"></i>
+          <span>Disconnected</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main-content">
+      <!-- Camera Section (Left Half) -->
+      <div id="camera-section">
+        <div class="camera-header">
+          <h2><i class="fas fa-qrcode"></i> QR Code Scanner</h2>
+          <div class="camera-status">
+            <i class="fas fa-video"></i>
+            <span id="camera-status-text">Initializing camera...</span>
+          </div>
+        </div>
+        
+        <div id="camera-container">
+          <video id="camera" autoplay></video>
+          <canvas id="canvas" style="display:none;"></canvas>
+          <div id="scan-overlay">
+            <div id="scan-frame">
+              <div class="corner corner-tl"></div>
+              <div class="corner corner-tr"></div>
+              <div class="corner corner-bl"></div>
+              <div class="corner corner-br"></div>
+            </div>
+            <div id="scan-text">
+              <i class="fas fa-crosshairs"></i>
+              <span>Point camera at QR code</span>
+            </div>
+          </div>
+        </div>
+        
+        <div id="scan-status">
+          <div class="status-indicator">
+            <div class="pulse-dot"></div>
+            <span>Ready to scan...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Section (Right Half) -->
+      <div id="form-section">
+        <div class="form-header">
+          <h2><i class="fas fa-user-plus"></i> Student Registration</h2>
+        </div>
+        
+        <div id="current-result" class="result-placeholder">
+          <div class="result-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <div class="result-text">Waiting for QR code scan...</div>
+          <div class="result-subtext">Point your camera at a student's QR code to register them</div>
+        </div>
+        
+        <div id="student-form">
+          <!-- Student form will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Popup -->
+    <div id="result-popup" class="result-popup">
+      <div class="result-content">
+        <div class="result-header">
+          <h2 id="result-title">
+            <i class="fas fa-check-circle"></i>
+            <span>Registration Result</span>
+          </h2>
+          <button id="close-result" class="close-btn">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="result-details"></div>
+      </div>
+    </div>
   </div>
+
   <script src="/libraries/qr-scanner-library.js"></script>
   <script src="/scripts/Entry-Scanner.js"></script>
 </body>

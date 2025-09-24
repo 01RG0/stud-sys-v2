@@ -39,6 +39,15 @@
 
     // Setup export button
     document.getElementById('export-btn').addEventListener('click', exportToExcel);
+    
+    // Setup refresh table button
+    const refreshBtn = document.getElementById('refresh-table');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        updateStudentsTable();
+        showNotification('Table refreshed');
+      });
+    }
   }
 
   function loadStoredRecords() {

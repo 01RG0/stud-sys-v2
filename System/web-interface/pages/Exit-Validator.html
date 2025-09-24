@@ -3,19 +3,33 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Exit Validator</title>
-  <link rel="stylesheet" href="/styles/main-styles.css" />
+  <title>Exit Validator - Student Lab System</title>
+  <link rel="stylesheet" href="/styles/common.css" />
+  <link rel="stylesheet" href="/styles/exit-validator.css" />
+  <link href="/libraries/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
   <div id="exit-validator-container">
     <!-- Header -->
     <div id="header">
-      <h1>Exit Validator</h1>
+      <div class="header-left">
+        <div class="logo">
+          <i class="fas fa-graduation-cap"></i>
+          <h1>Exit Validator</h1>
+        </div>
+        <div class="header-info">
+          <span class="system-name">Student Lab System</span>
+        </div>
+      </div>
       <div id="header-controls">
+        <div id="connection-status" class="status-offline">
+          <i class="fas fa-circle"></i>
+          <span>Disconnected</span>
+        </div>
         <button id="export-btn" class="export-button" title="Export all student data to Excel">
-          📊 Export to Excel
+          <i class="fas fa-file-excel"></i>
+          <span>Export to Excel</span>
         </button>
-        <div id="connection-status" class="status-offline">● Disconnected</div>
       </div>
     </div>
 
@@ -23,51 +37,89 @@
     <div id="main-content">
       <!-- Camera Section (Left Half) -->
       <div id="camera-section">
+        <div class="camera-header">
+          <h2><i class="fas fa-qrcode"></i> QR Code Scanner</h2>
+          <div class="camera-status">
+            <i class="fas fa-video"></i>
+            <span id="camera-status-text">Initializing camera...</span>
+          </div>
+        </div>
+        
         <div id="camera-container">
           <video id="camera" autoplay></video>
           <canvas id="canvas" style="display:none;"></canvas>
           <div id="scan-overlay">
-            <div id="scan-frame"></div>
-            <div id="scan-text">Point camera at QR code</div>
+            <div id="scan-frame">
+              <div class="corner corner-tl"></div>
+              <div class="corner corner-tr"></div>
+              <div class="corner corner-bl"></div>
+              <div class="corner corner-br"></div>
+            </div>
+            <div id="scan-text">
+              <i class="fas fa-crosshairs"></i>
+              <span>Point camera at QR code</span>
+            </div>
           </div>
         </div>
-        <div id="scan-status">Ready to scan...</div>
+        
+        <div id="scan-status">
+          <div class="status-indicator">
+            <div class="pulse-dot"></div>
+            <span>Ready to scan...</span>
+          </div>
+        </div>
       </div>
 
       <!-- Results Section (Right Half) -->
       <div id="results-section">
+        <div class="results-header">
+          <h2><i class="fas fa-users"></i> Student Validation</h2>
+          <div class="stats">
+            <div class="stat-item">
+              <span class="stat-number" id="total-students">0</span>
+              <span class="stat-label">Total Today</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="validated-students">0</span>
+              <span class="stat-label">Validated</span>
+            </div>
+          </div>
+        </div>
+        
         <div id="current-result" class="result-placeholder">
-          <div class="result-icon">📱</div>
-          <div class="result-text">Waiting for scan...</div>
+          <div class="result-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <div class="result-text">Waiting for QR code scan...</div>
+          <div class="result-subtext">Point your camera at a student's QR code to validate their exit</div>
         </div>
         
         <!-- Student Data Table -->
         <div id="student-table-container">
-          <h3>Today's Registered Students</h3>
+          <div class="table-header">
+            <h3><i class="fas fa-table"></i> Today's Registered Students</h3>
+            <div class="table-controls">
+              <button class="refresh-btn" id="refresh-table" title="Refresh table">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
           <div id="table-wrapper">
             <table id="students-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Center</th>
-                  <th>Fees</th>
-                  <th>Homework</th>
-                  <th>Exam</th>
-                  <th>Error</th>
-                  <th>Timestamp</th>
-                  <th>Extra Sessions</th>
-                  <th>Comment</th>
-                  <th>Error Detail</th>
-                  <th>Fees.1</th>
-                  <th>Subject</th>
-                  <th>Grade</th>
-                  <th>Session Sequence</th>
-                  <th>Guest Info</th>
-                  <th>Phone</th>
-                  <th>Parent Phone</th>
+                  <th><i class="fas fa-calendar"></i> Date</th>
+                  <th><i class="fas fa-clock"></i> Time</th>
+                  <th><i class="fas fa-id-card"></i> ID</th>
+                  <th><i class="fas fa-user"></i> Name</th>
+                  <th><i class="fas fa-building"></i> Center</th>
+                  <th><i class="fas fa-dollar-sign"></i> Fees</th>
+                  <th><i class="fas fa-book"></i> Homework</th>
+                  <th><i class="fas fa-clipboard-check"></i> Exam</th>
+                  <th><i class="fas fa-exclamation-triangle"></i> Error</th>
+                  <th><i class="fas fa-phone"></i> Phone</th>
+                  <th><i class="fas fa-user-friends"></i> Parent Phone</th>
+                  <th><i class="fas fa-check-circle"></i> Status</th>
                 </tr>
               </thead>
               <tbody id="students-table-body">
@@ -83,15 +135,20 @@
     <div id="result-popup" class="result-popup">
       <div class="result-content">
         <div class="result-header">
-          <h2 id="result-title">Result</h2>
-          <button id="close-result" class="close-btn">×</button>
+          <h2 id="result-title">
+            <i class="fas fa-check-circle"></i>
+            <span>Validation Result</span>
+          </h2>
+          <button id="close-result" class="close-btn">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
         <div id="result-details"></div>
       </div>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="/libraries/xlsx.full.min.js"></script>
   <script src="/libraries/qr-scanner-library.js"></script>
   <script src="/scripts/Exit-Validator.js"></script>
 </body>

@@ -21,6 +21,10 @@
       return; 
     }
     
+    // Hide setup screen and show scanner
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('entry-scanner-container').style.display = 'flex';
+    
     await loadCache();
     setupWS();
     setupUI();
@@ -57,6 +61,7 @@
     
     ws.addEventListener('open', () => {
       console.log('WebSocket connected');
+      updateConnectionStatus(true);
       ws.send(JSON.stringify({ 
         type: 'register_device', 
         role: 'first_scan', 
@@ -155,18 +160,42 @@
     
     ws.addEventListener('close', () => {
       console.log('WebSocket disconnected, attempting reconnect in 3s...');
+      updateConnectionStatus(false);
       reconnectTimer = setTimeout(setupWS, 3000);
     });
     
     ws.addEventListener('error', (error) => {
       console.error('WebSocket error:', error);
+      updateConnectionStatus(false);
       try { ws.close(); } catch(e) {}
     });
   }
 
   function setupUI() {
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('scanner-screen').style.display = 'block';
+    // Update camera status
+    const cameraStatusText = document.getElementById('camera-status-text');
+    if (cameraStatusText) {
+      cameraStatusText.textContent = 'Camera ready';
+    }
+    
+    // Setup close button for result popup
+    const closeBtn = document.getElementById('close-result');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        document.getElementById('result-popup').classList.remove('show');
+      });
+    }
+
+    // Close popup when clicking outside
+    const popup = document.getElementById('result-popup');
+    if (popup) {
+      popup.addEventListener('click', (e) => {
+        if (e.target.id === 'result-popup') {
+          popup.classList.remove('show');
+        }
+      });
+    }
+    
     video = document.getElementById('camera');
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
@@ -208,50 +237,91 @@
   function onQr(text) {
     const studentId = String(text).trim();
     const student = studentCache[studentId];
-    const status = document.getElementById('scan-status');
+    const statusElement = document.querySelector('#scan-status .status-indicator span');
     
     if (!student) { 
-      status.textContent = `❌ Student not found: ${studentId}`;
-      status.style.background = '#ffebee';
-      status.style.color = '#c62828';
+      if (statusElement) {
+        statusElement.textContent = `Student not found: ${studentId}`;
+      }
+      showResult('error', `Student not found: ${studentId}`, studentId);
       return; 
     }
     
-    status.textContent = `✅ Found: ${student.name} (#${studentId})`;
-    status.style.background = '#e8f5e8';
-    status.style.color = '#2e7d32';
+    if (statusElement) {
+      statusElement.textContent = `Found: ${student.name} (#${studentId})`;
+    }
     showStudentForm(studentId, student);
   }
 
   function showStudentForm(studentId, student) {
     const container = document.getElementById('student-form');
-    container.style.display = 'block';
+    container.classList.add('show');
     container.innerHTML = `
-      <div style="margin-bottom: 12px; padding: 8px; background: #f0f8ff; border-radius: 4px;">
-        <strong>${student.name}</strong> (ID: ${studentId})<br>
-        <small>Center: ${student.center} | Subject: ${student.subject} | Grade: ${student.grade}</small>
+      <div class="student-info">
+        <h3><i class="fas fa-user"></i> ${student.name}</h3>
+        <div class="student-details">
+          <div class="detail-item">
+            <i class="fas fa-id-card"></i>
+            <span>ID: ${studentId}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-building"></i>
+            <span>Center: ${student.center}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-book"></i>
+            <span>Subject: ${student.subject}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Grade: ${student.grade}</span>
+          </div>
+        </div>
       </div>
-      <label>Homework Score (0-10):</label>
-      <input id="hw" type="number" min="0" max="10" step="0.5" />
       
-      <label>Extra Sessions:</label>
-      <input id="extra" type="number" min="0" value="0" />
+      <div class="form-group">
+        <label for="hw">
+          <i class="fas fa-book-open"></i>
+          Homework Score (0-10)
+        </label>
+        <input id="hw" type="number" min="0" max="10" step="0.5" placeholder="Enter homework score" />
+      </div>
       
-      <label>Comment:</label>
-      <input id="comment" type="text" placeholder="Optional comment..." />
+      <div class="form-group">
+        <label for="extra">
+          <i class="fas fa-plus-circle"></i>
+          Extra Sessions
+        </label>
+        <input id="extra" type="number" min="0" value="0" placeholder="Number of extra sessions" />
+      </div>
       
-      <div style="margin-top: 16px;">
-        <button id="btn-register" type="button">✅ Register Student</button>
-        <button id="btn-continue" type="button">➡️ Continue Scanning</button>
+      <div class="form-group">
+        <label for="comment">
+          <i class="fas fa-comment"></i>
+          Comment
+        </label>
+        <textarea id="comment" placeholder="Optional comment about the session..."></textarea>
+      </div>
+      
+      <div class="form-actions">
+        <button id="btn-register" class="btn btn-success">
+          <i class="fas fa-check"></i>
+          <span>Register Student</span>
+        </button>
+        <button id="btn-continue" class="btn btn-secondary">
+          <i class="fas fa-arrow-right"></i>
+          <span>Continue Scanning</span>
+        </button>
       </div>
     `;
     
     document.getElementById('btn-register').onclick = () => registerStudent(studentId, student);
     document.getElementById('btn-continue').onclick = () => { 
-      container.style.display = 'none'; 
-      document.getElementById('scan-status').textContent = 'Ready to scan...';
-      document.getElementById('scan-status').style.background = '#f5f5f5';
-      document.getElementById('scan-status').style.color = '#333';
+      container.classList.remove('show');
+      const statusElement = document.querySelector('#scan-status .status-indicator span');
+      if (statusElement) {
+        statusElement.textContent = 'Ready to scan...';
+      }
     };
     
     // Focus on homework score input
@@ -286,16 +356,20 @@
     persistLocal(record);
     sendToManager(record);
     
-    document.getElementById('student-form').style.display = 'none';
-    document.getElementById('scan-status').textContent = `✅ Registered: ${student.name}`;
-    document.getElementById('scan-status').style.background = '#e8f5e8';
-    document.getElementById('scan-status').style.color = '#2e7d32';
+    document.getElementById('student-form').classList.remove('show');
+    
+    const statusElement = document.querySelector('#scan-status .status-indicator span');
+    if (statusElement) {
+      statusElement.textContent = `Registered: ${student.name}`;
+    }
+    
+    showResult('success', `Student ${student.name} registered successfully!`, studentId, record);
     
     // Auto-clear status after 3 seconds
     setTimeout(() => {
-      document.getElementById('scan-status').textContent = 'Ready to scan...';
-      document.getElementById('scan-status').style.background = '#f5f5f5';
-      document.getElementById('scan-status').style.color = '#333';
+      if (statusElement) {
+        statusElement.textContent = 'Ready to scan...';
+      }
     }, 3000);
   }
 
@@ -332,6 +406,71 @@
       console.log('New student sent to manager');
     } else {
       console.warn('WebSocket not connected, cannot add new student');
+    }
+  }
+
+  function showResult(status, message, studentId, record = null) {
+    const popup = document.getElementById('result-popup');
+    const title = document.getElementById('result-title');
+    const details = document.getElementById('result-details');
+    
+    // Update popup class
+    popup.className = `result-popup ${status.toLowerCase()}`;
+    
+    // Update title
+    title.innerHTML = `
+      <i class="fas fa-${status === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+      <span>${status === 'success' ? 'Registration Success' : 'Error'}</span>
+    `;
+    
+    // Update details
+    const currentTime = new Date().toLocaleTimeString();
+    let detailsHTML = `
+      <div style="margin-bottom: 16px;">
+        <strong>Student ID:</strong> ${studentId}<br>
+        <strong>Status:</strong> ${message}<br>
+        <strong>Time:</strong> ${currentTime}
+      </div>
+    `;
+    
+    if (record) {
+      detailsHTML += `
+        <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-top: 16px;">
+          <h4 style="margin: 0 0 12px 0; color: #333;">Registration Details</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px;">
+            <div><strong>Name:</strong> ${record.student_name}</div>
+            <div><strong>Center:</strong> ${record.center}</div>
+            <div><strong>Subject:</strong> ${record.subject}</div>
+            <div><strong>Grade:</strong> ${record.grade}</div>
+            <div><strong>Homework:</strong> ${record.homework_score}/10</div>
+            <div><strong>Extra Sessions:</strong> ${record.extra_sessions}</div>
+            <div><strong>Device:</strong> ${record.device_name}</div>
+            <div><strong>Registered:</strong> ${new Date(record.timestamp).toLocaleString()}</div>
+          </div>
+          ${record.comment ? `<div style="margin-top: 12px;"><strong>Comment:</strong> ${record.comment}</div>` : ''}
+        </div>
+      `;
+    }
+    
+    details.innerHTML = detailsHTML;
+    
+    // Show popup
+    popup.classList.add('show');
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      popup.classList.remove('show');
+    }, 5000);
+  }
+
+  function updateConnectionStatus(connected) {
+    const statusElement = document.getElementById('connection-status');
+    if (statusElement) {
+      statusElement.className = connected ? 'status-online' : 'status-offline';
+      statusElement.innerHTML = `
+        <i class="fas fa-circle"></i>
+        <span>${connected ? 'Connected' : 'Disconnected'}</span>
+      `;
     }
   }
 

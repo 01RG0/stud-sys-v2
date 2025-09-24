@@ -1,357 +1,25 @@
-body { 
-  font-family: system-ui, Arial, sans-serif; 
-  margin: 0; 
-  background: #f5f5f5;
-}
+/* ========================================
+   EXIT VALIDATOR SPECIFIC STYLES
+   Student Lab System
+   ======================================== */
 
-#setup-screen { 
-  padding: 20px; 
-  display: flex; 
-  gap: 12px; 
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  flex-direction: column;
-}
-
-#setup-screen input {
-  padding: 12px;
-  font-size: 16px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  width: 300px;
-  max-width: 90%;
-}
-
-#setup-screen button {
-  padding: 12px 24px;
-  font-size: 16px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 12px;
-}
-
-#setup-screen button:hover {
-  background: #0056b3;
-}
-
-#scanner-screen { 
-  position: relative; 
-  height: 100vh; 
-  display: flex;
-  flex-direction: column;
-}
-
-#camera { 
-  width: 100%; 
-  height: auto; 
-  max-height: 60vh; 
-  background: #000;
-  object-fit: cover;
-}
-
-#scan-status { 
-  padding: 12px 16px; 
-  font-weight: bold;
-  background: #f5f5f5;
-  border-bottom: 1px solid #ddd;
-  text-align: center;
-  font-size: 16px;
-}
-
-#student-form { 
-  padding: 16px; 
-  background: #fff; 
-  display: none; 
-  border: 1px solid #ddd;
-  margin: 8px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-#student-form label { 
-  display: block; 
-  margin-top: 12px; 
-  font-weight: bold;
-  color: #333;
-}
-
-#student-form input { 
-  width: 100%; 
-  padding: 8px; 
-  margin-top: 6px; 
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box;
-}
-
-#student-form input:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-}
-
-#student-form button { 
-  margin-top: 16px; 
-  padding: 10px 16px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-right: 8px;
-  font-size: 14px;
-}
-
-#student-form button:hover {
-  background: #0056b3;
-}
-
-#student-form button:nth-of-type(2) {
-  background: #6c757d;
-}
-
-#student-form button:nth-of-type(2):hover {
-  background: #545b62;
-}
-
-.result { 
-  position: fixed; 
-  left: 50%; 
-  top: 50%; 
-  transform: translate(-50%, -50%); 
-  padding: 20px 24px; 
-  border-radius: 12px; 
-  color: #fff; 
-  display: none; 
-  font-weight: bold;
-  z-index: 1000;
-  min-width: 300px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-.result h2 {
-  margin: 0 0 12px 0;
-  font-size: 24px;
-}
-
-.result p {
-  margin: 6px 0;
-  font-size: 14px;
-}
-
-.result.passed { 
-  background: linear-gradient(135deg, #2e7d32, #4caf50);
-}
-
-.result.blocked { 
-  background: linear-gradient(135deg, #c62828, #f44336);
-}
-
-.result.error {
-  background: linear-gradient(135deg, #ff9800, #ffc107);
-  color: #333;
-}
-
-/* Dashboard styles */
-h2 {
-  margin: 20px;
-  color: #333;
-  font-size: 24px;
-}
-
-table {
-  width: calc(100% - 40px);
-  margin: 0 20px;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-th, td {
-  padding: 12px 16px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
-
-th {
-  background: #f8f9fa;
-  font-weight: bold;
-  color: #333;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-td {
-  font-size: 14px;
-}
-
-tr:hover {
-  background: #f8f9fa;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  #setup-screen input {
-    width: 90%;
-  }
-  
-  #student-form {
-    margin: 4px;
-    padding: 12px;
-  }
-  
-  .result {
-    min-width: 280px;
-    margin: 0 20px;
-  }
-  
-  table {
-    width: calc(100% - 20px);
-    margin: 0 10px;
-    font-size: 12px;
-  }
-  
-  th, td {
-    padding: 8px 12px;
-  }
-  
-  /* Exit Validator Responsive */
-  #main-content {
-    flex-direction: column;
-  }
-  
-  #camera-section {
-    flex: 0 0 50vh;
-    border-radius: 0;
-  }
-  
-  #results-section {
-    border-radius: 0;
-  }
-  
-  .header-left {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .logo h1 {
-    font-size: 20px;
-  }
-  
-  .stats {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .stat-item {
-    padding: 8px 12px;
-  }
-  
-  .stat-number {
-    font-size: 20px;
-  }
-  
-  #students-table {
-    font-size: 11px;
-  }
-  
-  #students-table th,
-  #students-table td {
-    padding: 6px 4px;
-  }
-  
-  .export-button {
-    padding: 10px 16px;
-    font-size: 12px;
-  }
-  
-  .camera-header,
-  .results-header,
-  .table-header {
-    padding: 15px 20px;
-  }
-  
-  .camera-header h2,
-  .results-header h2 {
-    font-size: 16px;
-  }
-  
-  .table-header h3 {
-    font-size: 14px;
-  }
-}
-
-/* Loading animation */
-.loading {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #007bff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Status indicators */
-.status-online {
-  color: #2e7d32;
-  font-weight: bold;
-}
-
-.status-offline {
-  color: #666;
-}
-
-/* Notification styles */
-.notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #2196f3;
-  color: white;
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  z-index: 1001;
-  max-width: 300px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-/* Exit Validator Specific Styles */
+/* Main Container */
 #exit-validator-container {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #f5f7fa;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Header Styles */
 #header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px 30px;
+  background: #667eea;
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   color: white;
 }
 
@@ -454,20 +122,20 @@ tr:last-child td {
   font-size: 8px;
 }
 
+/* Main Content Area */
 #main-content {
   flex: 1;
   display: flex;
   overflow: hidden;
 }
 
+/* Camera Section */
 #camera-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  background: #e3f2fd;
   position: relative;
-  border-radius: 0 0 0 20px;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
 }
 
 .camera-header {
@@ -638,14 +306,13 @@ tr:last-child td {
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* Results Section */
 #results-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: #ffffff;
   overflow: hidden;
-  border-radius: 0 0 20px 0;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
 }
 
 .results-header {
@@ -739,6 +406,7 @@ tr:last-child td {
   line-height: 1.4;
 }
 
+/* Student Table Container */
 #student-table-container {
   flex: 1;
   display: flex;
@@ -944,76 +612,70 @@ tr:last-child td {
   padding: 24px;
 }
 
-.result-popup.passed .result-header h2 {
-  color: #28a745;
-}
-
-.result-popup.blocked .result-header h2 {
-  color: #dc3545;
-}
-
-.result-popup.error .result-header h2 {
-  color: #ffc107;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* Responsive Design for Exit Validator */
+@media (max-width: 768px) {
   #main-content {
     flex-direction: column;
   }
   
   #camera-section {
-    height: 50vh;
+    flex: 0 0 50vh;
+    border-radius: 0;
   }
   
   #results-section {
-    height: 50vh;
+    border-radius: 0;
   }
   
-  #students-table {
-    font-size: 10px;
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
   
-  #students-table th,
-  #students-table td {
-    padding: 4px 3px;
-  }
-}
-
-@media (max-width: 768px) {
-  #header {
-    padding: 12px 16px;
-  }
-  
-  #header h1 {
+  .logo h1 {
     font-size: 20px;
   }
   
-  #header-controls {
-    gap: 8px;
+  .stats {
+    flex-direction: column;
+    gap: 10px;
   }
   
-  .export-button {
-    padding: 6px 12px;
-    font-size: 12px;
+  .stat-item {
+    padding: 8px 12px;
   }
   
-  #scan-frame {
-    width: 200px;
-    height: 200px;
-  }
-  
-  #scan-text {
-    font-size: 14px;
+  .stat-number {
+    font-size: 20px;
   }
   
   #students-table {
-    font-size: 9px;
+    font-size: 11px;
   }
   
   #students-table th,
   #students-table td {
-    padding: 3px 2px;
-    max-width: 80px;
+    padding: 6px 4px;
+  }
+  
+  .export-button {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+  
+  .camera-header,
+  .results-header,
+  .table-header {
+    padding: 15px 20px;
+  }
+  
+  .camera-header h2,
+  .results-header h2 {
+    font-size: 16px;
+  }
+  
+  .table-header h3 {
+    font-size: 14px;
   }
 }
