@@ -1,0 +1,271 @@
+body { 
+  font-family: system-ui, Arial, sans-serif; 
+  margin: 0; 
+  background: #f5f5f5;
+}
+
+#setup-screen { 
+  padding: 20px; 
+  display: flex; 
+  gap: 12px; 
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  flex-direction: column;
+}
+
+#setup-screen input {
+  padding: 12px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  width: 300px;
+  max-width: 90%;
+}
+
+#setup-screen button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+#setup-screen button:hover {
+  background: #0056b3;
+}
+
+#scanner-screen { 
+  position: relative; 
+  height: 100vh; 
+  display: flex;
+  flex-direction: column;
+}
+
+#camera { 
+  width: 100%; 
+  height: auto; 
+  max-height: 60vh; 
+  background: #000;
+  object-fit: cover;
+}
+
+#scan-status { 
+  padding: 12px 16px; 
+  font-weight: bold;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-size: 16px;
+}
+
+#student-form { 
+  padding: 16px; 
+  background: #fff; 
+  display: none; 
+  border: 1px solid #ddd;
+  margin: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#student-form label { 
+  display: block; 
+  margin-top: 12px; 
+  font-weight: bold;
+  color: #333;
+}
+
+#student-form input { 
+  width: 100%; 
+  padding: 8px; 
+  margin-top: 6px; 
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+#student-form input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+#student-form button { 
+  margin-top: 16px; 
+  padding: 10px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+#student-form button:hover {
+  background: #0056b3;
+}
+
+#student-form button:nth-of-type(2) {
+  background: #6c757d;
+}
+
+#student-form button:nth-of-type(2):hover {
+  background: #545b62;
+}
+
+.result { 
+  position: fixed; 
+  left: 50%; 
+  top: 50%; 
+  transform: translate(-50%, -50%); 
+  padding: 20px 24px; 
+  border-radius: 12px; 
+  color: #fff; 
+  display: none; 
+  font-weight: bold;
+  z-index: 1000;
+  min-width: 300px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.result h2 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+}
+
+.result p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.result.passed { 
+  background: linear-gradient(135deg, #2e7d32, #4caf50);
+}
+
+.result.blocked { 
+  background: linear-gradient(135deg, #c62828, #f44336);
+}
+
+.result.error {
+  background: linear-gradient(135deg, #ff9800, #ffc107);
+  color: #333;
+}
+
+/* Dashboard styles */
+h2 {
+  margin: 20px;
+  color: #333;
+  font-size: 24px;
+}
+
+table {
+  width: calc(100% - 40px);
+  margin: 0 20px;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  font-size: 14px;
+}
+
+tr:hover {
+  background: #f8f9fa;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #setup-screen input {
+    width: 90%;
+  }
+  
+  #student-form {
+    margin: 4px;
+    padding: 12px;
+  }
+  
+  .result {
+    min-width: 280px;
+    margin: 0 20px;
+  }
+  
+  table {
+    width: calc(100% - 20px);
+    margin: 0 10px;
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 8px 12px;
+  }
+}
+
+/* Loading animation */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Status indicators */
+.status-online {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.status-offline {
+  color: #666;
+}
+
+/* Notification styles */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #2196f3;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  z-index: 1001;
+  max-width: 300px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}

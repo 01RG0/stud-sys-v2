@@ -1,0 +1,652 @@
+[
+  {
+    "id": 1758680433057,
+    "student_id": "1134",
+    "status": "BLOCKED",
+    "timestamp": "2025-09-24T02:20:33.057Z",
+    "record": null
+  },
+  {
+    "id": 1758680439530,
+    "student_id": "1134",
+    "status": "BLOCKED",
+    "timestamp": "2025-09-24T02:20:39.530Z",
+    "record": null
+  },
+  {
+    "id": 1758680461520,
+    "student_id": "1134",
+    "status": "BLOCKED",
+    "timestamp": "2025-09-24T02:21:01.520Z",
+    "record": null
+  },
+  {
+    "id": 1758680556854,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T02:22:36.854Z",
+    "record": {
+      "id": 1758680502844,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Pay 100 more",
+      "timestamp": "2025-09-24T02:21:42.844Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758680567866,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T02:22:47.866Z",
+    "record": {
+      "id": 1758680502844,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Pay 100 more",
+      "timestamp": "2025-09-24T02:21:42.844Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758680569090,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T02:22:49.090Z",
+    "record": {
+      "id": 1758680502844,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Pay 100 more",
+      "timestamp": "2025-09-24T02:21:42.844Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758680569601,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T02:22:49.601Z",
+    "record": {
+      "id": 1758680502844,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Pay 100 more",
+      "timestamp": "2025-09-24T02:21:42.844Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758680569941,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T02:22:49.941Z",
+    "record": {
+      "id": 1758680502844,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Pay 100 more",
+      "timestamp": "2025-09-24T02:21:42.844Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758680570465,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T02:22:50.465Z",
+    "record": {
+      "id": 1758680502844,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Pay 100 more",
+      "timestamp": "2025-09-24T02:21:42.844Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758680570948,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T02:22:50.948Z",
+    "record": {
+      "id": 1758680502844,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Pay 100 more",
+      "timestamp": "2025-09-24T02:21:42.844Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740703667,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:03.667Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740712184,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:12.184Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740737713,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:37.713Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740737878,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:37.878Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740737944,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:37.944Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740738109,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:38.109Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740738172,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:38.172Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740738347,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:38.347Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740738414,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:38.414Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740746904,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:46.904Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740752790,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:52.790Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740758002,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:58.002Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740758181,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:58.181Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740758250,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:58.250Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740758323,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:58.323Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740758392,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:58.392Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740758459,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:58.459Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740758534,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:05:58.534Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740763313,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:03.313Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740763377,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:03.377Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740763444,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:03.444Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740763506,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:03.506Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740763569,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:03.569Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740763636,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:03.636Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740763697,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:03.697Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740763760,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:03.760Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740763835,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:03.835Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740768856,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:08.856Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740768946,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:08.946Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  },
+  {
+    "id": 1758740769258,
+    "student_id": "1134",
+    "status": "PASSED",
+    "timestamp": "2025-09-24T19:06:09.258Z",
+    "record": {
+      "id": 1758744347324,
+      "student_id": "1134",
+      "student_name": "omar ayman ahmed",
+      "homework_score": 5,
+      "exam_score": 5,
+      "extra_sessions": 0,
+      "comment": "Not bad",
+      "timestamp": "2025-09-24T20:05:47.324Z",
+      "device_name": "Ahmed"
+    }
+  }
+]
