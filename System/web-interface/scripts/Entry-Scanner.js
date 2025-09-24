@@ -196,6 +196,7 @@
       });
     }
     
+    
     video = document.getElementById('camera');
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
@@ -218,6 +219,9 @@
     }
   }
 
+  let lastScanTime = 0;
+  const SCAN_COOLDOWN = 2000; // 2 seconds cooldown between scans
+  
   function loop() {
     if (!scanning) return;
     
@@ -227,7 +231,11 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       
       if (code && code.data) {
-        onQr(code.data);
+        const now = Date.now();
+        if (now - lastScanTime > SCAN_COOLDOWN) {
+          lastScanTime = now;
+          onQr(code.data);
+        }
       }
     }
     
@@ -473,6 +481,7 @@
       `;
     }
   }
+
 
   // Initialize when page loads
   window.addEventListener('load', init);

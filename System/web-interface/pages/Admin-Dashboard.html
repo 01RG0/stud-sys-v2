@@ -1,161 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Dashboard - Student Lab System</title>
-  <link rel="stylesheet" href="/styles/common.css" />
-  <link rel="stylesheet" href="/styles/admin-dashboard.css" />
-  <link href="/libraries/font-awesome.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Student Lab System</title>
+    <link rel="stylesheet" href="/styles/admin-dashboard.css">
+    <link href="/libraries/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
-  <div id="admin-dashboard-container">
-    <!-- Header -->
-    <div id="header">
-      <div class="header-left">
-        <div class="logo">
-          <i class="fas fa-tachometer-alt"></i>
-          <h1>Admin Dashboard</h1>
-        </div>
-      </div>
-      <div id="header-controls">
-        <div id="connection-status" class="status-offline">
-          <i class="fas fa-circle"></i>
-          <span>Disconnected</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Content -->
-    <div id="main-content">
-      <!-- Stats Overview -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number" id="total-students">0</div>
-          <div class="stat-label">Total Students</div>
-        </div>
-        <div class="stat-card success">
-          <div class="stat-number" id="active-scanners">0</div>
-          <div class="stat-label">Active Scanners</div>
-        </div>
-        <div class="stat-card warning">
-          <div class="stat-number" id="today-registrations">0</div>
-          <div class="stat-label">Today's Registrations</div>
-        </div>
-        <div class="stat-card danger">
-          <div class="stat-number" id="system-errors">0</div>
-          <div class="stat-label">System Errors</div>
-        </div>
-      </div>
-
-      <!-- Dashboard Grid -->
-      <div class="dashboard-grid">
-        <!-- System Status -->
-        <div class="dashboard-card">
-          <div class="card-header">
-            <i class="fas fa-server"></i>
-            <h3>System Status</h3>
-          </div>
-          <div class="card-content">
-            <div class="system-status">
-              <div class="status-item">
-                <div class="status-info">
-                  <i class="fas fa-database"></i>
-                  <span>Database</span>
-                </div>
-                <div class="status-indicator online">Online</div>
-              </div>
-              <div class="status-item">
-                <div class="status-info">
-                  <i class="fas fa-wifi"></i>
-                  <span>WebSocket</span>
-                </div>
-                <div class="status-indicator offline">Offline</div>
-              </div>
-              <div class="status-item">
-                <div class="status-info">
-                  <i class="fas fa-file-excel"></i>
-                  <span>Excel Database</span>
-                </div>
-                <div class="status-indicator online">Connected</div>
-              </div>
-              <div class="status-item">
-                <div class="status-info">
-                  <i class="fas fa-clock"></i>
-                  <span>Uptime</span>
-                </div>
-                <div class="status-indicator" id="system-uptime">0h 0m</div>
-              </div>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Admin Dashboard</h1>
             </div>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="dashboard-card">
-          <div class="card-header">
-            <i class="fas fa-bolt"></i>
-            <h3>Quick Actions</h3>
-          </div>
-          <div class="card-content">
-            <div class="quick-actions">
-              <a href="/entry-scanner" class="action-btn">
-                <i class="fas fa-qrcode"></i>
-                <span>Entry Scanner</span>
-              </a>
-              <a href="/exit-validator" class="action-btn">
-                <i class="fas fa-check-circle"></i>
-                <span>Exit Validator</span>
-              </a>
-              <button class="action-btn" id="export-data">
-                <i class="fas fa-download"></i>
-                <span>Export Data</span>
-              </button>
-              <button class="action-btn" id="refresh-system">
-                <i class="fas fa-sync-alt"></i>
-                <span>Refresh</span>
-              </button>
+            <div class="header-right">
+                <div id="connection-status" class="status-pill disconnected">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Disconnected</span>
+                </div>
             </div>
-          </div>
-        </div>
+        </header>
+
+        <!-- Overview Cards -->
+        <section class="overview-section">
+            <div class="overview-card" id="total-students">
+                <div class="card-number">0</div>
+                <div class="card-label">Total Students</div>
+            </div>
+            <div class="overview-card" id="active-scanners">
+                <div class="card-number">0</div>
+                <div class="card-label">Active Scanners</div>
+            </div>
+            <div class="overview-card" id="todays-registrations">
+                <div class="card-number">0</div>
+                <div class="card-label">Today's Registrations</div>
+            </div>
+            <div class="overview-card" id="system-errors">
+                <div class="card-number">0</div>
+                <div class="card-label">System Errors</div>
+            </div>
+        </section>
+
+        <!-- Two Column Row -->
+        <section class="main-content">
+            <!-- System Status -->
+            <div class="content-card system-status-card">
+                <h3>System Status</h3>
+                <div class="status-list">
+                    <div class="status-item">
+                        <span class="status-label">Excel Database</span>
+                        <span class="status-value" id="database-status">Connected</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Uptime</span>
+                        <span class="status-value" id="system-uptime">00:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="content-card quick-actions-card">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <a href="/entry-scanner" class="action-btn entry-scanner-btn">
+                        Entry Scanner
+                    </a>
+                    <a href="/exit-validator" class="action-btn exit-validator-btn">
+                        Exit Validator
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Devices -->
+        <section class="live-devices-section">
+            <div class="content-card">
+                <div class="devices-header">
+                    <h3>Live Devices</h3>
+                    <div class="devices-summary">
+                        <span id="devices-count">0 of 0 devices online</span>
+                        <button id="refresh-devices" class="refresh-btn" title="Refresh device list">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="devices-content">
+                    <div id="devices-list" class="devices-list">
+                        <div class="device-placeholder">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading devices...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- System Logs -->
-        <div class="dashboard-card" style="grid-column: 1 / -1;">
-          <div class="card-header">
-            <i class="fas fa-terminal"></i>
-            <h3>System Logs</h3>
-          </div>
-          <div class="card-content">
-            <div class="log-controls">
-              <button id="clear-logs" class="btn btn-secondary">
-                <i class="fas fa-trash"></i>
-                Clear
-              </button>
-              <button id="export-logs" class="btn btn-primary">
-                <i class="fas fa-download"></i>
-                Export
-              </button>
-              <div class="log-filter">
-                <select id="log-level-filter">
-                  <option value="all">All Levels</option>
-                  <option value="info">Info</option>
-                  <option value="success">Success</option>
-                  <option value="warning">Warning</option>
-                  <option value="error">Error</option>
-                </select>
-              </div>
+        <section class="system-logs-section">
+            <div class="content-card">
+                <div class="logs-header">
+                    <h3>System Logs</h3>
+                    <div class="logs-controls">
+                        <button id="clear-logs" class="control-btn">
+                            <i class="fas fa-trash"></i>
+                            Clear
+                        </button>
+                        <button id="export-logs" class="control-btn">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                        <select id="log-level-filter" class="log-filter">
+                            <option value="all">All Levels</option>
+                            <option value="info">Info</option>
+                            <option value="success">Success</option>
+                            <option value="warning">Warning</option>
+                            <option value="error">Error</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="logs-content">
+                    <div id="logs-container" class="logs-container">
+                        <div class="log-entry log-info">
+                            <span class="log-timestamp">[Loading...]</span>
+                            <span class="log-message">System initializing...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="logs-container" id="logs-container">
-              <div class="log-entry log-info">
-                <span class="log-timestamp">[Loading...]</span>
-                <span>System initializing...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        </section>
     </div>
-  </div>
 
-  <script src="/scripts/Admin-Dashboard.js"></script>
+    <script src="/scripts/Admin-Dashboard.js"></script>
 </body>
 </html>

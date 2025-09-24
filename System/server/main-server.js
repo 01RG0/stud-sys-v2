@@ -233,14 +233,48 @@ app.get('/api/student-cache', (req, res) => {
 // Device list endpoint
 app.get('/api/devices', (req, res) => {
   const list = [];
+  const now = Date.now();
+  
   for (const [wsClient, info] of devices.entries()) {
+    const isOnline = info.lastSeen && (now - info.lastSeen < 30000); // 30 seconds timeout
     list.push({ 
       role: info.role, 
       name: info.name, 
-      lastSeen: info.lastSeen || null 
+      lastSeen: info.lastSeen || null,
+      isOnline: isOnline,
+      connectionTime: info.connectionTime || null,
+      status: isOnline ? 'online' : 'offline'
     });
   }
   res.json(list);
+});
+
+// Live device status endpoint
+app.get('/api/live-devices', (req, res) => {
+  const now = Date.now();
+  const liveDevices = [];
+  
+  for (const [wsClient, info] of devices.entries()) {
+    const isOnline = info.lastSeen && (now - info.lastSeen < 30000);
+    const uptime = info.connectionTime ? now - info.connectionTime : 0;
+    
+    liveDevices.push({
+      id: `${info.name}-${info.role}`,
+      name: info.name,
+      role: info.role,
+      status: isOnline ? 'online' : 'offline',
+      lastSeen: info.lastSeen,
+      uptime: uptime,
+      connectionTime: info.connectionTime
+    });
+  }
+  
+  res.json({
+    devices: liveDevices,
+    totalDevices: devices.size,
+    onlineDevices: liveDevices.filter(d => d.status === 'online').length,
+    timestamp: now
+  });
 });
 
 // Validation log endpoint
@@ -431,7 +465,8 @@ function handleWebSocketConnection(ws, source) {
         devices.set(ws, { 
           role: data.role, 
           name: data.name, 
-          lastSeen: Date.now() 
+          lastSeen: Date.now(),
+          connectionTime: Date.now()
         });
         
         logToSystem('success', `Device registered: ${data.name} (${data.role})`);
