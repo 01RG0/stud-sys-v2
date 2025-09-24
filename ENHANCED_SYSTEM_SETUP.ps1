@@ -107,12 +107,12 @@ function Test-SystemHealth {
         @{ Name = "Node.js"; Test = { Get-Command node -ErrorAction SilentlyContinue } },
         @{ Name = "npm"; Test = { Get-Command npm -ErrorAction SilentlyContinue } },
         @{ Name = "OpenSSL"; Test = { Get-Command openssl -ErrorAction SilentlyContinue } },
-        @{ Name = "Main Server File"; Test = { Test-Path "System\server\main-server.js" } },
-        @{ Name = "Package.json"; Test = { Test-Path "System\server\package.json" } },
-        @{ Name = "Student Database"; Test = { Test-Path "Student-Data\students-database.xlsx" } },
-        @{ Name = "Web Interface"; Test = { Test-Path "System\web-interface" } },
-        @{ Name = "SSL Certificates"; Test = { (Test-Path "System\server\certs\server.key") -and (Test-Path "System\server\certs\server.crt") } },
-        @{ Name = "Node Modules"; Test = { Test-Path "System\server\node_modules" } },
+        @{ Name = "Main Server File"; Test = { Test-Path "$ProjectRoot\System\server\main-server.js" } },
+        @{ Name = "Package.json"; Test = { Test-Path "$ProjectRoot\System\server\package.json" } },
+        @{ Name = "Student Database"; Test = { Test-Path "$ProjectRoot\Student-Data\students-database.xlsx" } },
+        @{ Name = "Web Interface"; Test = { Test-Path "$ProjectRoot\System\web-interface" } },
+        @{ Name = "SSL Certificates"; Test = { (Test-Path "$ProjectRoot\System\server\certs\server.key") -and (Test-Path "$ProjectRoot\System\server\certs\server.crt") } },
+        @{ Name = "Node Modules"; Test = { Test-Path "$ProjectRoot\System\server\node_modules" } },
         @{ Name = "Port 3000 Free"; Test = { -not (Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue) } },
         @{ Name = "Port 3443 Free"; Test = { -not (Get-NetTCPConnection -LocalPort 3443 -ErrorAction SilentlyContinue) } },
         @{ Name = "Disk Space"; Test = { (Get-WmiObject -Class Win32_LogicalDisk -Filter "DeviceID='C:'").FreeSpace -gt 1GB } },
@@ -275,7 +275,7 @@ function New-SSLCertificate {
     Write-EnhancedLog "🔐 Generating SSL certificates..." -Color $Colors.Process -Level "Info"
     
     try {
-        $certDir = Join-Path $ServerDir "certs"
+        $certDir = Join-Path $ProjectRoot "System\server\certs"
         $keyPath = Join-Path $certDir "server.key"
         $certPath = Join-Path $certDir "server.crt"
         
@@ -354,7 +354,7 @@ function Install-Dependencies {
     Write-EnhancedLog "📦 Installing/Updating dependencies..." -Color $Colors.Process -Level "Info"
     
     try {
-        Push-Location $ServerDir
+        Push-Location (Join-Path $ProjectRoot "System\server")
         
         # Backup existing node_modules if Force is specified
         if ($Force -and (Test-Path "node_modules")) {
@@ -396,7 +396,7 @@ function Start-System {
     Write-EnhancedLog "🚀 Starting Student Lab System..." -Color $Colors.Process -Level "Info"
     
     try {
-        Push-Location $ServerDir
+        Push-Location (Join-Path $ProjectRoot "System\server")
         
         if ($TestOnly) {
             Write-EnhancedLog "   Testing system startup..." -Color $Colors.Info -Level "Debug"

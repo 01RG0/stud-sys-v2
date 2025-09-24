@@ -78,7 +78,7 @@ if %errorlevel% equ 0 (
 )
 
 REM Check main server file
-if exist "System\server\main-server.js" (
+if exist "%~dp0System\server\main-server.js" (
     call :LogMessage "✅ Main Server File: OK" "INFO" "SUCCESS"
     set /a "PassedChecks+=1"
 ) else (
@@ -87,7 +87,7 @@ if exist "System\server\main-server.js" (
 )
 
 REM Check package.json
-if exist "System\server\package.json" (
+if exist "%~dp0System\server\package.json" (
     call :LogMessage "✅ Package.json: OK" "INFO" "SUCCESS"
     set /a "PassedChecks+=1"
 ) else (
@@ -96,7 +96,7 @@ if exist "System\server\package.json" (
 )
 
 REM Check student database
-if exist "Student-Data\students-database.xlsx" (
+if exist "%~dp0Student-Data\students-database.xlsx" (
     call :LogMessage "✅ Student Database: OK" "INFO" "SUCCESS"
     set /a "PassedChecks+=1"
 ) else (
@@ -105,7 +105,7 @@ if exist "Student-Data\students-database.xlsx" (
 )
 
 REM Check web interface
-if exist "System\web-interface" (
+if exist "%~dp0System\web-interface" (
     call :LogMessage "✅ Web Interface: OK" "INFO" "SUCCESS"
     set /a "PassedChecks+=1"
 ) else (
@@ -114,7 +114,7 @@ if exist "System\web-interface" (
 )
 
 REM Check SSL certificates
-if exist "System\server\certs\server.key" if exist "System\server\certs\server.crt" (
+if exist "%~dp0System\server\certs\server.key" if exist "%~dp0System\server\certs\server.crt" (
     call :LogMessage "✅ SSL Certificates: OK" "INFO" "SUCCESS"
     set /a "PassedChecks+=1"
 ) else (
@@ -124,7 +124,7 @@ if exist "System\server\certs\server.key" if exist "System\server\certs\server.c
 )
 
 REM Check node_modules
-if exist "System\server\node_modules" (
+if exist "%~dp0System\server\node_modules" (
     call :LogMessage "✅ Node Modules: OK" "INFO" "SUCCESS"
     set /a "PassedChecks+=1"
 ) else (
@@ -229,7 +229,7 @@ REM Generate certificates function
 :GenerateCerts
 call :LogMessage "🔐 Generating SSL certificates..." "PROCESS" "PROCESS"
 
-if not exist "System\server\certs" mkdir "System\server\certs"
+if not exist "%~dp0System\server\certs" mkdir "%~dp0System\server\certs"
 
 REM Find OpenSSL executable
 set "OpenSSLExe="
@@ -251,7 +251,7 @@ if "%OpenSSLExe%"=="" (
 
 REM Generate private key
 call :LogMessage "   Generating private key..." "INFO" "INFO"
-"%OpenSSLExe%" genrsa -out "System\server\certs\server.key" 2048
+"%OpenSSLExe%" genrsa -out "%~dp0System\server\certs\server.key" 2048
 if %errorlevel% neq 0 (
     call :LogMessage "❌ Failed to generate private key" "ERROR" "ERROR"
     goto :eof
@@ -259,7 +259,7 @@ if %errorlevel% neq 0 (
 
 REM Generate certificate
 call :LogMessage "   Generating certificate..." "INFO" "INFO"
-"%OpenSSLExe%" req -new -x509 -key "System\server\certs\server.key" -out "System\server\certs\server.crt" -days 365 -subj "/C=US/ST=State/L=City/O=StudentLabSystem/CN=localhost"
+"%OpenSSLExe%" req -new -x509 -key "%~dp0System\server\certs\server.key" -out "%~dp0System\server\certs\server.crt" -days 365 -subj "/C=US/ST=State/L=City/O=StudentLabSystem/CN=localhost"
 if %errorlevel% neq 0 (
     call :LogMessage "❌ Failed to generate certificate" "ERROR" "ERROR"
     goto :eof
@@ -272,7 +272,7 @@ REM Install dependencies function
 :InstallDeps
 call :LogMessage "📦 Installing dependencies..." "PROCESS" "PROCESS"
 
-cd /d "System\server"
+cd /d "%~dp0System\server"
 
 REM Clean install if needed
 if exist "node_modules" (
@@ -362,7 +362,7 @@ if %HealthScore% geq 60 (
         call :LogMessage "   Press Ctrl+C to stop" "WARNING" "WARNING"
         echo.
         
-        cd /d "System\server"
+        cd /d "%~dp0System\server"
         node main-server.js
     ) else (
         echo.

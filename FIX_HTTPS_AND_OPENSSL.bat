@@ -81,9 +81,9 @@ exit /b 1
 echo.
 echo 🔐 Checking SSL certificates...
 
-if not exist "System\server\certs" mkdir "System\server\certs"
+if not exist "%~dp0System\server\certs" mkdir "%~dp0System\server\certs"
 
-if exist "System\server\certs\server.key" if exist "System\server\certs\server.crt" (
+if exist "%~dp0System\server\certs\server.key" if exist "%~dp0System\server\certs\server.crt" (
     echo ✅ SSL certificates already exist
     goto :test_system
 )
@@ -92,7 +92,7 @@ echo 📦 Generating SSL certificates...
 
 REM Generate private key
 echo    Generating private key...
-openssl genrsa -out "System\server\certs\server.key" 2048
+openssl genrsa -out "%~dp0System\server\certs\server.key" 2048
 if %errorlevel% neq 0 (
     echo ❌ Failed to generate private key
     pause
@@ -101,7 +101,7 @@ if %errorlevel% neq 0 (
 
 REM Generate certificate
 echo    Generating certificate...
-openssl req -new -x509 -key "System\server\certs\server.key" -out "System\server\certs\server.crt" -days 365 -subj "/C=US/ST=State/L=City/O=StudentLabSystem/CN=localhost"
+openssl req -new -x509 -key "%~dp0System\server\certs\server.key" -out "%~dp0System\server\certs\server.crt" -days 365 -subj "/C=US/ST=State/L=City/O=StudentLabSystem/CN=localhost"
 if %errorlevel% neq 0 (
     echo ❌ Failed to generate certificate
     pause
@@ -155,7 +155,7 @@ if exist "System\server\certs\server.key" if exist "System\server\certs\server.c
 )
 
 REM Check main server file
-if exist "System\server\main-server.js" (
+if exist "%~dp0System\server\main-server.js" (
     echo ✅ Main server: Present
 ) else (
     echo ❌ Main server file missing
@@ -163,7 +163,7 @@ if exist "System\server\main-server.js" (
 )
 
 REM Check package.json
-if exist "System\server\package.json" (
+if exist "%~dp0System\server\package.json" (
     echo ✅ Package.json: Present
 ) else (
     echo ❌ Package.json missing
@@ -195,7 +195,7 @@ if /i "%startNow%"=="y" (
     echo    Press Ctrl+C to stop
     echo.
     
-    cd /d "System\server"
+    cd /d "%~dp0System\server"
     
     REM Install dependencies if needed
     if not exist "node_modules" (

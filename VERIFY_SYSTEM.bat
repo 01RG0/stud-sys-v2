@@ -10,21 +10,21 @@ cd /d "%BASE_DIR%"
 echo Checking folder structure...
 echo.
 
-if exist "System\server" (
+if exist "%~dp0System\server" (
     echo ✅ System\server folder exists
 ) else (
     echo ❌ System\server folder missing
     goto :error
 )
 
-if exist "System\web-interface" (
+if exist "%~dp0System\web-interface" (
     echo ✅ System\web-interface folder exists
 ) else (
     echo ❌ System\web-interface folder missing
     goto :error
 )
 
-if exist "Student-Data" (
+if exist "%~dp0Student-Data" (
     echo ✅ Student-Data folder exists
 ) else (
     echo ❌ Student-Data folder missing
@@ -34,21 +34,21 @@ if exist "Student-Data" (
 echo.
 echo Checking server files...
 
-if exist "System\server\main-server.js" (
+if exist "%~dp0System\server\main-server.js" (
     echo ✅ main-server.js exists
 ) else (
     echo ❌ main-server.js missing
     goto :error
 )
 
-if exist "System\server\package.json" (
+if exist "%~dp0System\server\package.json" (
     echo ✅ package.json exists
 ) else (
     echo ❌ package.json missing
     goto :error
 )
 
-if exist "System\server\node_modules" (
+if exist "%~dp0System\server\node_modules" (
     echo ✅ node_modules exists
 ) else (
     echo ❌ node_modules missing
@@ -58,56 +58,56 @@ if exist "System\server\node_modules" (
 echo.
 echo Checking web interface files...
 
-if exist "System\web-interface\pages\Entry-Scanner.html" (
+if exist "%~dp0System\web-interface\pages\Entry-Scanner.html" (
     echo ✅ Entry-Scanner.html exists
 ) else (
     echo ❌ Entry-Scanner.html missing
     goto :error
 )
 
-if exist "System\web-interface\pages\Exit-Validator.html" (
+if exist "%~dp0System\web-interface\pages\Exit-Validator.html" (
     echo ✅ Exit-Validator.html exists
 ) else (
     echo ❌ Exit-Validator.html missing
     goto :error
 )
 
-if exist "System\web-interface\pages\Admin-Dashboard.html" (
+if exist "%~dp0System\web-interface\pages\Admin-Dashboard.html" (
     echo ✅ Admin-Dashboard.html exists
 ) else (
     echo ❌ Admin-Dashboard.html missing
     goto :error
 )
 
-if exist "System\web-interface\scripts\Entry-Scanner.js" (
+if exist "%~dp0System\web-interface\scripts\Entry-Scanner.js" (
     echo ✅ Entry-Scanner.js exists
 ) else (
     echo ❌ Entry-Scanner.js missing
     goto :error
 )
 
-if exist "System\web-interface\scripts\Exit-Validator.js" (
+if exist "%~dp0System\web-interface\scripts\Exit-Validator.js" (
     echo ✅ Exit-Validator.js exists
 ) else (
     echo ❌ Exit-Validator.js missing
     goto :error
 )
 
-if exist "System\web-interface\scripts\Admin-Dashboard.js" (
+if exist "%~dp0System\web-interface\scripts\Admin-Dashboard.js" (
     echo ✅ Admin-Dashboard.js exists
 ) else (
     echo ❌ Admin-Dashboard.js missing
     goto :error
 )
 
-if exist "System\web-interface\styles\main-styles.css" (
+if exist "%~dp0System\web-interface\styles\main-styles.css" (
     echo ✅ main-styles.css exists
 ) else (
     echo ❌ main-styles.css missing
     goto :error
 )
 
-if exist "System\web-interface\libraries\qr-scanner-library.js" (
+if exist "%~dp0System\web-interface\libraries\qr-scanner-library.js" (
     echo ✅ qr-scanner-library.js exists
 ) else (
     echo ❌ qr-scanner-library.js missing
@@ -117,7 +117,7 @@ if exist "System\web-interface\libraries\qr-scanner-library.js" (
 echo.
 echo Checking data files...
 
-if exist "Student-Data\students-database.xlsx" (
+if exist "%~dp0Student-Data\students-database.xlsx" (
     echo ✅ students-database.xlsx exists
 ) else (
     echo ⚠️  students-database.xlsx missing (will use sample data)
@@ -126,7 +126,7 @@ if exist "Student-Data\students-database.xlsx" (
 echo.
 echo Checking scripts...
 
-if exist "Scripts\daily-export-tool.js" (
+if exist "%~dp0Scripts\daily-export-tool.js" (
     echo ✅ daily-export-tool.js exists
 ) else (
     echo ❌ daily-export-tool.js missing

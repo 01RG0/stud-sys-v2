@@ -115,10 +115,14 @@ function Install-OpenSSL {
 
 function New-SSLCertificate {
     param(
-        [string]$CertDir = "System\server\certs",
+        [string]$CertDir = "",
         [string]$KeyFile = "server.key",
         [string]$CertFile = "server.crt"
     )
+    
+    if (-not $CertDir) {
+        $CertDir = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "System\server\certs"
+    }
     
     Write-ColorOutput "🔐 Generating SSL certificates..." -Color $Colors.Info
     
@@ -239,7 +243,7 @@ function Test-SystemHealth {
     }
     
     # Check certificates
-    $certDir = "System\server\certs"
+    $certDir = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "System\server\certs"
     $keyPath = Join-Path $certDir "server.key"
     $certPath = Join-Path $certDir "server.crt"
     
@@ -250,14 +254,15 @@ function Test-SystemHealth {
     }
     
     # Check main server file
-    if (Test-Path "System\server\main-server.js") {
+    $serverDir = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "System\server"
+    if (Test-Path (Join-Path $serverDir "main-server.js")) {
         Write-ColorOutput "✅ Main server: Present" -Color $Colors.Success
     } else {
         $issues += "Main server file missing"
     }
     
     # Check package.json
-    if (Test-Path "System\server\package.json") {
+    if (Test-Path (Join-Path $serverDir "package.json")) {
         Write-ColorOutput "✅ Package.json: Present" -Color $Colors.Success
     } else {
         $issues += "Package.json missing"
@@ -278,7 +283,7 @@ function Test-SystemHealth {
 function Start-System {
     Write-ColorOutput "🚀 Starting Student Lab System..." -Color $Colors.Info
     
-    $serverDir = "System\server"
+    $serverDir = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "System\server"
     if (!(Test-Path $serverDir)) {
         Write-ColorOutput "❌ Server directory not found: $serverDir" -Color $Colors.Error
         return $false

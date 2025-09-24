@@ -64,7 +64,7 @@ if %errorlevel% equ 0 (
 
 goto :eof
 
-cd /d "C:\Users\hamad\Desktop\stud sys v2\System\server"
+cd /d "%~dp0System\server"
 
 call :LogMessage "🔍 Checking system..." "INFO" "INFO"
 

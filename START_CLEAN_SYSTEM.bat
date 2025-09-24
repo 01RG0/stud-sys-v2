@@ -4,7 +4,7 @@ echo   Student Lab System - Auto-Detect
 echo ========================================
 echo.
 
-cd /d "C:\Users\hamad\Desktop\stud sys v2\System\server"
+cd /d "%~dp0System\server"
 
 echo Checking system...
 if not exist "package.json" (

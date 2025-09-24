@@ -5,7 +5,8 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Change to the server directory
-Set-Location "C:\Users\hamad\Desktop\stud-sys-v2\System\server"
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+Set-Location "$ScriptDir\System\server"
 
 Write-Host "Checking system..." -ForegroundColor Yellow
 

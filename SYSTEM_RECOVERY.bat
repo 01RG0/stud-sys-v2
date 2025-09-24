@@ -77,13 +77,13 @@ if %errorlevel% equ 0 (
 )
 
 REM Remove node_modules and package-lock.json
-if exist "System\server\node_modules" (
-    rmdir /s /q "System\server\node_modules" >nul 2>nul
+if exist "%~dp0System\server\node_modules" (
+    rmdir /s /q "%~dp0System\server\node_modules" >nul 2>nul
     call :LogMessage "✅ node_modules removed" "INFO" "SUCCESS"
 )
 
-if exist "System\server\package-lock.json" (
-    del "System\server\package-lock.json" >nul 2>nul
+if exist "%~dp0System\server\package-lock.json" (
+    del "%~dp0System\server\package-lock.json" >nul 2>nul
     call :LogMessage "✅ package-lock.json removed" "INFO" "SUCCESS"
 )
 
@@ -94,7 +94,7 @@ REM Reinstall dependencies
 :ReinstallDeps
 call :LogMessage "🔄 Reinstalling dependencies..." "PROCESS" "PROCESS"
 
-cd /d "System\server"
+cd /d "%~dp0System\server"
 
 REM Install dependencies
 npm install --production --silent
@@ -113,13 +113,13 @@ REM Regenerate certificates
 call :LogMessage "🔄 Regenerating SSL certificates..." "PROCESS" "PROCESS"
 
 REM Remove existing certificates
-if exist "System\server\certs" (
-    rmdir /s /q "System\server\certs" >nul 2>nul
+if exist "%~dp0System\server\certs" (
+    rmdir /s /q "%~dp0System\server\certs" >nul 2>nul
     call :LogMessage "✅ Old certificates removed" "INFO" "SUCCESS"
 )
 
 REM Create new certificate directory
-mkdir "System\server\certs" >nul 2>nul
+mkdir "%~dp0System\server\certs" >nul 2>nul
 
 REM Find OpenSSL
 set "OpenSSLExe="
@@ -140,7 +140,7 @@ if "%OpenSSLExe%"=="" (
 )
 
 REM Generate new certificates
-"%OpenSSLExe%" genrsa -out "System\server\certs\server.key" 2048 >nul 2>nul
+"%OpenSSLExe%" genrsa -out "%~dp0System\server\certs\server.key" 2048 >nul 2>nul
 if %errorlevel% equ 0 (
     call :LogMessage "✅ Private key generated" "INFO" "SUCCESS"
 ) else (
@@ -148,7 +148,7 @@ if %errorlevel% equ 0 (
     goto :eof
 )
 
-"%OpenSSLExe%" req -new -x509 -key "System\server\certs\server.key" -out "System\server\certs\server.crt" -days 365 -subj "/C=US/ST=State/L=City/O=StudentLabSystem/CN=localhost" >nul 2>nul
+"%OpenSSLExe%" req -new -x509 -key "%~dp0System\server\certs\server.key" -out "%~dp0System\server\certs\server.crt" -days 365 -subj "/C=US/ST=State/L=City/O=StudentLabSystem/CN=localhost" >nul 2>nul
 if %errorlevel% equ 0 (
     call :LogMessage "✅ Certificate generated" "INFO" "SUCCESS"
     set /a "SuccessCount+=1"
@@ -196,7 +196,7 @@ if %errorlevel% equ 0 (
 )
 
 REM Check main server file
-if exist "System\server\main-server.js" (
+if exist "%~dp0System\server\main-server.js" (
     call :LogMessage "✅ Main Server: OK" "INFO" "SUCCESS"
     set /a "HealthScore+=1"
 ) else (
@@ -204,7 +204,7 @@ if exist "System\server\main-server.js" (
 )
 
 REM Check package.json
-if exist "System\server\package.json" (
+if exist "%~dp0System\server\package.json" (
     call :LogMessage "✅ Package.json: OK" "INFO" "SUCCESS"
     set /a "HealthScore+=1"
 ) else (
@@ -212,7 +212,7 @@ if exist "System\server\package.json" (
 )
 
 REM Check node_modules
-if exist "System\server\node_modules" (
+if exist "%~dp0System\server\node_modules" (
     call :LogMessage "✅ Node Modules: OK" "INFO" "SUCCESS"
     set /a "HealthScore+=1"
 ) else (
@@ -220,7 +220,7 @@ if exist "System\server\node_modules" (
 )
 
 REM Check SSL certificates
-if exist "System\server\certs\server.key" if exist "System\server\certs\server.crt" (
+if exist "%~dp0System\server\certs\server.key" if exist "%~dp0System\server\certs\server.crt" (
     call :LogMessage "✅ SSL Certificates: OK" "INFO" "SUCCESS"
     set /a "HealthScore+=1"
 ) else (
