@@ -221,6 +221,19 @@ body {
     background-color: #e1bee7;
 }
 
+.exit-table-btn {
+    background-color: #fff3e0;
+    color: #f57c00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.exit-table-btn:hover {
+    background-color: #ffe0b2;
+}
+
 /* Live Devices Section */
 .live-devices-section {
     margin-bottom: 16px;

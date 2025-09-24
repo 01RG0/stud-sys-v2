@@ -40,6 +40,9 @@
     // Setup export button
     document.getElementById('export-btn').addEventListener('click', exportToExcel);
     
+    // Setup reset button
+    document.getElementById('reset-btn').addEventListener('click', showResetConfirmation);
+    
     // Setup refresh table button
     const refreshBtn = document.getElementById('refresh-table');
     if (refreshBtn) {
@@ -484,6 +487,82 @@
       exportBtn.disabled = false;
       exportBtn.innerHTML = originalText;
     }
+  }
+
+  // Password-Protected Reset Functions
+  function showResetConfirmation() {
+    // Create password dialog
+    const password = prompt('Enter password to reset all data:');
+    
+    if (password === null) {
+      // User cancelled
+      return;
+    }
+    
+    if (password !== '1234') {
+      showNotification('❌ Invalid password!', 'error');
+      return;
+    }
+    
+    // Password is correct, show final confirmation
+    const confirmed = confirm(
+      '⚠️ WARNING: This will permanently delete ALL local data!\n\n' +
+      'This includes:\n' +
+      '• All registered students for today\n' +
+      '• All validation logs\n' +
+      '• All local storage data\n\n' +
+      'Are you sure you want to continue?'
+    );
+    
+    if (confirmed) {
+      resetAllData();
+    }
+  }
+
+  function resetAllData() {
+    try {
+      // Clear all local storage data
+      localStorage.removeItem('exitValidatorToday');
+      localStorage.removeItem('exitValidatorLogs');
+      
+      // Clear in-memory data
+      const today = todayKey();
+      registeredByDate[today] = {};
+      
+      // Update UI
+      updateStudentsTable();
+      
+      // Show success notification
+      showNotification('✅ All data has been reset successfully!', 'success');
+      
+      console.log('All Exit Validator data has been reset');
+      
+    } catch (error) {
+      console.error('Failed to reset data:', error);
+      showNotification('❌ Failed to reset data. Please try again.', 'error');
+    }
+  }
+
+  function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
+      <span>${message}</span>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 4000);
   }
 
 

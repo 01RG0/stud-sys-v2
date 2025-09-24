@@ -88,6 +88,50 @@ function broadcastToAdmins(message) {
   }
 }
 
+// Broadcast updated statistics to all admin dashboards
+function broadcastUpdatedStats() {
+  const uptime = Date.now() - serverStartTime;
+  const now = Date.now();
+  const onlineDevices = Array.from(devices.values()).filter(d => d.lastSeen && (now - d.lastSeen < 30000));
+  const activeScanners = onlineDevices.filter(d => d.role === 'first_scan' || d.role === 'last_scan').length;
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Count today's registrations from logs
+  let todayRegistrations = 0;
+  try {
+    const logsDir = path.join(__dirname, '..', '..', 'Logs');
+    const file = path.join(logsDir, `registrations-${today}.json`);
+    if (fs.existsSync(file)) {
+      const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+      todayRegistrations = data.filter(record => record.record && record.record.student_id).length;
+    }
+  } catch (error) {
+    console.error('Error counting today registrations:', error);
+  }
+  
+  // Count system errors from logs
+  const systemErrors = systemLogs.filter(log => log.level === 'error').length;
+  
+  const stats = {
+    totalStudents: Object.keys(studentCache).length,
+    activeScanners: activeScanners,
+    todayRegistrations: todayRegistrations,
+    systemErrors: systemErrors,
+    totalDevices: devices.size,
+    onlineDevices: onlineDevices.length,
+    totalRegistrations,
+    totalValidations,
+    serverUptime: uptime,
+    systemLogsCount: systemLogs.length
+  };
+  
+  broadcastToAdmins({
+    type: 'server_stats',
+    stats,
+    timestamp: new Date().toISOString()
+  });
+}
+
 function loadStudentData() {
   try {
     // Look for student data in organized location
@@ -275,6 +319,72 @@ app.get('/api/live-devices', (req, res) => {
     onlineDevices: liveDevices.filter(d => d.status === 'online').length,
     timestamp: now
   });
+});
+
+// Exit Validator data endpoint
+app.get('/api/exit-validator-data', (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const logsDir = path.join(__dirname, '..', '..', 'Logs');
+    const file = path.join(logsDir, `registrations-${today}.json`);
+    
+    let students = [];
+    
+    if (fs.existsSync(file)) {
+      const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+      
+      // Process registration data and combine with student database
+      const processedStudents = new Map(); // Use Map to avoid duplicates
+      
+      data.forEach(record => {
+        if (record.record && record.record.student_id) {
+          const studentId = record.record.student_id;
+          const studentData = studentCache[studentId] || {};
+          
+          // Create comprehensive student record
+          const studentRecord = {
+            timestamp: record.timestamp || new Date().toISOString(),
+            student_id: studentId,
+            student_name: studentData.name || record.record.student_name || 'Unknown',
+            center: studentData.center || record.record.center || 'Unknown',
+            subject: studentData.subject || record.record.subject || 'Unknown',
+            grade: studentData.grade || record.record.grade || 'Unknown',
+            fees: studentData.fees || record.record.fees || '0',
+            phone: studentData.phone || record.record.phone || '',
+            parent_phone: studentData.parent_phone || record.record.parent_phone || '',
+            payment_amount: record.record.payment_amount || 0,
+            homework_score: record.record.homework_score || studentData.homework_score || '',
+            exam_score: record.record.exam_score || studentData.exam_score || '',
+            entry_method: record.record.entry_method || 'QR Scan',
+            device_name: record.record.device_name || 'Unknown Device',
+            comment: record.record.comment || '',
+            error_detail: record.record.error_detail || ''
+          };
+          
+          // Use student_id as key to avoid duplicates, keep the latest record
+          processedStudents.set(studentId, studentRecord);
+        }
+      });
+      
+      // Convert Map to Array
+      students = Array.from(processedStudents.values());
+    }
+    
+    res.json({
+      students: students,
+      totalStudents: students.length,
+      date: today,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Error fetching exit validator data:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch exit validator data',
+      students: [],
+      totalStudents: 0
+    });
+  }
 });
 
 // Validation log endpoint
@@ -526,6 +636,9 @@ function handleWebSocketConnection(ws, source) {
           timestamp: new Date().toISOString()
         });
         
+        // Broadcast updated stats (active scanners count changed)
+        broadcastUpdatedStats();
+        
         return;
       }
       
@@ -565,6 +678,9 @@ function handleWebSocketConnection(ws, source) {
           timestamp: new Date().toISOString()
         });
         
+        // Broadcast updated stats to all admin dashboards
+        broadcastUpdatedStats();
+        
         return;
       }
       
@@ -593,10 +709,34 @@ function handleWebSocketConnection(ws, source) {
       if (data.type === 'request_stats') {
         // Send server statistics to requesting admin
         const uptime = Date.now() - serverStartTime;
+        const now = Date.now();
+        const onlineDevices = Array.from(devices.values()).filter(d => d.lastSeen && (now - d.lastSeen < 30000));
+        const activeScanners = onlineDevices.filter(d => d.role === 'first_scan' || d.role === 'last_scan').length;
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Count today's registrations from logs
+        let todayRegistrations = 0;
+        try {
+          const logsDir = path.join(__dirname, '..', '..', 'Logs');
+          const file = path.join(logsDir, `registrations-${today}.json`);
+          if (fs.existsSync(file)) {
+            const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+            todayRegistrations = data.filter(record => record.record && record.record.student_id).length;
+          }
+        } catch (error) {
+          console.error('Error counting today registrations:', error);
+        }
+        
+        // Count system errors from logs
+        const systemErrors = systemLogs.filter(log => log.level === 'error').length;
+        
         const stats = {
-          totalDevices: devices.size,
-          onlineDevices: Array.from(devices.values()).filter(d => d.lastSeen && (Date.now() - d.lastSeen < 30000)).length,
           totalStudents: Object.keys(studentCache).length,
+          activeScanners: activeScanners,
+          todayRegistrations: todayRegistrations,
+          systemErrors: systemErrors,
+          totalDevices: devices.size,
+          onlineDevices: onlineDevices.length,
           totalRegistrations,
           totalValidations,
           serverUptime: uptime,
@@ -637,6 +777,9 @@ function handleWebSocketConnection(ws, source) {
       });
       
       devices.delete(ws);
+      
+      // Broadcast updated stats (active scanners count changed)
+      broadcastUpdatedStats();
     } else {
       logToSystem('info', 'WebSocket connection closed');
     }

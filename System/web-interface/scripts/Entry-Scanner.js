@@ -213,6 +213,12 @@
       manualEntryBtn.addEventListener('click', showManualEntryForm);
     }
     
+    // Setup reset data button
+    const resetDataBtn = document.getElementById('reset-data-btn');
+    if (resetDataBtn) {
+      resetDataBtn.addEventListener('click', showResetConfirmation);
+    }
+    
     video = document.getElementById('camera');
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
@@ -825,6 +831,55 @@
   window.cancelManualEntry = cancelManualEntry;
   window.submitManualEntry = submitManualEntry;
 
+
+  // Reset Data Functions
+  function showResetConfirmation() {
+    const password = prompt('Enter password to reset all data:');
+    
+    if (password === null) {
+      return;
+    }
+    
+    if (password !== '1234') {
+      showNotification('❌ Invalid password!', 'error');
+      return;
+    }
+    
+    const confirmed = confirm(
+      '⚠️ WARNING: This will permanently delete ALL local data!\n\n' +
+      'This includes:\n' +
+      '• All scanned student records\n' +
+      '• All offline queue data\n' +
+      '• All local storage data\n\n' +
+      'Are you sure you want to continue?'
+    );
+    
+    if (confirmed) {
+      resetAllData();
+    }
+  }
+
+  function resetAllData() {
+    try {
+      // Clear all localStorage data
+      localStorage.removeItem('entryScanRecords');
+      localStorage.removeItem('entryScanOfflineQueue');
+      
+      // Clear in-memory data
+      offlineQueue = [];
+      
+      // Reset UI
+      updateOfflineIndicator();
+      
+      showNotification('✅ All data has been reset successfully!', 'success');
+      
+      console.log('All Entry Scanner data has been reset');
+      
+    } catch (error) {
+      console.error('Failed to reset data:', error);
+      showNotification('❌ Failed to reset data. Please try again.', 'error');
+    }
+  }
 
   // Initialize when page loads
   window.addEventListener('load', init);

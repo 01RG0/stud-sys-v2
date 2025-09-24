@@ -27,8 +27,8 @@
       
       // Register as admin dashboard
       ws.send(JSON.stringify({ 
-        type: 'register_device',
-        role: 'admin_dashboard',
+        type: 'register_device', 
+        role: 'admin_dashboard', 
         name: 'Admin Dashboard'
       }));
       
@@ -121,6 +121,9 @@
 
     // Setup live devices functionality
     setupLiveDevices();
+    
+    // Setup exit table download
+    setupExitTableDownload();
   }
 
   function updateSystemInfo(data) {
@@ -314,6 +317,85 @@
       return `${minutes}m ${seconds % 60}s`;
     } else {
       return `${seconds}s`;
+    }
+  }
+
+  // Exit Table Download Function
+  function setupExitTableDownload() {
+    const downloadBtn = document.getElementById('download-exit-table');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', downloadExitTableExcel);
+    }
+  }
+
+  async function downloadExitTableExcel() {
+    try {
+      // Show loading state
+      const btn = document.getElementById('download-exit-table');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+      btn.disabled = true;
+
+      const response = await fetch('/api/exit-validator-data');
+      const data = await response.json();
+      
+      if (!data.students || data.students.length === 0) {
+        alert('No data to download');
+        return;
+      }
+
+      // Create Excel content using XLSX library
+      const worksheet = XLSX.utils.json_to_sheet(
+        data.students.map(student => {
+          const date = new Date(student.timestamp);
+          return {
+            'Date': date.toLocaleDateString(),
+            'Time': date.toLocaleTimeString(),
+            'Student ID': student.student_id || '',
+            'Name': student.student_name || '',
+            'Center': student.center || '',
+            'Subject': student.subject || '',
+            'Grade': student.grade || '',
+            'Fees': student.fees || '0',
+            'Payment Amount': student.payment_amount ? student.payment_amount.toFixed(2) : '0.00',
+            'Homework Score': student.homework_score || '',
+            'Exam Score': student.exam_score || '',
+            'Entry Method': student.entry_method === 'manual' ? 'Manual Entry' : 'QR Scan',
+            'Device': student.device_name || '',
+            'Phone': student.phone || '',
+            'Parent Phone': student.parent_phone || '',
+            'Comment': student.comment || '',
+            'Error Detail': student.error_detail || ''
+          };
+        })
+      );
+
+      // Create workbook and add worksheet
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Exit Validator Data');
+
+      // Generate Excel file
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      
+      // Create blob and download
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `exit-validator-data-${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      console.log(`Downloaded Excel file with ${data.students.length} student records`);
+      
+    } catch (error) {
+      console.error('Failed to download exit validator data:', error);
+      alert('Failed to download data. Please try again.');
+    } finally {
+      // Restore button state
+      const btn = document.getElementById('download-exit-table');
+      btn.innerHTML = '<i class="fas fa-download"></i> Download Exit Table';
+      btn.disabled = false;
     }
   }
 

@@ -382,6 +382,15 @@
   background-color: #5a6268;
 }
 
+.form-controls .btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.form-controls .btn-danger:hover {
+  background-color: #c82333;
+}
+
 #student-form {
   padding: 30px;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
