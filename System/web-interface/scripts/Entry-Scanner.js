@@ -1135,7 +1135,7 @@
       <div class="simple-entry-form">
         <div class="form-header">
           <h3><i class="fas fa-keyboard"></i> Quick Student Entry</h3>
-          <p class="form-instructions">Press <strong>Enter</strong> to move to next field. Final <strong>Enter</strong> registers student.</p>
+          <p class="form-instructions">Press <strong>Enter</strong> to move to next field. Final <strong>Enter</strong> registers student. <em>All fields are optional.</em></p>
         </div>
         
         <div class="form-steps">
@@ -1172,7 +1172,7 @@
           
           <div class="form-fields">
             <div class="field-group active" data-field="1">
-              <label for="simple-name">Student Name *</label>
+              <label for="simple-name">Student Name</label>
               <input type="text" id="simple-name" placeholder="Enter student name" autofocus>
               <div class="field-hint">Press Enter to continue</div>
             </div>
@@ -1217,7 +1217,7 @@
                     <i class="fas fa-times"></i>
                     Cancel
                   </button>
-                  <button type="button" class="btn btn-primary" onclick="registerSimpleStudent()">
+                  <button type="button" class="btn btn-primary" id="register-simple-btn">
                     <i class="fas fa-check"></i>
                     Register Student
                   </button>
@@ -1465,6 +1465,18 @@
       }
     });
     
+    // Add click event listener to register button
+    const registerBtn = document.getElementById('register-simple-btn');
+    if (registerBtn) {
+      registerBtn.addEventListener('click', () => {
+        console.log('🔧 Register button clicked');
+        registerSimpleStudent();
+      });
+      console.log('✅ Register button event listener added');
+    } else {
+      console.error('❌ Register button not found');
+    }
+    
     console.log('✅ Simple entry form setup complete');
   }
   
@@ -1649,12 +1661,8 @@
     
     console.log('🔧 Form values:', { name, center, grade, phone, subject, payment });
     
-    // Validate required field
-    if (!name) {
-      console.log('❌ Name is required');
-      alert('Please enter the student name');
-      return;
-    }
+    // No validation required - all fields are optional
+    console.log('✅ All fields are optional - proceeding with registration');
     
     // Auto-generate ID
     const studentId = `STU${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
