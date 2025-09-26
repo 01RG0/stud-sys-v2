@@ -272,7 +272,7 @@ REM Install dependencies function
 :InstallDeps
 call :LogMessage "📦 Installing dependencies..." "PROCESS" "PROCESS"
 
-cd /d "%~dp0System\server"
+cd /d "%~dp0..\..\System\server"
 
 REM Clean install if needed
 if exist "node_modules" (
@@ -362,7 +362,7 @@ if %HealthScore% geq 60 (
         call :LogMessage "   Press Ctrl+C to stop" "WARNING" "WARNING"
         echo.
         
-        cd /d "%~dp0System\server"
+        cd /d "%~dp0..\..\System\server"
         node main-server.js
     ) else (
         echo.

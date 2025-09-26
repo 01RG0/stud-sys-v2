@@ -94,7 +94,7 @@ REM Reinstall dependencies
 :ReinstallDeps
 call :LogMessage "🔄 Reinstalling dependencies..." "PROCESS" "PROCESS"
 
-cd /d "%~dp0System\server"
+cd /d "%~dp0..\..\System\server"
 
 REM Install dependencies
 npm install --production --silent

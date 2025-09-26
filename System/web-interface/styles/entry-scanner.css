@@ -23,6 +23,56 @@
   text-align: center;
 }
 
+/* Auto-Login Option Styles */
+.auto-login-option {
+  margin-bottom: 30px;
+}
+
+.auto-login-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #3498db;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.auto-login-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.auto-login-header i {
+  color: #3498db;
+  font-size: 24px;
+}
+
+.auto-login-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 18px;
+}
+
+.auto-login-content p {
+  margin: 0 0 20px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.auto-login-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.auto-login-actions .btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  min-width: 120px;
+}
+
 .setup-header {
   margin-bottom: 30px;
 }
@@ -948,5 +998,262 @@
     right: 10px;
     left: 10px;
     max-width: none;
+  }
+}
+
+/* ========================================
+   SIMPLIFIED ENTRY FORM STYLES
+   ======================================== */
+
+.simple-entry-form, .qr-student-form {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.form-header h3 {
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.form-instructions {
+  color: #7f8c8d;
+  font-size: 14px;
+  margin: 0;
+}
+
+.form-instructions strong {
+  color: #3498db;
+  font-weight: 600;
+}
+
+/* Step Indicator */
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.4;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  opacity: 1;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e9ecef;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+  background: #3498db;
+  color: white;
+}
+
+.step-label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.step.active .step-label {
+  color: #3498db;
+}
+
+/* Form Fields */
+.form-fields {
+  position: relative;
+  min-height: 200px;
+}
+
+.field-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.field-group.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+.field-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.field-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.field-group input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.field-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+/* Student Preview (QR Form) */
+.student-preview {
+  margin-bottom: 24px;
+}
+
+.student-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.student-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+}
+
+.student-info h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 18px;
+}
+
+.student-info p {
+  margin: 4px 0;
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+/* Register Confirmation */
+.register-confirmation {
+  text-align: center;
+}
+
+.student-summary {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.student-summary h4 {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  font-size: 18px;
+}
+
+.summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-item strong {
+  color: #2c3e50;
+}
+
+.register-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.register-actions .btn {
+  min-width: 140px;
+}
+
+/* Additional responsive adjustments for simplified forms */
+@media (max-width: 768px) {
+  .step-indicator {
+    gap: 8px;
+  }
+  
+  .step-number {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .step-label {
+    font-size: 10px;
+  }
+  
+  .student-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .register-actions {
+    flex-direction: column;
+  }
+  
+  .register-actions .btn {
+    width: 100%;
   }
 }

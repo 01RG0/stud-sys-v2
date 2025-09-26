@@ -195,7 +195,7 @@ if /i "%startNow%"=="y" (
     echo    Press Ctrl+C to stop
     echo.
     
-    cd /d "%~dp0System\server"
+    cd /d "%~dp0..\..\System\server"
     
     REM Install dependencies if needed
     if not exist "node_modules" (

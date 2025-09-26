@@ -7,6 +7,7 @@
 body { 
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
   margin: 0; 
+  padding: 0 0 60px 0; /* Add bottom padding for permanent reconnect bar */
   background: #f5f5f5;
   line-height: 1.6;
 }
@@ -98,6 +99,148 @@ label {
 .status-offline {
   color: #dc3545;
   font-weight: bold;
+}
+
+/* Enhanced Connection Status Indicators */
+.network-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.network-status.online {
+  color: #27ae60;
+  background: rgba(39, 174, 96, 0.1);
+}
+
+.network-status.offline {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.device-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.device-count.active {
+  color: #3498db;
+  background: rgba(52, 152, 219, 0.1);
+}
+
+.device-count.inactive {
+  color: #95a5a6;
+  background: rgba(149, 165, 166, 0.1);
+}
+
+/* Connection Status Enhanced */
+#connection-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+#connection-status.status-online {
+  color: #27ae60;
+  background: rgba(39, 174, 96, 0.1);
+}
+
+#connection-status.status-offline {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+#connection-status.status-syncing {
+  color: #f39c12;
+  background: rgba(243, 156, 18, 0.1);
+}
+
+#connection-status i {
+  font-size: 8px;
+  animation: pulse 2s infinite;
+}
+
+#connection-status.status-online i {
+  animation: none;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Offline Mode Styles */
+.offline-mode {
+  background: #fff3cd !important;
+  color: #856404 !important;
+  border: 1px solid #ffeaa7;
+}
+
+.offline-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: #fff3cd;
+  color: #856404;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.offline-indicator i {
+  animation: pulse 2s infinite;
+}
+
+.result-subtext {
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Offline Mode Status Colors */
+.status-offline {
+  background: rgba(231, 76, 60, 0.1) !important;
+  color: #e74c3c !important;
+}
+
+.status-syncing {
+  background: rgba(243, 156, 18, 0.1) !important;
+  color: #f39c12 !important;
+}
+
+/* Offline Mode Notifications */
+.notification-offline {
+  background: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffc107;
+}
+
+.notification-sync {
+  background: #d1ecf1;
+  color: #0c5460;
+  border-left: 4px solid #17a2b8;
 }
 
 /* Notification Styles */
@@ -254,6 +397,113 @@ label {
   transform: rotate(180deg);
 }
 
+/* Logout Button Styles */
+.btn-logout {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.btn-logout:hover {
+  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.btn-logout:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+}
+
+/* Sync Status Indicator Styles */
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.sync-status.synced {
+  color: #27ae60;
+  background: rgba(39, 174, 96, 0.1);
+}
+
+.sync-status.syncing {
+  color: #f39c12;
+  background: rgba(243, 156, 18, 0.1);
+}
+
+.sync-status.offline {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.sync-status i {
+  animation: pulse 2s infinite;
+}
+
+.sync-status.synced i {
+  animation: none;
+}
+
+/* Manual Sync Button Styles */
+.btn-sync {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn-sync:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.btn-sync:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+}
+
+.btn-sync:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-sync i {
+  transition: transform 0.3s ease;
+}
+
+.btn-sync:hover:not(:disabled) i {
+  transform: rotate(180deg);
+}
+
 .devices-list {
   padding: 16px 20px;
   min-height: 120px;
@@ -379,3 +629,269 @@ label {
 .bg-warning { background-color: #ffc107; }
 .bg-danger { background-color: #dc3545; }
 .bg-light { background-color: #f8f9fa; }
+
+/* ========================================
+   MANUAL RECONNECT OVERLAY STYLES
+   ======================================== */
+
+.reconnect-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(5px);
+}
+
+.reconnect-panel {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reconnect-header {
+  margin-bottom: 24px;
+}
+
+.reconnect-header i {
+  font-size: 48px;
+  color: #dc3545;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.reconnect-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.reconnect-content p {
+  color: #6c757d;
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.reconnect-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.reconnect-actions .btn {
+  min-width: 140px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.reconnect-actions .btn i {
+  font-size: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .reconnect-panel {
+    padding: 24px;
+    margin: 20px;
+  }
+  
+  .reconnect-actions {
+    flex-direction: column;
+  }
+  
+  .reconnect-actions .btn {
+    width: 100%;
+  }
+}
+
+/* ========================================
+   PERMANENT RECONNECT BAR STYLES
+   ======================================== */
+
+.permanent-reconnect-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-top: 3px solid #3498db;
+  padding: 12px 20px;
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.permanent-reconnect-bar .reconnect-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.reconnect-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+}
+
+.reconnect-info i {
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.reconnect-info span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.reconnect-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.reconnect-actions .btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.btn-reconnect {
+  background: #28a745;
+  color: white;
+  border: 1px solid #28a745;
+}
+
+.btn-reconnect:hover {
+  background: #218838;
+  border-color: #1e7e34;
+  transform: translateY(-1px);
+}
+
+.btn-refresh {
+  background: #6c757d;
+  color: white;
+  border: 1px solid #6c757d;
+}
+
+.btn-refresh:hover {
+  background: #5a6268;
+  border-color: #545b62;
+  transform: translateY(-1px);
+}
+
+.btn-reconnect:disabled,
+.btn-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-reconnect:disabled:hover,
+.btn-refresh:disabled:hover {
+  transform: none;
+}
+
+/* Connection status indicators */
+.reconnect-info.connected {
+  color: #d4edda;
+}
+
+.reconnect-info.connected i {
+  color: #28a745;
+}
+
+.reconnect-info.disconnected {
+  color: #f8d7da;
+}
+
+.reconnect-info.disconnected i {
+  color: #dc3545;
+}
+
+.reconnect-info.connecting {
+  color: #fff3cd;
+}
+
+.reconnect-info.connecting i {
+  color: #ffc107;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Responsive adjustments for permanent bar */
+@media (max-width: 768px) {
+  .permanent-reconnect-bar {
+    padding: 10px 15px;
+  }
+  
+  .permanent-reconnect-bar .reconnect-content {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .reconnect-actions {
+    justify-content: center;
+  }
+  
+  .reconnect-actions .btn {
+    min-width: 80px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reconnect-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .reconnect-actions .btn {
+    width: 100%;
+    min-width: auto;
+  }
+}

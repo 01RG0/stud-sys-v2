@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Student Lab System</title>
+    <link rel="stylesheet" href="/styles/common.css">
     <link rel="stylesheet" href="/styles/admin-dashboard.css">
     <link href="/libraries/font-awesome.min.css" rel="stylesheet">
 </head>
@@ -15,6 +16,10 @@
                 <h1>Admin Dashboard</h1>
             </div>
             <div class="header-right">
+                <a href="/data-collection-manager" class="data-collection-btn" title="Data Collection Manager">
+                    <i class="fas fa-database"></i>
+                    Data Collection
+                </a>
                 <div id="connection-status" class="status-pill disconnected">
                     <span class="status-dot"></span>
                     <span class="status-text">Disconnected</span>
@@ -77,6 +82,36 @@
             </div>
         </section>
 
+        <!-- Auto Excel Import Status -->
+        <section class="auto-import-section">
+            <div class="content-card">
+                <div class="import-status-header">
+                    <h3>Auto Excel Import</h3>
+                    <div class="import-status-indicator">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Monitoring Student-Data folder</span>
+                    </div>
+                </div>
+                <div class="import-status-content">
+                    <div class="status-info">
+                        <p><strong>Automatic Import:</strong> Excel files placed in the <code>Student-Data/</code> folder will be automatically detected and imported.</p>
+                        <p><strong>Supported Formats:</strong> .xlsx, .xls, .csv</p>
+                        <p><strong>Scan Frequency:</strong> Every 30 seconds</p>
+                        <p><strong>Processed Files:</strong> Moved to <code>Student-Data/processed/</code> folder</p>
+                    </div>
+                    <div class="import-logs" id="import-logs">
+                        <h5>Recent Import Activity</h5>
+                        <div class="logs-container" id="import-logs-container">
+                            <div class="log-entry log-info">
+                                <span class="log-timestamp">[System Ready]</span>
+                                <span class="log-message">Auto import system monitoring Student-Data folder...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Live Devices -->
         <section class="live-devices-section">
             <div class="content-card">
@@ -135,6 +170,48 @@
         </section>
     </div>
 
+    <!-- Permanent Manual Reconnect Button -->
+    <div id="permanent-reconnect-bar" class="permanent-reconnect-bar">
+        <div class="reconnect-content">
+            <div class="reconnect-info">
+                <i class="fas fa-wifi"></i>
+                <span id="reconnect-status-text">Connection Status</span>
+            </div>
+            <div class="reconnect-actions">
+                <button id="permanent-reconnect-btn" class="btn btn-reconnect">
+                    <i class="fas fa-sync-alt"></i>
+                    Reconnect
+                </button>
+                <button id="permanent-refresh-btn" class="btn btn-refresh">
+                    <i class="fas fa-refresh"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Reconnect Button -->
+    <div id="reconnect-overlay" class="reconnect-overlay" style="display: none;">
+        <div class="reconnect-panel">
+            <div class="reconnect-header">
+                <i class="fas fa-wifi"></i>
+                <h3>Connection Lost</h3>
+            </div>
+            <div class="reconnect-content">
+                <p>Unable to connect to the server. Please check your connection and try again.</p>
+                <div class="reconnect-actions">
+                    <button id="manual-reconnect-btn" class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i>
+                        Reconnect Now
+                    </button>
+                    <button id="refresh-page-btn" class="btn btn-secondary">
+                        <i class="fas fa-refresh"></i>
+                        Refresh Page
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="/libraries/xlsx.full.min.js"></script>
     <script src="/scripts/Admin-Dashboard.js"></script>

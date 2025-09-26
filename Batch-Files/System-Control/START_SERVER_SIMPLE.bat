@@ -4,7 +4,7 @@ echo   Student Lab System - Simple Start
 echo ========================================
 echo.
 
-cd /d "%~dp0System\server"
+cd /d "%~dp0..\..\System\server"
 
 echo Starting server with Node.js directly...
 echo (No nodemon - manual restart required)

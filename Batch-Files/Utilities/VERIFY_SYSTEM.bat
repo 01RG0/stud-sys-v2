@@ -142,7 +142,7 @@ echo Your system is properly organized and ready to run.
 echo.
 echo To start the system:
 echo   1. Double-click START_CLEAN_SYSTEM.bat
-echo   2. Or run: cd System\server && npm run dev
+echo   2. Or run: cd System\server ^&^& npm run dev
 echo.
 echo Access URLs when running:
 echo   Entry Scanner:  http://localhost:3000/entry-scanner
