@@ -321,7 +321,7 @@
     }, delay);
   }
   
-  // Heartbeat system
+  // Heartbeat system - Fixed to prevent constant reconnections
   function startHeartbeat() {
     heartbeatInterval = setInterval(() => {
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -329,19 +329,23 @@
         
         // Check if we haven't received a heartbeat response in too long
         const timeSinceLastResponse = Date.now() - lastHeartbeatResponse;
-        if (timeSinceLastResponse > 15000) { // 15 seconds - reduced from 30
-          console.log('No heartbeat response received, connection may be stale');
+        if (timeSinceLastResponse > 60000) { // 60 seconds - much more lenient
+          console.log('No heartbeat response received for 60 seconds, connection may be stale');
           console.log(`Last response: ${timeSinceLastResponse}ms ago`);
           
-          // Force connection status to offline
-          isOnline = false;
-          updateConnectionStatus(false);
-          
-          // Close the connection to trigger reconnection
-          try {
-            ws.close();
-          } catch (e) {
-            console.log('Error closing stale connection:', e);
+          // Only close if we're really sure the connection is dead
+          if (timeSinceLastResponse > 120000) { // 2 minutes - very lenient
+            console.log('Connection appears to be dead, closing...');
+            // Force connection status to offline
+            isOnline = false;
+            updateConnectionStatus(false);
+            
+            // Close the connection to trigger reconnection
+            try {
+              ws.close();
+            } catch (e) {
+              console.log('Error closing stale connection:', e);
+            }
           }
         }
       } else {
@@ -349,7 +353,7 @@
         isOnline = false;
         updateConnectionStatus(false);
       }
-    }, 5000); // Send heartbeat every 5 seconds - increased frequency
+    }, 30000); // Send heartbeat every 30 seconds - much less frequent
   }
   
   // Network scanning for device discovery
