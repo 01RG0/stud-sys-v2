@@ -1215,8 +1215,10 @@
       </div>
     `;
     
-    // Setup simple entry form event listeners
-    setupSimpleEntryForm();
+    // Setup simple entry form event listeners with a small delay to ensure DOM is ready
+    setTimeout(() => {
+      setupSimpleEntryForm();
+    }, 100);
   }
 
   function cancelManualEntry() {
@@ -1401,58 +1403,123 @@
     const fields = ['simple-name', 'simple-center', 'simple-grade', 'simple-phone', 'simple-subject'];
     let currentFieldIndex = 0;
     
+    console.log('🔧 Setting up simple entry form with fields:', fields);
+    
+    // Check if all fields exist before setting up listeners
+    const missingFields = [];
+    fields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (!field) {
+        missingFields.push(fieldId);
+      }
+    });
+    
+    if (missingFields.length > 0) {
+      console.error('❌ Missing form fields:', missingFields);
+      console.log('🔧 Retrying setup in 200ms...');
+      setTimeout(() => {
+        setupSimpleEntryForm();
+      }, 200);
+      return;
+    }
+    
+    console.log('✅ All form fields found, setting up event listeners');
+    
     // Add Enter key listeners to all fields
     fields.forEach((fieldId, index) => {
       const field = document.getElementById(fieldId);
+      console.log(`🔧 Setting up field ${fieldId} (index: ${index}):`, field);
       if (field) {
         field.addEventListener('keydown', (e) => {
+          console.log(`🔧 Enter key pressed on field ${fieldId} (index: ${index})`);
           if (e.key === 'Enter') {
             e.preventDefault();
+            console.log(`🔧 Processing Enter key for field ${fieldId}`);
             if (index < fields.length - 1) {
-              // Move to next field
-              moveToNextField(index + 1);
+              // Move to next field (index + 2 because data attributes start from 1)
+              console.log(`🔧 Moving to next field: ${index + 2}`);
+              moveToNextField(index + 2);
             } else {
               // Last field - show summary and register
+              console.log('🔧 Last field - showing summary');
               showStudentSummary();
             }
           }
         });
+      } else {
+        console.error(`❌ Field not found: ${fieldId}`);
       }
     });
+    
+    console.log('✅ Simple entry form setup complete');
   }
   
   function moveToNextField(nextIndex) {
-    // Hide current field
-    const currentField = document.querySelector(`[data-field="${nextIndex}"]`);
-    const currentStep = document.querySelector(`[data-step="${nextIndex}"]`);
+    console.log(`🔧 moveToNextField called with nextIndex: ${nextIndex}`);
     
-    if (currentField && currentStep) {
-      // Remove active class from all fields and steps
-      document.querySelectorAll('.field-group').forEach(f => f.classList.remove('active'));
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-      
-      // Add active class to current field and step
-      currentField.classList.add('active');
-      currentStep.classList.add('active');
+    // Remove active class from all fields and steps
+    document.querySelectorAll('.field-group').forEach(f => f.classList.remove('active'));
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    
+    // Show the next field and step
+    const nextField = document.querySelector(`[data-field="${nextIndex}"]`);
+    const nextStep = document.querySelector(`[data-step="${nextIndex}"]`);
+    
+    console.log(`🔧 Looking for field with data-field="${nextIndex}":`, nextField);
+    console.log(`🔧 Looking for step with data-step="${nextIndex}":`, nextStep);
+    
+    if (nextField && nextStep) {
+      // Add active class to next field and step
+      nextField.classList.add('active');
+      nextStep.classList.add('active');
       
       // Focus on the input field
-      const input = currentField.querySelector('input');
+      const input = nextField.querySelector('input');
       if (input) {
         input.focus();
+        console.log(`🔧 Focused on input field:`, input);
       }
+      console.log(`🔧 Successfully moved to field ${nextIndex}`);
+    } else {
+      console.error(`❌ Could not find field or step with index ${nextIndex}`);
     }
   }
   
   function showStudentSummary() {
-    // Get all form values
-    const name = document.getElementById('simple-name').value.trim();
-    const center = document.getElementById('simple-center').value.trim();
-    const grade = document.getElementById('simple-grade').value.trim();
-    const phone = document.getElementById('simple-phone').value.trim();
-    const subject = document.getElementById('simple-subject').value.trim();
+    console.log('🔧 showStudentSummary called');
+    
+    // Get all form values with null checks
+    const nameElement = document.getElementById('simple-name');
+    const centerElement = document.getElementById('simple-center');
+    const gradeElement = document.getElementById('simple-grade');
+    const phoneElement = document.getElementById('simple-phone');
+    const subjectElement = document.getElementById('simple-subject');
+    
+    // Check if all elements exist
+    if (!nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement) {
+      console.error('❌ Form elements not found in showStudentSummary:', {
+        nameElement: !!nameElement,
+        centerElement: !!centerElement,
+        gradeElement: !!gradeElement,
+        phoneElement: !!phoneElement,
+        subjectElement: !!subjectElement
+      });
+      alert('Error: Form elements not found. Please refresh the page and try again.');
+      return;
+    }
+    
+    // Get values safely
+    const name = nameElement.value.trim();
+    const center = centerElement.value.trim();
+    const grade = gradeElement.value.trim();
+    const phone = phoneElement.value.trim();
+    const subject = subjectElement.value.trim();
+    
+    console.log('🔧 Form values:', { name, center, grade, phone, subject });
     
     // Validate required field
     if (!name) {
+      console.log('❌ Name is required');
       alert('Please enter the student name');
       moveToNextField(1); // Go back to name field
       return;
@@ -1486,15 +1553,40 @@
   }
   
   async function registerSimpleStudent() {
-    // Get all form values
-    const name = document.getElementById('simple-name').value.trim();
-    const center = document.getElementById('simple-center').value.trim();
-    const grade = document.getElementById('simple-grade').value.trim();
-    const phone = document.getElementById('simple-phone').value.trim();
-    const subject = document.getElementById('simple-subject').value.trim();
+    console.log('🔧 registerSimpleStudent called');
+    
+    // Get all form values with null checks
+    const nameElement = document.getElementById('simple-name');
+    const centerElement = document.getElementById('simple-center');
+    const gradeElement = document.getElementById('simple-grade');
+    const phoneElement = document.getElementById('simple-phone');
+    const subjectElement = document.getElementById('simple-subject');
+    
+    // Check if all elements exist
+    if (!nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement) {
+      console.error('❌ Form elements not found:', {
+        nameElement: !!nameElement,
+        centerElement: !!centerElement,
+        gradeElement: !!gradeElement,
+        phoneElement: !!phoneElement,
+        subjectElement: !!subjectElement
+      });
+      alert('Error: Form elements not found. Please refresh the page and try again.');
+      return;
+    }
+    
+    // Get values safely
+    const name = nameElement.value.trim();
+    const center = centerElement.value.trim();
+    const grade = gradeElement.value.trim();
+    const phone = phoneElement.value.trim();
+    const subject = subjectElement.value.trim();
+    
+    console.log('🔧 Form values:', { name, center, grade, phone, subject });
     
     // Validate required field
     if (!name) {
+      console.log('❌ Name is required');
       alert('Please enter the student name');
       return;
     }
@@ -1553,42 +1645,73 @@
     const fields = ['qr-payment-amount', 'qr-homework-score', 'qr-comment'];
     let currentFieldIndex = 0;
     
+    console.log('🔧 Setting up QR student form with fields:', fields);
+    
+    // Check if all fields exist before setting up listeners
+    const missingFields = [];
+    fields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (!field) {
+        missingFields.push(fieldId);
+      }
+    });
+    
+    if (missingFields.length > 0) {
+      console.error('❌ Missing QR form fields:', missingFields);
+      console.log('🔧 Retrying QR setup in 200ms...');
+      setTimeout(() => {
+        setupQRStudentForm();
+      }, 200);
+      return;
+    }
+    
+    console.log('✅ All QR form fields found, setting up event listeners');
+    
     // Add Enter key listeners to all fields
     fields.forEach((fieldId, index) => {
       const field = document.getElementById(fieldId);
+      console.log(`🔧 Setting up QR field ${fieldId} (index: ${index}):`, field);
       if (field) {
         field.addEventListener('keydown', (e) => {
+          console.log(`🔧 Enter key pressed on QR field ${fieldId} (index: ${index})`);
           if (e.key === 'Enter') {
             e.preventDefault();
+            console.log(`🔧 Processing Enter key for QR field ${fieldId}`);
             if (index < fields.length - 1) {
-              // Move to next field
-              moveToNextQRField(index + 1);
+              // Move to next field (index + 2 because data attributes start from 1)
+              console.log(`🔧 Moving to next QR field: ${index + 2}`);
+              moveToNextQRField(index + 2);
             } else {
               // Last field - show summary and register
+              console.log('🔧 Last QR field - showing summary');
               showQRStudentSummary();
             }
           }
         });
+      } else {
+        console.error(`❌ QR field not found: ${fieldId}`);
       }
     });
+    
+    console.log('✅ QR student form setup complete');
   }
   
   function moveToNextQRField(nextIndex) {
-    // Hide current field
-    const currentField = document.querySelector(`[data-field="${nextIndex}"]`);
-    const currentStep = document.querySelector(`[data-step="${nextIndex}"]`);
+    // Remove active class from all fields and steps
+    document.querySelectorAll('.field-group').forEach(f => f.classList.remove('active'));
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     
-    if (currentField && currentStep) {
-      // Remove active class from all fields and steps
-      document.querySelectorAll('.field-group').forEach(f => f.classList.remove('active'));
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-      
-      // Add active class to current field and step
-      currentField.classList.add('active');
-      currentStep.classList.add('active');
+    // Show the next field and step
+    const nextField = document.querySelector(`[data-field="${nextIndex}"]`);
+    const nextStep = document.querySelector(`[data-step="${nextIndex}"]`);
+    
+    if (nextField && nextStep) {
+      // Add active class to next field and step
+      nextField.classList.add('active');
+      nextStep.classList.add('active');
       
       // Focus on the input field
-      const input = currentField.querySelector('input');
+      const input = nextField.querySelector('input');
       if (input) {
         input.focus();
       }
@@ -1596,10 +1719,30 @@
   }
   
   function showQRStudentSummary() {
-    // Get all form values
-    const paymentAmount = document.getElementById('qr-payment-amount').value.trim();
-    const homeworkScore = document.getElementById('qr-homework-score').value.trim();
-    const comment = document.getElementById('qr-comment').value.trim();
+    console.log('🔧 showQRStudentSummary called');
+    
+    // Get all form values with null checks
+    const paymentAmountElement = document.getElementById('qr-payment-amount');
+    const homeworkScoreElement = document.getElementById('qr-homework-score');
+    const commentElement = document.getElementById('qr-comment');
+    
+    // Check if all elements exist
+    if (!paymentAmountElement || !homeworkScoreElement || !commentElement) {
+      console.error('❌ QR form elements not found in showQRStudentSummary:', {
+        paymentAmountElement: !!paymentAmountElement,
+        homeworkScoreElement: !!homeworkScoreElement,
+        commentElement: !!commentElement
+      });
+      alert('Error: QR form elements not found. Please refresh the page and try again.');
+      return;
+    }
+    
+    // Get values safely
+    const paymentAmount = paymentAmountElement.value.trim();
+    const homeworkScore = homeworkScoreElement.value.trim();
+    const comment = commentElement.value.trim();
+    
+    console.log('🔧 QR form values:', { paymentAmount, homeworkScore, comment });
     
     // Show summary
     const summary = document.getElementById('qr-student-summary');
@@ -1623,10 +1766,30 @@
   }
   
   async function registerQRStudent(studentId, studentName) {
-    // Get all form values
-    const paymentAmount = document.getElementById('qr-payment-amount').value.trim();
-    const homeworkScore = document.getElementById('qr-homework-score').value.trim();
-    const comment = document.getElementById('qr-comment').value.trim();
+    console.log('🔧 registerQRStudent called with:', { studentId, studentName });
+    
+    // Get all form values with null checks
+    const paymentAmountElement = document.getElementById('qr-payment-amount');
+    const homeworkScoreElement = document.getElementById('qr-homework-score');
+    const commentElement = document.getElementById('qr-comment');
+    
+    // Check if all elements exist
+    if (!paymentAmountElement || !homeworkScoreElement || !commentElement) {
+      console.error('❌ QR form elements not found:', {
+        paymentAmountElement: !!paymentAmountElement,
+        homeworkScoreElement: !!homeworkScoreElement,
+        commentElement: !!commentElement
+      });
+      alert('Error: QR form elements not found. Please refresh the page and try again.');
+      return;
+    }
+    
+    // Get values safely
+    const paymentAmount = paymentAmountElement.value.trim();
+    const homeworkScore = homeworkScoreElement.value.trim();
+    const comment = commentElement.value.trim();
+    
+    console.log('🔧 QR form values:', { paymentAmount, homeworkScore, comment });
     
     // Create student record
     const record = {
