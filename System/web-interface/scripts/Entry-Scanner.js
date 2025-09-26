@@ -1010,7 +1010,7 @@
     }, delay);
   }
   
-  // Heartbeat system
+  // Heartbeat system - Fixed to prevent constant reconnections
   function startHeartbeat() {
     heartbeatInterval = setInterval(() => {
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1018,19 +1018,23 @@
         
         // Check if we haven't received a heartbeat response in too long
         const timeSinceLastResponse = Date.now() - lastHeartbeatResponse;
-        if (timeSinceLastResponse > 15000) { // 15 seconds - reduced from 30
-          console.log('No heartbeat response received, connection may be stale');
+        if (timeSinceLastResponse > 60000) { // 60 seconds - much more lenient
+          console.log('No heartbeat response received for 60 seconds, connection may be stale');
           console.log(`Last response: ${timeSinceLastResponse}ms ago`);
           
-          // Force connection status to offline
-          isOnline = false;
-          updateConnectionStatus(false);
-          
-          // Close the connection to trigger reconnection
-          try {
-            ws.close();
-          } catch (e) {
-            console.log('Error closing stale connection:', e);
+          // Only close if we're really sure the connection is dead
+          if (timeSinceLastResponse > 120000) { // 2 minutes - very lenient
+            console.log('Connection appears to be dead, closing...');
+            // Force connection status to offline
+            isOnline = false;
+            updateConnectionStatus(false);
+            
+            // Close the connection to trigger reconnection
+            try {
+              ws.close();
+            } catch (e) {
+              console.log('Error closing stale connection:', e);
+            }
           }
         }
       } else {
@@ -1038,7 +1042,7 @@
         isOnline = false;
         updateConnectionStatus(false);
       }
-    }, 5000); // Send heartbeat every 5 seconds - increased frequency
+    }, 30000); // Send heartbeat every 30 seconds - much less frequent
   }
   
   // Connection monitoring system
@@ -1158,6 +1162,10 @@
             </div>
             <div class="step" data-step="6">
               <span class="step-number">6</span>
+              <span class="step-label">Payment</span>
+            </div>
+            <div class="step" data-step="7">
+              <span class="step-number">7</span>
               <span class="step-label">Register</span>
             </div>
           </div>
@@ -1190,10 +1198,16 @@
             <div class="field-group" data-field="5">
               <label for="simple-subject">Subject</label>
               <input type="text" id="simple-subject" placeholder="Enter subject">
-              <div class="field-hint">Press Enter to register student</div>
+              <div class="field-hint">Press Enter to continue</div>
             </div>
             
             <div class="field-group" data-field="6">
+              <label for="simple-payment">Payment Amount</label>
+              <input type="number" id="simple-payment" placeholder="Enter payment amount" step="0.01" min="0">
+              <div class="field-hint">Press Enter to register student</div>
+            </div>
+            
+            <div class="field-group" data-field="7">
               <div class="register-confirmation">
                 <div class="student-summary" id="student-summary">
                   <!-- Student summary will be shown here -->
@@ -1400,7 +1414,7 @@
 
   // Simple Entry Form Functions
   function setupSimpleEntryForm() {
-    const fields = ['simple-name', 'simple-center', 'simple-grade', 'simple-phone', 'simple-subject'];
+    const fields = ['simple-name', 'simple-center', 'simple-grade', 'simple-phone', 'simple-subject', 'simple-payment'];
     let currentFieldIndex = 0;
     
     console.log('🔧 Setting up simple entry form with fields:', fields);
@@ -1440,9 +1454,9 @@
               console.log(`🔧 Moving to next field: ${index + 2}`);
               moveToNextField(index + 2);
             } else {
-              // Last field - show summary and register
-              console.log('🔧 Last field - showing summary');
-              showStudentSummary();
+              // Last field - automatically register student
+              console.log('🔧 Last field - automatically registering student');
+              registerSimpleStudent();
             }
           }
         });
@@ -1494,15 +1508,17 @@
     const gradeElement = document.getElementById('simple-grade');
     const phoneElement = document.getElementById('simple-phone');
     const subjectElement = document.getElementById('simple-subject');
+    const paymentElement = document.getElementById('simple-payment');
     
     // Check if all elements exist
-    if (!nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement) {
+    if (!nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement || !paymentElement) {
       console.error('❌ Form elements not found in showStudentSummary:', {
         nameElement: !!nameElement,
         centerElement: !!centerElement,
         gradeElement: !!gradeElement,
         phoneElement: !!phoneElement,
-        subjectElement: !!subjectElement
+        subjectElement: !!subjectElement,
+        paymentElement: !!paymentElement
       });
       alert('Error: Form elements not found. Please refresh the page and try again.');
       return;
@@ -1514,8 +1530,9 @@
     const grade = gradeElement.value.trim();
     const phone = phoneElement.value.trim();
     const subject = subjectElement.value.trim();
+    const payment = paymentElement.value.trim();
     
-    console.log('🔧 Form values:', { name, center, grade, phone, subject });
+    console.log('🔧 Form values:', { name, center, grade, phone, subject, payment });
     
     // Validate required field
     if (!name) {
@@ -1545,11 +1562,14 @@
         <div class="summary-item">
           <strong>Subject:</strong> ${subject || 'Not specified'}
         </div>
+        <div class="summary-item">
+          <strong>Payment:</strong> ${payment ? '$' + payment : 'Not specified'}
+        </div>
       </div>
     `;
     
     // Move to final step
-    moveToNextField(6);
+    moveToNextField(7);
   }
   
   async function registerSimpleStudent() {
@@ -1561,19 +1581,63 @@
     const gradeElement = document.getElementById('simple-grade');
     const phoneElement = document.getElementById('simple-phone');
     const subjectElement = document.getElementById('simple-subject');
+    const paymentElement = document.getElementById('simple-payment');
+    
+    console.log('🔧 Form elements found:', {
+      nameElement: !!nameElement,
+      centerElement: !!centerElement,
+      gradeElement: !!gradeElement,
+      phoneElement: !!phoneElement,
+      subjectElement: !!subjectElement,
+      paymentElement: !!paymentElement
+    });
     
     // Check if all elements exist
-    if (!nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement) {
+    if (!nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement || !paymentElement) {
       console.error('❌ Form elements not found:', {
         nameElement: !!nameElement,
         centerElement: !!centerElement,
         gradeElement: !!gradeElement,
         phoneElement: !!phoneElement,
-        subjectElement: !!subjectElement
+        subjectElement: !!subjectElement,
+        paymentElement: !!paymentElement
       });
-      alert('Error: Form elements not found. Please refresh the page and try again.');
+      
+      // Try to find the elements again with a delay
+      console.log('🔧 Retrying to find form elements...');
+      setTimeout(() => {
+        const retryNameElement = document.getElementById('simple-name');
+        const retryCenterElement = document.getElementById('simple-center');
+        const retryGradeElement = document.getElementById('simple-grade');
+        const retryPhoneElement = document.getElementById('simple-phone');
+        const retrySubjectElement = document.getElementById('simple-subject');
+        const retryPaymentElement = document.getElementById('simple-payment');
+        
+        console.log('🔧 Retry form elements found:', {
+          nameElement: !!retryNameElement,
+          centerElement: !!retryCenterElement,
+          gradeElement: !!retryGradeElement,
+          phoneElement: !!retryPhoneElement,
+          subjectElement: !!retrySubjectElement,
+          paymentElement: !!retryPaymentElement
+        });
+        
+        if (retryNameElement && retryCenterElement && retryGradeElement && retryPhoneElement && retrySubjectElement && retryPaymentElement) {
+          console.log('🔧 Form elements found on retry, proceeding...');
+          registerSimpleStudentWithElements(retryNameElement, retryCenterElement, retryGradeElement, retryPhoneElement, retrySubjectElement, retryPaymentElement);
+        } else {
+          alert('Error: Form elements not found. Please refresh the page and try again.');
+        }
+      }, 100);
       return;
     }
+    
+    // Proceed with registration
+    registerSimpleStudentWithElements(nameElement, centerElement, gradeElement, phoneElement, subjectElement, paymentElement);
+  }
+  
+  async function registerSimpleStudentWithElements(nameElement, centerElement, gradeElement, phoneElement, subjectElement, paymentElement) {
+    console.log('🔧 registerSimpleStudentWithElements called');
     
     // Get values safely
     const name = nameElement.value.trim();
@@ -1581,8 +1645,9 @@
     const grade = gradeElement.value.trim();
     const phone = phoneElement.value.trim();
     const subject = subjectElement.value.trim();
+    const payment = paymentElement.value.trim();
     
-    console.log('🔧 Form values:', { name, center, grade, phone, subject });
+    console.log('🔧 Form values:', { name, center, grade, phone, subject, payment });
     
     // Validate required field
     if (!name) {
@@ -1604,7 +1669,7 @@
       phone: phone || '',
       parent_phone: '',
       subject: subject || 'General',
-      fees: 0,
+      fees: payment ? parseFloat(payment) : 0,
       homework_score: 0,
       exam_score: null,
       error: null,
@@ -1682,9 +1747,12 @@
               console.log(`🔧 Moving to next QR field: ${index + 2}`);
               moveToNextQRField(index + 2);
             } else {
-              // Last field - show summary and register
-              console.log('🔧 Last QR field - showing summary');
-              showQRStudentSummary();
+              // Last field - automatically register student
+              console.log('🔧 Last QR field - automatically registering student');
+              // Get the student data from the QR scan
+              const studentId = window.currentQRStudentId || '';
+              const studentName = window.currentQRStudentName || '';
+              registerQRStudent(studentId, studentName);
             }
           }
         });
