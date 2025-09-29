@@ -91,7 +91,7 @@ async function createTables() {
     await pool.execute(`
       CREATE TABLE IF NOT EXISTS entry_registrations (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        student_id VARCHAR(50) NOT NULL,
+        student_id VARCHAR(50),
         student_name VARCHAR(255) NOT NULL,
         center VARCHAR(255),
         fees DECIMAL(10,2) DEFAULT 0,
@@ -118,16 +118,43 @@ async function createTables() {
         INDEX idx_student_id (student_id),
         INDEX idx_timestamp (timestamp),
         INDEX idx_device_name (device_name),
-        INDEX idx_offline_mode (offline_mode),
-        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+        INDEX idx_offline_mode (offline_mode)
       )
     `);
+    
+    // Migrate existing entry_registrations table to allow null student_id
+    try {
+      await pool.execute(`
+        ALTER TABLE entry_registrations 
+        MODIFY COLUMN student_id VARCHAR(50) NULL
+      `);
+      console.log('✅ Migrated entry_registrations table to allow null student_id');
+    } catch (error) {
+      // Ignore error if column is already nullable or table doesn't exist
+      if (!error.message.includes('Duplicate column name') && !error.message.includes("doesn't exist")) {
+        console.log('ℹ️ Migration note:', error.message);
+      }
+    }
+    
+    // Migrate existing exit_validations table to allow null student_id
+    try {
+      await pool.execute(`
+        ALTER TABLE exit_validations 
+        MODIFY COLUMN student_id VARCHAR(50) NULL
+      `);
+      console.log('✅ Migrated exit_validations table to allow null student_id');
+    } catch (error) {
+      // Ignore error if column is already nullable or table doesn't exist
+      if (!error.message.includes('Duplicate column name') && !error.message.includes("doesn't exist")) {
+        console.log('ℹ️ Migration note:', error.message);
+      }
+    }
     
     // Exit validations table
     await pool.execute(`
       CREATE TABLE IF NOT EXISTS exit_validations (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        student_id VARCHAR(50) NOT NULL,
+        student_id VARCHAR(50),
         student_name VARCHAR(255) NOT NULL,
         center VARCHAR(255),
         fees DECIMAL(10,2) DEFAULT 0,
@@ -154,8 +181,7 @@ async function createTables() {
         INDEX idx_student_id (student_id),
         INDEX idx_timestamp (timestamp),
         INDEX idx_device_name (device_name),
-        INDEX idx_offline_mode (offline_mode),
-        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+        INDEX idx_offline_mode (offline_mode)
       )
     `);
     

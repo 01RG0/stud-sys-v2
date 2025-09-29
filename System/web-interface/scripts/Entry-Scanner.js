@@ -1105,72 +1105,82 @@
           <div class="step-indicator">
             <div class="step active" data-step="1">
               <span class="step-number">1</span>
-              <span class="step-label">Name</span>
+              <span class="step-label">ID</span>
             </div>
             <div class="step" data-step="2">
               <span class="step-number">2</span>
-              <span class="step-label">Center</span>
+              <span class="step-label">Name</span>
             </div>
             <div class="step" data-step="3">
               <span class="step-number">3</span>
-              <span class="step-label">Grade</span>
+              <span class="step-label">Center</span>
             </div>
             <div class="step" data-step="4">
               <span class="step-number">4</span>
-              <span class="step-label">Phone</span>
+              <span class="step-label">Grade</span>
             </div>
             <div class="step" data-step="5">
               <span class="step-number">5</span>
-              <span class="step-label">Subject</span>
+              <span class="step-label">Phone</span>
             </div>
             <div class="step" data-step="6">
               <span class="step-number">6</span>
-              <span class="step-label">Payment</span>
+              <span class="step-label">Subject</span>
             </div>
             <div class="step" data-step="7">
               <span class="step-number">7</span>
+              <span class="step-label">Payment</span>
+            </div>
+            <div class="step" data-step="8">
+              <span class="step-number">8</span>
               <span class="step-label">Register</span>
             </div>
           </div>
           
           <div class="form-fields">
             <div class="field-group active" data-field="1">
-              <label for="simple-name">Student Name</label>
-              <input type="text" id="simple-name" placeholder="Enter student name" autofocus>
-              <div class="field-hint">Press Enter to continue</div>
+              <label for="simple-id">Student ID (Optional)</label>
+              <input type="text" id="simple-id" placeholder="Enter student ID (optional)" autofocus>
+              <div class="field-hint">Press Enter to continue (leave empty to skip ID)</div>
             </div>
             
             <div class="field-group" data-field="2">
+              <label for="simple-name">Student Name</label>
+              <input type="text" id="simple-name" placeholder="Enter student name">
+              <div class="field-hint">Press Enter to continue</div>
+            </div>
+            
+            <div class="field-group" data-field="3">
               <label for="simple-center">Center</label>
               <input type="text" id="simple-center" placeholder="Enter center name">
               <div class="field-hint">Press Enter to continue</div>
             </div>
             
-            <div class="field-group" data-field="3">
+            <div class="field-group" data-field="4">
               <label for="simple-grade">Grade</label>
               <input type="text" id="simple-grade" placeholder="Enter grade">
               <div class="field-hint">Press Enter to continue</div>
             </div>
             
-            <div class="field-group" data-field="4">
+            <div class="field-group" data-field="5">
               <label for="simple-phone">Phone</label>
               <input type="text" id="simple-phone" placeholder="Enter phone number">
               <div class="field-hint">Press Enter to continue</div>
             </div>
             
-            <div class="field-group" data-field="5">
+            <div class="field-group" data-field="6">
               <label for="simple-subject">Subject</label>
               <input type="text" id="simple-subject" placeholder="Enter subject">
               <div class="field-hint">Press Enter to continue</div>
             </div>
             
-            <div class="field-group" data-field="6">
+            <div class="field-group" data-field="7">
               <label for="simple-payment">Payment Amount</label>
-              <input type="number" id="simple-payment" placeholder="Enter payment amount" step="0.01" min="0">
+              <input type="text" id="simple-payment" placeholder="Enter payment amount">
               <div class="field-hint">Press Enter to register student</div>
             </div>
             
-            <div class="field-group" data-field="7">
+            <div class="field-group" data-field="8">
               <div class="register-confirmation">
                 <div class="student-summary" id="student-summary">
                   <!-- Student summary will be shown here -->
@@ -1377,7 +1387,7 @@
 
   // Simple Entry Form Functions
   function setupSimpleEntryForm() {
-    const fields = ['simple-name', 'simple-center', 'simple-grade', 'simple-phone', 'simple-subject', 'simple-payment'];
+    const fields = ['simple-id', 'simple-name', 'simple-center', 'simple-grade', 'simple-phone', 'simple-subject', 'simple-payment'];
     let currentFieldIndex = 0;
     
     console.log('🔧 Setting up simple entry form with fields:', fields);
@@ -1478,6 +1488,7 @@
     console.log('🔧 showStudentSummary called');
     
     // Get all form values with null checks
+    const idElement = document.getElementById('simple-id');
     const nameElement = document.getElementById('simple-name');
     const centerElement = document.getElementById('simple-center');
     const gradeElement = document.getElementById('simple-grade');
@@ -1486,8 +1497,9 @@
     const paymentElement = document.getElementById('simple-payment');
     
     // Check if all elements exist
-    if (!nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement || !paymentElement) {
+    if (!idElement || !nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement || !paymentElement) {
       console.error('❌ Form elements not found in showStudentSummary:', {
+        idElement: !!idElement,
         nameElement: !!nameElement,
         centerElement: !!centerElement,
         gradeElement: !!gradeElement,
@@ -1499,15 +1511,16 @@
       return;
     }
     
-    // Get values safely
-    const name = nameElement.value.trim();
-    const center = centerElement.value.trim();
-    const grade = gradeElement.value.trim();
-    const phone = phoneElement.value.trim();
-    const subject = subjectElement.value.trim();
-    const payment = paymentElement.value.trim();
+    // Get values safely - allow both strings and numbers
+    const id = (idElement && idElement.value) ? String(idElement.value).trim() : '';
+    const name = (nameElement && nameElement.value) ? String(nameElement.value).trim() : '';
+    const center = (centerElement && centerElement.value) ? String(centerElement.value).trim() : '';
+    const grade = (gradeElement && gradeElement.value) ? String(gradeElement.value).trim() : '';
+    const phone = (phoneElement && phoneElement.value) ? String(phoneElement.value).trim() : '';
+    const subject = (subjectElement && subjectElement.value) ? String(subjectElement.value).trim() : '';
+    const payment = (paymentElement && paymentElement.value) ? String(paymentElement.value).trim() : '';
     
-    console.log('🔧 Form values:', { name, center, grade, phone, subject, payment });
+    console.log('🔧 Form values:', { id, name, center, grade, phone, subject, payment });
     
     // Validate required field
     if (!name) {
@@ -1522,6 +1535,9 @@
     summary.innerHTML = `
       <h4><i class="fas fa-user"></i> Student Summary</h4>
       <div class="summary-details">
+        <div class="summary-item">
+          <strong>ID:</strong> ${id || 'Empty'}
+        </div>
         <div class="summary-item">
           <strong>Name:</strong> ${name}
         </div>
@@ -1544,13 +1560,14 @@
     `;
     
     // Move to final step
-    moveToNextField(7);
+    moveToNextField(8);
   }
   
   async function registerSimpleStudent() {
     console.log('🔧 registerSimpleStudent called');
     
     // Get all form values with null checks
+    const idElement = document.getElementById('simple-id');
     const nameElement = document.getElementById('simple-name');
     const centerElement = document.getElementById('simple-center');
     const gradeElement = document.getElementById('simple-grade');
@@ -1559,6 +1576,7 @@
     const paymentElement = document.getElementById('simple-payment');
     
     console.log('🔧 Form elements found:', {
+      idElement: !!idElement,
       nameElement: !!nameElement,
       centerElement: !!centerElement,
       gradeElement: !!gradeElement,
@@ -1568,8 +1586,9 @@
     });
     
     // Check if all elements exist
-    if (!nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement || !paymentElement) {
+    if (!idElement || !nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement || !paymentElement) {
       console.error('❌ Form elements not found:', {
+        idElement: !!idElement,
         nameElement: !!nameElement,
         centerElement: !!centerElement,
         gradeElement: !!gradeElement,
@@ -1581,6 +1600,7 @@
       // Try to find the elements again with a delay
       console.log('🔧 Retrying to find form elements...');
       setTimeout(() => {
+        const retryIdElement = document.getElementById('simple-id');
         const retryNameElement = document.getElementById('simple-name');
         const retryCenterElement = document.getElementById('simple-center');
         const retryGradeElement = document.getElementById('simple-grade');
@@ -1589,6 +1609,7 @@
         const retryPaymentElement = document.getElementById('simple-payment');
         
         console.log('🔧 Retry form elements found:', {
+          idElement: !!retryIdElement,
           nameElement: !!retryNameElement,
           centerElement: !!retryCenterElement,
           gradeElement: !!retryGradeElement,
@@ -1597,9 +1618,9 @@
           paymentElement: !!retryPaymentElement
         });
         
-        if (retryNameElement && retryCenterElement && retryGradeElement && retryPhoneElement && retrySubjectElement && retryPaymentElement) {
+        if (retryIdElement && retryNameElement && retryCenterElement && retryGradeElement && retryPhoneElement && retrySubjectElement && retryPaymentElement) {
           console.log('🔧 Form elements found on retry, proceeding...');
-          registerSimpleStudentWithElements(retryNameElement, retryCenterElement, retryGradeElement, retryPhoneElement, retrySubjectElement, retryPaymentElement);
+          registerSimpleStudentWithElements(retryIdElement, retryNameElement, retryCenterElement, retryGradeElement, retryPhoneElement, retrySubjectElement, retryPaymentElement);
         } else {
           alert('Error: Form elements not found. Please refresh the page and try again.');
         }
@@ -1608,27 +1629,28 @@
     }
     
     // Proceed with registration
-    registerSimpleStudentWithElements(nameElement, centerElement, gradeElement, phoneElement, subjectElement, paymentElement);
+    registerSimpleStudentWithElements(idElement, nameElement, centerElement, gradeElement, phoneElement, subjectElement, paymentElement);
   }
   
-  async function registerSimpleStudentWithElements(nameElement, centerElement, gradeElement, phoneElement, subjectElement, paymentElement) {
+  async function registerSimpleStudentWithElements(idElement, nameElement, centerElement, gradeElement, phoneElement, subjectElement, paymentElement) {
     console.log('🔧 registerSimpleStudentWithElements called');
     
-    // Get values safely with null checks
-    const name = (nameElement && nameElement.value) ? nameElement.value.trim() : '';
-    const center = (centerElement && centerElement.value) ? centerElement.value.trim() : '';
-    const grade = (gradeElement && gradeElement.value) ? gradeElement.value.trim() : '';
-    const phone = (phoneElement && phoneElement.value) ? phoneElement.value.trim() : '';
-    const subject = (subjectElement && subjectElement.value) ? subjectElement.value.trim() : '';
-    const payment = (paymentElement && paymentElement.value) ? paymentElement.value.trim() : '';
+    // Get values safely with null checks - allow both strings and numbers
+    const id = (idElement && idElement.value) ? String(idElement.value).trim() : '';
+    const name = (nameElement && nameElement.value) ? String(nameElement.value).trim() : '';
+    const center = (centerElement && centerElement.value) ? String(centerElement.value).trim() : '';
+    const grade = (gradeElement && gradeElement.value) ? String(gradeElement.value).trim() : '';
+    const phone = (phoneElement && phoneElement.value) ? String(phoneElement.value).trim() : '';
+    const subject = (subjectElement && subjectElement.value) ? String(subjectElement.value).trim() : '';
+    const payment = (paymentElement && paymentElement.value) ? String(paymentElement.value).trim() : '';
     
-    console.log('🔧 Form values:', { name, center, grade, phone, subject, payment });
+    console.log('🔧 Form values:', { id, name, center, grade, phone, subject, payment });
     
     // No validation required - all fields are optional
     console.log('✅ All fields are optional - proceeding with registration');
     
-    // Auto-generate ID
-    const studentId = `STU${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+    // Use provided ID or null if empty (no auto-generation)
+    const studentId = id || null;
     
     // Create student record
     const record = {
@@ -1640,15 +1662,15 @@
       phone: phone || '',
       parent_phone: '',
       subject: subject || 'General',
-      fees: payment ? parseFloat(payment) : 0,
-      fees_1: payment ? parseFloat(payment) : 0,
+      fees: payment ? (isNaN(parseFloat(payment)) ? 0 : parseFloat(payment)) : 0,
+      fees_1: payment ? (isNaN(parseFloat(payment)) ? 0 : parseFloat(payment)) : 0,
       homework_score: 0,
       exam_score: null,
       error: null,
       extra_sessions: 0,
       comment: 'Manual entry via simplified form',
       error_detail: null,
-      payment_amount: payment ? parseFloat(payment) : 0,
+      payment_amount: payment ? (isNaN(parseFloat(payment)) ? 0 : parseFloat(payment)) : 0,
       timestamp: new Date().toISOString(),
       device_name: deviceName,
       registered: true,
