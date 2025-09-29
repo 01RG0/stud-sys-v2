@@ -211,15 +211,15 @@ function parseStudentData(worksheet, mappings) {
         student.id = '';
       }
       
-      // Set default values for missing fields
-      student.center = student.center || 'Default Center';
-      student.subject = student.subject || 'General';
-      student.grade = student.grade || 'N/A';
-      student.fees = student.fees || '0';
-      student.phone = student.phone || '';
-      student.parent_phone = student.parent_phone || '';
-      student.email = student.email || '';
-      student.address = student.address || '';
+      // Keep fields empty if not provided (no default values)
+      // student.center = student.center || '';
+      // student.subject = student.subject || '';
+      // student.grade = student.grade || '';
+      // student.fees = student.fees || '0';
+      // student.phone = student.phone || '';
+      // student.parent_phone = student.parent_phone || '';
+      // student.email = student.email || '';
+      // student.address = student.address || '';
       
       students.push(student);
     }

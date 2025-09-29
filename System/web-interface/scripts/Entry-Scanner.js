@@ -990,7 +990,7 @@
     if (connectionAttempts >= maxReconnectAttempts) {
       console.log('Max reconnection attempts reached, stopping reconnection');
       showNotification('❌ Max reconnection attempts reached. Please use manual reconnect.', 'error');
-      showReconnectOverlay();
+      // Removed popup - just show notification
       return;
     }
     
@@ -1654,11 +1654,11 @@
     const record = {
       student_id: studentId,
       student_name: name,
-      center: center || 'Default Center',
-      grade: grade || 'N/A',
+      center: center || '',
+      grade: grade || '',
       phone: phone || '',
       parent_phone: '',
-      subject: subject || 'General',
+      subject: subject || '',
       fees: payment ? (isNaN(parseFloat(payment)) ? 0 : parseFloat(payment)) : 0,
       fees_1: payment ? (isNaN(parseFloat(payment)) ? 0 : parseFloat(payment)) : 0,
       homework_score: 0,
@@ -1887,11 +1887,11 @@
     const record = {
       student_id: studentId,
       student_name: studentName,
-      center: studentCache[studentId]?.center || 'Default Center',
-      grade: studentCache[studentId]?.grade || 'N/A',
+      center: studentCache[studentId]?.center || '',
+      grade: studentCache[studentId]?.grade || '',
       phone: studentCache[studentId]?.phone || '',
       parent_phone: studentCache[studentId]?.parent_phone || '',
-      subject: studentCache[studentId]?.subject || 'General',
+      subject: studentCache[studentId]?.subject || '',
       fees: paymentAmount ? parseFloat(paymentAmount) : 0,
       homework_score: homeworkScore ? parseInt(homeworkScore) : 0,
       exam_score: null,
@@ -1907,11 +1907,11 @@
       const studentData = {
         id: studentId,
         name: studentName,
-        center: studentCache[studentId]?.center || 'Default Center',
-        grade: studentCache[studentId]?.grade || 'N/A',
+        center: studentCache[studentId]?.center || '',
+        grade: studentCache[studentId]?.grade || '',
         phone: studentCache[studentId]?.phone || '',
         parent_phone: studentCache[studentId]?.parent_phone || '',
-        subject: studentCache[studentId]?.subject || 'General',
+        subject: studentCache[studentId]?.subject || '',
         fees: paymentAmount ? parseFloat(paymentAmount) : 0,
         method: 'qr_scan'
       };
@@ -1979,20 +1979,16 @@
     }
   }
 
-  // Show reconnect overlay
+  // Show reconnect overlay - DISABLED
   function showReconnectOverlay() {
-    const overlay = document.getElementById('reconnect-overlay');
-    if (overlay) {
-      overlay.style.display = 'flex';
-    }
+    // Popup disabled - no action taken
+    console.log('Reconnect overlay disabled');
   }
 
-  // Hide reconnect overlay
+  // Hide reconnect overlay - DISABLED
   function hideReconnectOverlay() {
-    const overlay = document.getElementById('reconnect-overlay');
-    if (overlay) {
-      overlay.style.display = 'none';
-    }
+    // Popup disabled - no action taken
+    console.log('Reconnect overlay disabled');
   }
 
   // Setup permanent reconnect bar

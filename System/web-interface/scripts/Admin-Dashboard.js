@@ -249,7 +249,7 @@
     if (connectionAttempts >= maxReconnectAttempts) {
       console.log('Max reconnection attempts reached, stopping reconnection');
       addLogEntry('error', 'Max reconnection attempts reached. Please use manual reconnect.');
-      showReconnectOverlay();
+      // Removed popup - just show log entry
       return;
     }
     
@@ -286,20 +286,16 @@
     }
   }
 
-  // Show reconnect overlay
+  // Show reconnect overlay - DISABLED
   function showReconnectOverlay() {
-    const overlay = document.getElementById('reconnect-overlay');
-    if (overlay) {
-      overlay.style.display = 'flex';
-    }
+    // Popup disabled - no action taken
+    console.log('Reconnect overlay disabled');
   }
 
-  // Hide reconnect overlay
+  // Hide reconnect overlay - DISABLED
   function hideReconnectOverlay() {
-    const overlay = document.getElementById('reconnect-overlay');
-    if (overlay) {
-      overlay.style.display = 'none';
-    }
+    // Popup disabled - no action taken
+    console.log('Reconnect overlay disabled');
   }
 
   // Setup permanent reconnect bar

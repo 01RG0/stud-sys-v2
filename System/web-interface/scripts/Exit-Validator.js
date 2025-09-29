@@ -305,7 +305,7 @@
     if (connectionAttempts >= maxReconnectAttempts) {
       console.log('Max reconnection attempts reached, stopping reconnection');
       showNotification('❌ Max reconnection attempts reached. Please use manual reconnect.', 'error');
-      showReconnectOverlay();
+      // Removed popup - just show notification
       return;
     }
     
@@ -508,23 +508,23 @@
         <td>${date.toLocaleDateString()}</td>
         <td>${date.toLocaleTimeString()}</td>
         <td>${record.student_id}</td>
-        <td>${record.student_name || 'N/A'}</td>
-        <td>${record.center || 'N/A'}</td>
-        <td>${record.fees || 'N/A'}</td>
-        <td>${record.homework_score || 'N/A'}</td>
-        <td>${record.exam_score || 'N/A'}</td>
-        <td>${record.error || 'N/A'}</td>
+        <td>${record.student_name || ''}</td>
+        <td>${record.center || ''}</td>
+        <td>${record.fees || ''}</td>
+        <td>${record.homework_score || ''}</td>
+        <td>${record.exam_score || ''}</td>
+        <td>${record.error || ''}</td>
         <td>${record.timestamp}</td>
-        <td>${record.extra_sessions || 'N/A'}</td>
-        <td>${record.comment || 'N/A'}</td>
-        <td>${record.error_detail || 'N/A'}</td>
-        <td>${record.fees_1 || 'N/A'}</td>
-        <td>${record.subject || 'N/A'}</td>
-        <td>${record.grade || 'N/A'}</td>
-        <td>${record.session_sequence || 'N/A'}</td>
-        <td>${record.guest_info || 'N/A'}</td>
-        <td>${record.phone || 'N/A'}</td>
-        <td>${record.parent_phone || 'N/A'}</td>
+        <td>${record.extra_sessions || ''}</td>
+        <td>${record.comment || ''}</td>
+        <td>${record.error_detail || ''}</td>
+        <td>${record.fees_1 || ''}</td>
+        <td>${record.subject || ''}</td>
+        <td>${record.grade || ''}</td>
+        <td>${record.session_sequence || ''}</td>
+        <td>${record.guest_info || ''}</td>
+        <td>${record.phone || ''}</td>
+        <td>${record.parent_phone || ''}</td>
       `;
       
       tbody.appendChild(row);
@@ -573,14 +573,14 @@
         <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-top: 16px;">
           <h4 style="margin: 0 0 12px 0; color: #333;">Student Details</h4>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px;">
-            <div><strong>Name:</strong> ${record.student_name || 'N/A'}</div>
-            <div><strong>Center:</strong> ${record.center || 'N/A'}</div>
-            <div><strong>Subject:</strong> ${record.subject || 'N/A'}</div>
-            <div><strong>Grade:</strong> ${record.grade || 'N/A'}</div>
-            <div><strong>Homework:</strong> ${record.homework_score || 'N/A'}/10</div>
-            <div><strong>Exam:</strong> ${record.exam_score || 'N/A'}/10</div>
-            <div><strong>Extra Sessions:</strong> ${record.extra_sessions || 'N/A'}</div>
-            <div><strong>Device:</strong> ${record.device_name || 'N/A'}</div>
+            <div><strong>Name:</strong> ${record.student_name || ''}</div>
+            <div><strong>Center:</strong> ${record.center || ''}</div>
+            <div><strong>Subject:</strong> ${record.subject || ''}</div>
+            <div><strong>Grade:</strong> ${record.grade || ''}</div>
+            <div><strong>Homework:</strong> ${record.homework_score || ''}/10</div>
+            <div><strong>Exam:</strong> ${record.exam_score || ''}/10</div>
+            <div><strong>Extra Sessions:</strong> ${record.extra_sessions || ''}</div>
+            <div><strong>Device:</strong> ${record.device_name || ''}</div>
           </div>
           ${record.comment ? `<div style="margin-top: 12px;"><strong>Comment:</strong> ${record.comment}</div>` : ''}
           <div style="margin-top: 12px; font-size: 12px; color: #6c757d;">
@@ -735,24 +735,24 @@
           'Date': date.toLocaleDateString(),
           'Time': date.toLocaleTimeString(),
           'ID': record.student_id,
-          'Name': record.student_name || 'N/A',
-          'Center': record.center || 'N/A',
-          'Fees': record.fees || 'N/A',
-          'Homework': record.homework_score || 'N/A',
-          'Exam': record.exam_score || 'N/A',
-          'Error': record.error || 'N/A',
+          'Name': record.student_name || '',
+          'Center': record.center || '',
+          'Fees': record.fees || '',
+          'Homework': record.homework_score || '',
+          'Exam': record.exam_score || '',
+          'Error': record.error || '',
           'Timestamp': record.timestamp,
-          'Extra Sessions': record.extra_sessions || 'N/A',
-          'Comment': record.comment || 'N/A',
-          'Error Detail': record.error_detail || 'N/A',
-          'Fees.1': record.fees_1 || 'N/A',
-          'Subject': record.subject || 'N/A',
-          'Grade': record.grade || 'N/A',
-          'Session Sequence': record.session_sequence || 'N/A',
-          'Guest Info': record.guest_info || 'N/A',
-          'Phone': record.phone || 'N/A',
-          'Parent Phone': record.parent_phone || 'N/A',
-          'Device': record.device_name || 'N/A',
+          'Extra Sessions': record.extra_sessions || '',
+          'Comment': record.comment || '',
+          'Error Detail': record.error_detail || '',
+          'Fees.1': record.fees_1 || '',
+          'Subject': record.subject || '',
+          'Grade': record.grade || '',
+          'Session Sequence': record.session_sequence || '',
+          'Guest Info': record.guest_info || '',
+          'Phone': record.phone || '',
+          'Parent Phone': record.parent_phone || '',
+          'Device': record.device_name || '',
           'Registered': record.registered ? 'Yes' : 'No'
         };
       });
@@ -922,20 +922,16 @@
     }
   }
 
-  // Show reconnect overlay
+  // Show reconnect overlay - DISABLED
   function showReconnectOverlay() {
-    const overlay = document.getElementById('reconnect-overlay');
-    if (overlay) {
-      overlay.style.display = 'flex';
-    }
+    // Popup disabled - no action taken
+    console.log('Reconnect overlay disabled');
   }
 
-  // Hide reconnect overlay
+  // Hide reconnect overlay - DISABLED
   function hideReconnectOverlay() {
-    const overlay = document.getElementById('reconnect-overlay');
-    if (overlay) {
-      overlay.style.display = 'none';
-    }
+    // Popup disabled - no action taken
+    console.log('Reconnect overlay disabled');
   }
 
   // Setup permanent reconnect bar

@@ -65,7 +65,8 @@ async function createTables() {
     // Students table
     await pool.execute(`
       CREATE TABLE IF NOT EXISTS students (
-        id VARCHAR(50) DEFAULT '',
+        internal_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        id VARCHAR(50) NULL,
         name VARCHAR(255) NOT NULL,
         center VARCHAR(255),
         grade VARCHAR(50),
@@ -80,7 +81,8 @@ async function createTables() {
         guest_info TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        PRIMARY KEY (id, name),
+        UNIQUE KEY unique_name (name),
+        INDEX idx_id (id),
         INDEX idx_name (name),
         INDEX idx_center (center),
         INDEX idx_grade (grade)
@@ -121,6 +123,40 @@ async function createTables() {
         INDEX idx_offline_mode (offline_mode)
       )
     `);
+    
+    // Migrate existing students table to use auto-increment primary key
+    try {
+      // Check if internal_id column exists
+      const [columns] = await pool.execute(`SHOW COLUMNS FROM students LIKE 'internal_id'`);
+      
+      if (columns.length === 0) {
+        // Add internal_id as auto-increment primary key
+        await pool.execute(`ALTER TABLE students ADD COLUMN internal_id BIGINT AUTO_INCREMENT PRIMARY KEY FIRST`);
+        console.log('✅ Added internal_id as auto-increment primary key');
+        
+        // Make id column nullable
+        await pool.execute(`ALTER TABLE students MODIFY COLUMN id VARCHAR(50) NULL`);
+        console.log('✅ Made id column nullable');
+        
+        // Add unique constraint on name if it doesn't exist
+        try {
+          await pool.execute(`ALTER TABLE students ADD UNIQUE KEY unique_name (name)`);
+          console.log('✅ Added unique constraint on name');
+        } catch (nameError) {
+          if (!nameError.message.includes('Duplicate key name')) {
+            console.log('ℹ️ Name constraint note:', nameError.message);
+          }
+        }
+      } else {
+        console.log('✅ Students table already has internal_id column');
+      }
+      
+    } catch (error) {
+      // Ignore error if table doesn't exist or constraints already exist
+      if (!error.message.includes("doesn't exist") && !error.message.includes('Duplicate key name')) {
+        console.log('ℹ️ Students table migration note:', error.message);
+      }
+    }
     
     // Migrate existing entry_registrations table to allow null student_id
     try {
@@ -266,6 +302,14 @@ class Database {
         id, name, center, grade, phone, parent_phone, subject, fees, email, address
       } = studentData;
       
+      // Handle ID field - keep empty/null values as they are (no auto-generation)
+      let studentId = id;
+      if (!studentId || studentId === null || studentId === 'null' || studentId.trim() === '') {
+        // Keep empty/null values as null in database
+        studentId = null;
+        console.log(`Keeping null/empty ID for student: ${name}`);
+      }
+      
       const result = await pool.execute(`
         INSERT INTO students (id, name, center, grade, phone, parent_phone, subject, fees, email, address)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -281,7 +325,7 @@ class Database {
         address = VALUES(address),
         updated_at = CURRENT_TIMESTAMP
       `, [
-        id, 
+        studentId, 
         name || null, 
         center || null,
         grade || null,
@@ -310,6 +354,14 @@ class Database {
         device_name, registered, entry_method, offline_mode, timestamp
       } = registrationData;
       
+      // Handle student_id field - keep empty/null values as they are (no auto-generation)
+      let finalStudentId = student_id;
+      if (!finalStudentId || finalStudentId === null || finalStudentId === 'null' || finalStudentId.trim() === '') {
+        // Keep empty/null values as null in database
+        finalStudentId = null;
+        console.log(`Keeping null/empty ID for registration: ${student_name}`);
+      }
+      
       const [result] = await pool.execute(`
         INSERT INTO entry_registrations (
           student_id, student_name, center, grade, phone, parent_phone,
@@ -318,7 +370,7 @@ class Database {
           device_name, registered, entry_method, offline_mode, timestamp
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [
-        student_id || null,
+        finalStudentId || null,
         student_name || null,
         center || null,
         grade || null,
