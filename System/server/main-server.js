@@ -113,12 +113,12 @@ const devices = new Map();
 
 // Connection management and auto-reconnection settings
 const CONNECTION_CONFIG = {
-  HEARTBEAT_INTERVAL: 10000, // 10 seconds
-  CONNECTION_TIMEOUT: 30000, // 30 seconds
+  HEARTBEAT_INTERVAL: 30000, // 30 seconds (increased from 10)
+  CONNECTION_TIMEOUT: 120000, // 2 minutes (increased from 30 seconds)
   RECONNECT_ATTEMPTS: 5,
-  RECONNECT_DELAY: 3000, // 3 seconds
-  DEVICE_DISCOVERY_INTERVAL: 5000, // 5 seconds
-  NETWORK_SCAN_INTERVAL: 10000 // 10 seconds
+  RECONNECT_DELAY: 5000, // 5 seconds (increased from 3)
+  DEVICE_DISCOVERY_INTERVAL: 15000, // 15 seconds (increased from 5)
+  NETWORK_SCAN_INTERVAL: 30000 // 30 seconds (increased from 10)
 };
 
 // Track connection attempts and network status
@@ -712,20 +712,28 @@ function updateNetworkStatus() {
   networkStatus.lastCheck = now;
   networkStatus.devicesFound = new Set(onlineDevices.map(d => d.name));
   
-  // Notify if network status changed
+  // Notify if network status changed (with debouncing to reduce spam)
   if (previousStatus !== networkStatus.isOnline) {
-    logToSystem(networkStatus.isOnline ? 'success' : 'warning', 
-      `Network status changed: ${networkStatus.isOnline ? 'Online' : 'Offline'}`, {
-        onlineDevices: onlineDevices.length,
-        totalDevices: devices.size
-      });
+    // Only log significant status changes, not temporary fluctuations
+    const statusChangeThreshold = 5000; // 5 seconds
+    const timeSinceLastChange = now - (networkStatus.lastStatusChange || 0);
     
-    broadcastToAdmins({
-      type: 'network_status_change',
-      isOnline: networkStatus.isOnline,
-      onlineDevices: onlineDevices.length,
-      timestamp: new Date().toISOString()
-    });
+    if (timeSinceLastChange > statusChangeThreshold) {
+      logToSystem(networkStatus.isOnline ? 'success' : 'warning', 
+        `Network status changed: ${networkStatus.isOnline ? 'Online' : 'Offline'}`, {
+          onlineDevices: onlineDevices.length,
+          totalDevices: devices.size
+        });
+      
+      broadcastToAdmins({
+        type: 'network_status_change',
+        isOnline: networkStatus.isOnline,
+        onlineDevices: onlineDevices.length,
+        timestamp: new Date().toISOString()
+      });
+      
+      networkStatus.lastStatusChange = now;
+    }
   }
 }
 
@@ -1769,7 +1777,7 @@ const httpServer = app.listen(HTTP_PORT, '0.0.0.0', async () => {
         setInterval(broadcastDeviceDiscovery, CONNECTION_CONFIG.NETWORK_SCAN_INTERVAL);
         
         // Start periodic stats broadcasts to admin dashboards
-        setInterval(broadcastUpdatedStats, 5000); // Every 5 seconds
+        setInterval(broadcastUpdatedStats, 15000); // Every 15 seconds (reduced from 5)
   
   // Use new logging system
   logToSystem('success', 'Student Lab System started successfully');
@@ -1860,15 +1868,24 @@ function handleWebSocketConnection(ws, source) {
       const data = JSON.parse(msg);
       
       if (data.type === 'register_device') {
+        // Check if this is a reconnection of an existing device
+        const existingDevice = Array.from(devices.values()).find(d => d.name === data.name && d.role === data.role);
+        const isReconnection = existingDevice !== undefined;
+        
         devices.set(ws, { 
           role: data.role, 
           name: data.name, 
           lastSeen: Date.now(),
-          connectionTime: Date.now(),
-          initialDataPushed: false // Initialize flag for one-time data push
+          connectionTime: isReconnection ? existingDevice.connectionTime : Date.now(),
+          initialDataPushed: isReconnection ? existingDevice.initialDataPushed : false,
+          reconnectCount: isReconnection ? (existingDevice.reconnectCount || 0) + 1 : 0
         });
         
-        logToSystem('success', `Device registered: ${data.name} (${data.role})`);
+        if (isReconnection) {
+          logToSystem('info', `Device reconnected: ${data.name} (${data.role}) - Reconnect #${devices.get(ws).reconnectCount}`);
+        } else {
+          logToSystem('success', `Device registered: ${data.name} (${data.role})`);
+        }
         
         // AUTO-PUSH: Send student cache to Entry Scanner devices only once upon initial connection
         const deviceInfo = devices.get(ws);
@@ -1886,10 +1903,11 @@ function handleWebSocketConnection(ws, source) {
           // Mark that the initial data has been pushed
           deviceInfo.initialDataPushed = true;
           
-          logToSystem('success', `Auto-pushed ${studentCount} students to new Entry Scanner: ${data.name}`, {
+          logToSystem('success', `Auto-pushed ${studentCount} students to Entry Scanner: ${data.name}`, {
             deviceName: data.name,
             studentCount: studentCount,
-            cacheSize: JSON.stringify(studentCache).length
+            cacheSize: JSON.stringify(studentCache).length,
+            isReconnection: isReconnection
           });
         }
         
@@ -2205,20 +2223,30 @@ function handleWebSocketConnection(ws, source) {
   ws.on('close', async () => {
     const deviceInfo = devices.get(ws);
     if (deviceInfo) {
-      logToSystem('warning', `Device disconnected: ${deviceInfo.name} (${deviceInfo.role})`);
+      // Only log disconnection if it's not a frequent reconnector
+      const reconnectCount = deviceInfo.reconnectCount || 0;
+      if (reconnectCount < 3) {
+        logToSystem('warning', `Device disconnected: ${deviceInfo.name} (${deviceInfo.role})`);
+      } else {
+        logToSystem('info', `Device disconnected: ${deviceInfo.name} (${deviceInfo.role}) - Frequent reconnector`);
+      }
       
-      // Notify admins about device disconnection
-      broadcastToAdmins({
-        type: 'device_disconnected',
-        name: deviceInfo.name,
-        role: deviceInfo.role,
-        timestamp: new Date().toISOString()
-      });
+      // Notify admins about device disconnection (but not for frequent reconnectors)
+      if (reconnectCount < 5) {
+        broadcastToAdmins({
+          type: 'device_disconnected',
+          name: deviceInfo.name,
+          role: deviceInfo.role,
+          timestamp: new Date().toISOString()
+        });
+      }
       
       devices.delete(ws);
       
-      // Broadcast updated stats (active scanners count changed)
-      await broadcastUpdatedStats();
+      // Broadcast updated stats (active scanners count changed) - but less frequently
+      if (reconnectCount < 3) {
+        await broadcastUpdatedStats();
+      }
     } else {
       logToSystem('info', 'WebSocket connection closed');
     }
