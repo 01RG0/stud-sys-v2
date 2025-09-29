@@ -1864,13 +1864,15 @@ function handleWebSocketConnection(ws, source) {
           role: data.role, 
           name: data.name, 
           lastSeen: Date.now(),
-          connectionTime: Date.now()
+          connectionTime: Date.now(),
+          initialDataPushed: false // Initialize flag for one-time data push
         });
         
         logToSystem('success', `Device registered: ${data.name} (${data.role})`);
         
-        // AUTO-PUSH: Send student cache to Entry Scanner devices immediately upon connection
-        if (data.role === 'first_scan') {
+        // AUTO-PUSH: Send student cache to Entry Scanner devices only once upon initial connection
+        const deviceInfo = devices.get(ws);
+        if (data.role === 'first_scan' && deviceInfo && !deviceInfo.initialDataPushed) {
           const studentCount = Object.keys(studentCache).length;
           
           // Send the complete student database to the newly connected Entry Scanner
@@ -1881,7 +1883,10 @@ function handleWebSocketConnection(ws, source) {
             totalStudents: studentCount
           }));
           
-          logToSystem('success', `Auto-pushed ${studentCount} students to Entry Scanner: ${data.name}`, {
+          // Mark that the initial data has been pushed
+          deviceInfo.initialDataPushed = true;
+          
+          logToSystem('success', `Auto-pushed ${studentCount} students to new Entry Scanner: ${data.name}`, {
             deviceName: data.name,
             studentCount: studentCount,
             cacheSize: JSON.stringify(studentCache).length

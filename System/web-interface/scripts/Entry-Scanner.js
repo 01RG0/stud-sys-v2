@@ -250,9 +250,6 @@
       // Start heartbeat system
       startHeartbeat();
       
-      // Start connection monitoring
-      startConnectionMonitoring();
-      
       // Start network scanning for other devices
       startNetworkScanning();
       
@@ -1018,23 +1015,17 @@
         
         // Check if we haven't received a heartbeat response in too long
         const timeSinceLastResponse = Date.now() - lastHeartbeatResponse;
-        if (timeSinceLastResponse > 60000) { // 60 seconds - much more lenient
-          console.log('No heartbeat response received for 60 seconds, connection may be stale');
-          console.log(`Last response: ${timeSinceLastResponse}ms ago`);
+        if (timeSinceLastResponse > 35000) { // 35 seconds, slightly more than heartbeat interval
+          console.log('No heartbeat response received for 35 seconds, connection may be stale, closing...');
+          // Force connection status to offline
+          isOnline = false;
+          updateConnectionStatus(false);
           
-          // Only close if we're really sure the connection is dead
-          if (timeSinceLastResponse > 120000) { // 2 minutes - very lenient
-            console.log('Connection appears to be dead, closing...');
-            // Force connection status to offline
-            isOnline = false;
-            updateConnectionStatus(false);
-            
-            // Close the connection to trigger reconnection
-            try {
-              ws.close();
-            } catch (e) {
-              console.log('Error closing stale connection:', e);
-            }
+          // Close the connection to trigger reconnection
+          try {
+            ws.close();
+          } catch (e) {
+            console.log('Error closing stale connection:', e);
           }
         }
       } else {
@@ -1042,38 +1033,10 @@
         isOnline = false;
         updateConnectionStatus(false);
       }
-    }, 30000); // Send heartbeat every 30 seconds - much less frequent
+    }, 30000); // Send heartbeat every 30 seconds
   }
   
-  // Connection monitoring system
-  function startConnectionMonitoring() {
-    setInterval(() => {
-      // Check if WebSocket is actually connected
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        if (isOnline) {
-          console.log('Connection lost - WebSocket not open');
-          isOnline = false;
-          updateConnectionStatus(false);
-        }
-        return;
-      }
-      
-      // Check if we haven't received any response in too long
-      const timeSinceLastResponse = Date.now() - lastHeartbeatResponse;
-      if (timeSinceLastResponse > 20000) { // 20 seconds
-        console.log('Connection appears stale - no server response');
-        isOnline = false;
-        updateConnectionStatus(false);
-        
-        // Try to close and reconnect
-        try {
-          ws.close();
-        } catch (e) {
-          console.log('Error closing stale connection:', e);
-        }
-      }
-    }, 3000); // Check every 3 seconds
-  }
+  
 
   // Network scanning for device discovery
   function startNetworkScanning() {
