@@ -304,24 +304,40 @@ class Database {
   static async createEntryRegistration(registrationData) {
     try {
       const {
-        student_id, student_name, class: studentClass, section, roll_number, 
-        device_name, homework_score, exam_score, timestamp
+        student_id, student_name, center, grade, phone, parent_phone,
+        subject, fees, fees_1, homework_score, exam_score, error,
+        extra_sessions, comment, error_detail, payment_amount,
+        device_name, registered, entry_method, offline_mode, timestamp
       } = registrationData;
       
       const [result] = await pool.execute(`
         INSERT INTO entry_registrations (
-          student_id, student_name, class, section, roll_number, 
-          device_name, homework_score, exam_score, timestamp
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          student_id, student_name, center, grade, phone, parent_phone,
+          subject, fees, fees_1, homework_score, exam_score, error,
+          extra_sessions, comment, error_detail, payment_amount,
+          device_name, registered, entry_method, offline_mode, timestamp
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [
         student_id || null,
         student_name || null,
-        studentClass || null,
-        section || null,
-        roll_number || null,
-        device_name || null,
+        center || null,
+        grade || null,
+        phone || null,
+        parent_phone || null,
+        subject || null,
+        fees || 0,
+        fees_1 || 0,
         homework_score || 0,
-        exam_score || 0,
+        exam_score || null,
+        error || null,
+        extra_sessions || 0,
+        comment || null,
+        error_detail || null,
+        payment_amount || 0,
+        device_name || null,
+        registered || true,
+        entry_method || 'manual',
+        offline_mode || false,
         timestamp ? new Date(timestamp) : new Date()
       ]);
       

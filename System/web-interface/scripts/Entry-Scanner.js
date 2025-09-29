@@ -583,7 +583,6 @@
     const paymentAmount = document.getElementById('payment-amount').value;
     
     const record = {
-      id: Date.now(),
       student_id: studentId,
       student_name: student.name,
       center: student.center,
@@ -1244,7 +1243,6 @@
     
     // Create student record (same format as QR scan)
     const record = {
-      id: Date.now(),
       student_id: studentId,
       student_name: studentName,
       center: center || 'Manual Entry',
@@ -1654,7 +1652,6 @@
     
     // Create student record
     const record = {
-      id: Date.now(),
       student_id: studentId,
       student_name: name,
       center: center || 'Default Center',
@@ -1888,7 +1885,6 @@
     
     // Create student record
     const record = {
-      id: Date.now(),
       student_id: studentId,
       student_name: studentName,
       center: studentCache[studentId]?.center || 'Default Center',
