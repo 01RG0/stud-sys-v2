@@ -1614,13 +1614,13 @@
   async function registerSimpleStudentWithElements(nameElement, centerElement, gradeElement, phoneElement, subjectElement, paymentElement) {
     console.log('🔧 registerSimpleStudentWithElements called');
     
-    // Get values safely
-    const name = nameElement.value.trim();
-    const center = centerElement.value.trim();
-    const grade = gradeElement.value.trim();
-    const phone = phoneElement.value.trim();
-    const subject = subjectElement.value.trim();
-    const payment = paymentElement.value.trim();
+    // Get values safely with null checks
+    const name = (nameElement && nameElement.value) ? nameElement.value.trim() : '';
+    const center = (centerElement && centerElement.value) ? centerElement.value.trim() : '';
+    const grade = (gradeElement && gradeElement.value) ? gradeElement.value.trim() : '';
+    const phone = (phoneElement && phoneElement.value) ? phoneElement.value.trim() : '';
+    const subject = (subjectElement && subjectElement.value) ? subjectElement.value.trim() : '';
+    const payment = (paymentElement && paymentElement.value) ? paymentElement.value.trim() : '';
     
     console.log('🔧 Form values:', { name, center, grade, phone, subject, payment });
     
@@ -1641,18 +1641,52 @@
       parent_phone: '',
       subject: subject || 'General',
       fees: payment ? parseFloat(payment) : 0,
+      fees_1: payment ? parseFloat(payment) : 0,
       homework_score: 0,
       exam_score: null,
       error: null,
       extra_sessions: 0,
       comment: 'Manual entry via simplified form',
       error_detail: null,
-      timestamp: new Date().toISOString()
+      payment_amount: payment ? parseFloat(payment) : 0,
+      timestamp: new Date().toISOString(),
+      device_name: deviceName,
+      registered: true,
+      entry_method: 'manual',
+      offline_mode: offlineMode || !isOnline
     };
     
     try {
-      // Register student
-      await registerStudent(record);
+      // Use the hybrid system for registration (same as QR scan method)
+      // Save locally first (ZERO DATA LOSS)
+      persistLocal(record);
+      
+      // Add to offline registrations if in offline mode
+      if (offlineMode || !isOnline) {
+        offlineRegistrations.push(record);
+        saveOfflineRegistrations();
+      }
+      
+      // Add to MySQL sync queue
+      addToSyncQueue('create_registration', record);
+      
+      // Try to send to manager (will queue if offline)
+      sendToManager(record);
+      
+      // Save data persistently
+      saveDataPersistently();
+      
+      // Update data integrity counters
+      updateDataIntegrityCounters();
+      
+      // Send registration to server via WebSocket (if connected)
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'student_registered',
+          record: record
+        }));
+        console.log('📤 Registration sent to server via WebSocket');
+      }
       
       // Show success message
       showNotification(`✅ Student ${name} registered successfully!`, 'success');
