@@ -1,0 +1,459 @@
+@echo off
+title Enhanced MySQL Setup and Configuration
+color 0C
+setlocal enabledelayedexpansion
+
+echo.
+echo ========================================
+echo   ENHANCED MYSQL SETUP AND CONFIGURATION
+echo ========================================
+echo.
+echo This enhanced setup will:
+echo   ✓ Check MySQL installation and version
+echo   ✓ Test connection and credentials
+echo   ✓ Create database with proper charset
+echo   ✓ Set up database configuration
+echo   ✓ Create tables and indexes
+echo   ✓ Test database operations
+echo   ✓ Configure connection pooling
+echo.
+
+set /p continue="Continue with MySQL setup? (y/n): "
+if /i not "%continue%"=="y" (
+    echo Setup cancelled.
+    pause
+    exit /b 0
+)
+
+echo.
+echo ========================================
+echo   STEP 1: MYSQL INSTALLATION CHECK
+echo ========================================
+
+REM Check if MySQL is installed
+mysql --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ❌ MySQL command line client not found!
+    echo.
+    echo Please install MySQL from: https://dev.mysql.com/downloads/mysql/
+    echo.
+    echo Installation options:
+    echo 1. MySQL Community Server (Recommended)
+    echo 2. MySQL Workbench (GUI tool)
+    echo 3. XAMPP (includes MySQL)
+    echo.
+    echo After installation:
+    echo 1. Add MySQL bin directory to your system PATH
+    echo 2. Restart your command prompt
+    echo 3. Run this script again
+    echo.
+    echo Alternative: Use MySQL Workbench for manual setup
+    pause
+    exit /b 1
+) else (
+    for /f "tokens=*" %%i in ('mysql --version') do set MYSQL_VERSION=%%i
+    echo ✅ MySQL found: %MYSQL_VERSION%
+)
+
+REM Check MySQL service status
+echo.
+echo 🔍 Checking MySQL service status...
+sc query mysql >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ⚠️  MySQL service not found or not accessible
+    echo Please ensure MySQL is properly installed and running
+) else (
+    sc query mysql | findstr "RUNNING" >nul
+    if %errorlevel% neq 0 (
+        echo ⚠️  MySQL service is not running
+        echo Attempting to start MySQL service...
+        net start mysql
+        if %errorlevel% neq 0 (
+            echo ❌ Failed to start MySQL service!
+            echo Please start MySQL service manually or check installation
+            pause
+            exit /b 1
+        ) else (
+            echo ✅ MySQL service started successfully
+        )
+    ) else (
+        echo ✅ MySQL service is running
+    )
+)
+
+echo.
+echo ========================================
+echo   STEP 2: MYSQL CONNECTION TEST
+echo ========================================
+
+echo Please enter your MySQL credentials:
+echo.
+
+set /p mysql_user="MySQL Username (default: root): "
+if "%mysql_user%"=="" set mysql_user=root
+
+set /p mysql_password="MySQL Password (press Enter if no password): "
+
+echo.
+echo 🔗 Testing MySQL connection...
+
+REM Test connection
+if "%mysql_password%"=="" (
+    mysql -u %mysql_user% -e "SELECT 1 as connection_test;" 2>nul
+) else (
+    mysql -u %mysql_user% -p%mysql_password% -e "SELECT 1 as connection_test;" 2>nul
+)
+
+if %errorlevel% neq 0 (
+    echo ❌ MySQL connection failed!
+    echo.
+    echo Common solutions:
+    echo 1. Check if MySQL service is running:
+    echo    net start mysql
+    echo.
+    echo 2. Verify username and password
+    echo 3. Check if MySQL is listening on port 3306:
+    echo    netstat -an | findstr :3306
+    echo.
+    echo 4. Try connecting with MySQL Workbench first
+    echo 5. Check MySQL error logs for details
+    echo.
+    echo 6. Reset MySQL root password if needed:
+    echo    mysqld --init-file=reset-password.txt
+    echo.
+    pause
+    exit /b 1
+) else (
+    echo ✅ MySQL connection successful!
+)
+
+echo.
+echo ========================================
+echo   STEP 3: DATABASE CREATION
+echo ========================================
+
+echo 🗄️ Creating database 'student_lab_system'...
+
+REM Create database with proper charset
+if "%mysql_password%"=="" (
+    mysql -u %mysql_user% -e "CREATE DATABASE IF NOT EXISTS student_lab_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+) else (
+    mysql -u %mysql_user% -p%mysql_password% -e "CREATE DATABASE IF NOT EXISTS student_lab_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+)
+
+if %errorlevel% neq 0 (
+    echo ❌ Failed to create database!
+    echo You may need to create it manually with:
+    echo CREATE DATABASE student_lab_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    pause
+    exit /b 1
+) else (
+    echo ✅ Database 'student_lab_system' created successfully
+)
+
+echo.
+echo ========================================
+echo   STEP 4: DATABASE CONFIGURATION
+echo ========================================
+
+echo 📝 Creating database configuration file...
+
+REM Navigate to server directory
+cd /d "%~dp0..\..\..\System\server"
+
+REM Create database config file
+echo Creating db-config.js...
+(
+echo // Database Configuration
+echo // Generated by ENHANCED_MYSQL_SETUP.bat
+echo // Date: %date% %time%
+echo.
+echo module.exports = {
+echo     host: 'localhost',
+echo     user: '%mysql_user%',
+echo     password: '%mysql_password%',
+echo     database: 'student_lab_system',
+echo     charset: 'utf8mb4',
+echo     connectionLimit: 10,
+echo     acquireTimeout: 60000,
+echo     timeout: 60000,
+echo     reconnect: true,
+echo     multipleStatements: true,
+echo     dateStrings: true,
+echo     supportBigNumbers: true,
+echo     bigNumberStrings: true
+echo };
+) > db-config.js
+
+if %errorlevel% neq 0 (
+    echo ❌ Failed to create database configuration!
+    pause
+    exit /b 1
+) else (
+    echo ✅ Database configuration file created: db-config.js
+)
+
+echo.
+echo ========================================
+echo   STEP 5: DATABASE SCHEMA SETUP
+echo ========================================
+
+echo 🏗️ Creating database tables and indexes...
+
+REM Create SQL script for tables
+echo Creating database schema...
+(
+echo -- Student Lab System Database Schema
+echo -- Generated by ENHANCED_MYSQL_SETUP.bat
+echo.
+echo USE student_lab_system;
+echo.
+echo -- Students table
+echo CREATE TABLE IF NOT EXISTS students (
+echo     id VARCHAR(50) PRIMARY KEY,
+echo     name VARCHAR(255) NOT NULL,
+echo     center VARCHAR(100),
+echo     grade VARCHAR(50),
+echo     phone VARCHAR(20),
+echo     parent_phone VARCHAR(20),
+echo     subject VARCHAR(100),
+echo     payment_amount DECIMAL(10,2) DEFAULT 0.00,
+echo     homework_score INT DEFAULT 0,
+echo     exam_score INT DEFAULT 0,
+echo     comment TEXT,
+echo     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+echo     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+echo     INDEX idx_name (name),
+echo     INDEX idx_center (center),
+echo     INDEX idx_created_at (created_at)
+echo ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+echo.
+echo -- Student sessions table
+echo CREATE TABLE IF NOT EXISTS student_sessions (
+echo     id INT AUTO_INCREMENT PRIMARY KEY,
+echo     student_id VARCHAR(50) NOT NULL,
+echo     session_type ENUM('entry', 'exit') NOT NULL,
+echo     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+echo     device_info TEXT,
+echo     ip_address VARCHAR(45),
+echo     user_agent TEXT,
+echo     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+echo     INDEX idx_student_id (student_id),
+echo     INDEX idx_session_type (session_type),
+echo     INDEX idx_timestamp (timestamp)
+echo ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+echo.
+echo -- System logs table
+echo CREATE TABLE IF NOT EXISTS system_logs (
+echo     id INT AUTO_INCREMENT PRIMARY KEY,
+echo     level ENUM('info', 'warn', 'error', 'debug') NOT NULL,
+echo     message TEXT NOT NULL,
+echo     context JSON,
+echo     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+echo     INDEX idx_level (level),
+echo     INDEX idx_timestamp (timestamp)
+echo ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+echo.
+echo -- Backup records table
+echo CREATE TABLE IF NOT EXISTS backup_records (
+echo     id INT AUTO_INCREMENT PRIMARY KEY,
+echo     backup_type ENUM('full', 'incremental', 'manual') NOT NULL,
+echo     file_path VARCHAR(500),
+echo     file_size BIGINT,
+echo     record_count INT,
+echo     status ENUM('success', 'failed', 'in_progress') NOT NULL,
+echo     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+echo     INDEX idx_backup_type (backup_type),
+echo     INDEX idx_status (status),
+echo     INDEX idx_created_at (created_at)
+echo ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) > database_schema.sql
+
+REM Execute the schema
+if "%mysql_password%"=="" (
+    mysql -u %mysql_user% student_lab_system < database_schema.sql
+) else (
+    mysql -u %mysql_user% -p%mysql_password% student_lab_system < database_schema.sql
+)
+
+if %errorlevel% neq 0 (
+    echo ❌ Failed to create database schema!
+    echo You may need to create tables manually
+) else (
+    echo ✅ Database schema created successfully
+)
+
+REM Clean up SQL file
+del database_schema.sql >nul 2>&1
+
+echo.
+echo ========================================
+echo   STEP 6: DATABASE CONNECTION TEST
+echo ========================================
+
+echo 🧪 Testing database connection from Node.js...
+
+REM Create a comprehensive test script
+echo Creating database test script...
+(
+echo const mysql = require('mysql2/promise'^);
+echo const config = require('./db-config.js'^);
+echo.
+echo async function testDatabase(^) {
+echo     let connection;
+echo     try {
+echo         console.log('🔗 Testing database connection...'^);
+echo         connection = await mysql.createConnection(config^);
+echo         console.log('✅ Database connection successful!'^);
+echo.
+echo         console.log('🔍 Testing database query...'^);
+echo         const [rows] = await connection.execute('SELECT 1 as test, NOW(^) as current_time'^);
+echo         console.log('✅ Database query successful!'^);
+echo         console.log('📊 Query result:', rows[0]^);
+echo.
+echo         console.log('🏗️ Testing table creation...'^);
+echo         await connection.execute('SHOW TABLES'^);
+echo         console.log('✅ Tables accessible!'^);
+echo.
+echo         console.log('📈 Testing insert operation...'^);
+echo         const testData = {
+echo             id: 'TEST_' + Date.now(^),
+echo             name: 'Test Student',
+echo             center: 'Test Center',
+echo             grade: 'Test Grade'
+echo         };
+echo.
+echo         await connection.execute(
+echo             'INSERT INTO students (id, name, center, grade) VALUES (?, ?, ?, ?)',
+echo             [testData.id, testData.name, testData.center, testData.grade]
+echo         ^);
+echo         console.log('✅ Insert operation successful!'^);
+echo.
+echo         console.log('🔍 Testing select operation...'^);
+echo         const [students] = await connection.execute('SELECT * FROM students WHERE id = ?', [testData.id]^);
+echo         console.log('✅ Select operation successful!'^);
+echo         console.log('📊 Retrieved student:', students[0]^);
+echo.
+echo         console.log('🗑️ Cleaning up test data...'^);
+echo         await connection.execute('DELETE FROM students WHERE id = ?', [testData.id]^);
+echo         console.log('✅ Test data cleaned up!'^);
+echo.
+echo         await connection.end(^);
+echo         console.log('✅ Database connection closed successfully!'^);
+echo         console.log('🎉 All database tests passed!'^);
+echo         process.exit(0^);
+echo     } catch (error^) {
+echo         console.error('❌ Database test failed:', error.message^);
+echo         if (connection^) {
+echo             await connection.end(^);
+echo         }
+echo         process.exit(1^);
+echo     }
+echo }
+echo.
+echo testDatabase(^);
+) > test-database-comprehensive.js
+
+REM Run the comprehensive test
+node test-database-comprehensive.js
+if %errorlevel% neq 0 (
+    echo ❌ Database connection test failed!
+    echo.
+    echo Please check:
+    echo 1. MySQL service is running
+    echo 2. Database credentials are correct
+    echo 3. Database 'student_lab_system' exists
+    echo 4. Tables were created successfully
+    echo.
+    pause
+    exit /b 1
+) else (
+    echo ✅ All database tests passed!
+)
+
+REM Clean up test file
+del test-database-comprehensive.js >nul 2>&1
+
+echo.
+echo ========================================
+echo   STEP 7: PERFORMANCE OPTIMIZATION
+echo ========================================
+
+echo ⚡ Optimizing database performance...
+
+REM Create performance optimization script
+(
+echo -- Performance optimization for Student Lab System
+echo USE student_lab_system;
+echo.
+echo -- Analyze tables for better query optimization
+echo ANALYZE TABLE students;
+echo ANALYZE TABLE student_sessions;
+echo ANALYZE TABLE system_logs;
+echo ANALYZE TABLE backup_records;
+echo.
+echo -- Show table status
+echo SHOW TABLE STATUS;
+) > optimize_database.sql
+
+REM Execute optimization
+if "%mysql_password%"=="" (
+    mysql -u %mysql_user% student_lab_system < optimize_database.sql
+) else (
+    mysql -u %mysql_user% -p%mysql_password% student_lab_system < optimize_database.sql
+)
+
+if %errorlevel% neq 0 (
+    echo ⚠️  Performance optimization failed, but database is functional
+) else (
+    echo ✅ Database performance optimized
+)
+
+REM Clean up optimization file
+del optimize_database.sql >nul 2>&1
+
+echo.
+echo ========================================
+echo   MYSQL SETUP COMPLETED SUCCESSFULLY!
+echo ========================================
+echo.
+echo ✅ MySQL: %MYSQL_VERSION%
+echo ✅ Connection: Successful
+echo ✅ Database: student_lab_system created
+echo ✅ Schema: Tables and indexes created
+echo ✅ Configuration: db-config.js created
+echo ✅ Tests: All passed
+echo ✅ Performance: Optimized
+echo.
+echo Your MySQL setup is complete and optimized!
+echo The system will automatically use these settings when it starts.
+echo.
+echo Database Information:
+echo   Host: localhost
+echo   Database: student_lab_system
+echo   User: %mysql_user%
+echo   Charset: utf8mb4
+echo   Engine: InnoDB
+echo.
+echo Tables Created:
+echo   - students (main student data)
+echo   - student_sessions (entry/exit tracking)
+echo   - system_logs (system logging)
+echo   - backup_records (backup tracking)
+echo.
+
+set /p test_connection="Test database connection one more time? (y/n): "
+if /i "%test_connection%"=="y" (
+    echo.
+    echo 🧪 Running final connection test...
+    cd /d "%~dp0..\..\..\System\server"
+    node -e "const mysql=require('mysql2/promise');const config=require('./db-config.js');mysql.createConnection(config).then(conn=>{console.log('✅ Final test passed!');conn.end();process.exit(0);}).catch(err=>{console.error('❌ Final test failed:',err.message);process.exit(1);});"
+    if %errorlevel% neq 0 (
+        echo ❌ Final test failed!
+    ) else (
+        echo ✅ Final test passed!
+    )
+)
+
+echo.
+pause

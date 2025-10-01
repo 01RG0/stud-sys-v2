@@ -302,28 +302,19 @@ class Database {
         id, name, center, grade, phone, parent_phone, subject, fees, email, address
       } = studentData;
       
-      // Handle ID field - keep empty/null values as they are (no auto-generation)
+      // Handle ID field - generate "null" + random number for empty values
       let studentId = id;
       if (!studentId || studentId === null || studentId === 'null' || studentId.trim() === '') {
-        // Keep empty/null values as null in database
-        studentId = null;
-        console.log(`Keeping null/empty ID for student: ${name}`);
+        // Generate "null" + random number for empty values
+        const crypto = require('crypto');
+        const randomNumber = Math.floor(Math.random() * 100000); // 5-digit random number
+        studentId = `null${randomNumber}`;
+        console.log(`Generated null+random ID for student: ${studentId} (from: ${name})`);
       }
       
       const result = await pool.execute(`
         INSERT INTO students (id, name, center, grade, phone, parent_phone, subject, fees, email, address)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-        name = VALUES(name),
-        center = VALUES(center),
-        grade = VALUES(grade),
-        phone = VALUES(phone),
-        parent_phone = VALUES(parent_phone),
-        subject = VALUES(subject),
-        fees = VALUES(fees),
-        email = VALUES(email),
-        address = VALUES(address),
-        updated_at = CURRENT_TIMESTAMP
       `, [
         studentId, 
         name || null, 
@@ -354,12 +345,14 @@ class Database {
         device_name, registered, entry_method, offline_mode, timestamp
       } = registrationData;
       
-      // Handle student_id field - keep empty/null values as they are (no auto-generation)
+      // Handle student_id field - generate "null" + random number for empty values
       let finalStudentId = student_id;
       if (!finalStudentId || finalStudentId === null || finalStudentId === 'null' || finalStudentId.trim() === '') {
-        // Keep empty/null values as null in database
-        finalStudentId = null;
-        console.log(`Keeping null/empty ID for registration: ${student_name}`);
+        // Generate "null" + random number for empty values
+        const crypto = require('crypto');
+        const randomNumber = Math.floor(Math.random() * 100000); // 5-digit random number
+        finalStudentId = `null${randomNumber}`;
+        console.log(`Generated null+random ID for registration: ${finalStudentId} (from: ${student_name})`);
       }
       
       const [result] = await pool.execute(`

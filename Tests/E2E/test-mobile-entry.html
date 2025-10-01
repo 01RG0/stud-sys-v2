@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mobile Entry Test - Student Lab System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .test-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .test-instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-instructions h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .test-instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .test-instructions li {
+            margin: 5px 0;
+        }
+        .test-form {
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        .field-hint {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+            padding: 5px 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            border-left: 3px solid #3498db;
+        }
+        .test-result {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        .test-result.show {
+            display: block;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .test-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1><i class="fas fa-mobile-alt"></i> Mobile Entry Test</h1>
+            <p>Test the mobile-friendly manual entry functionality</p>
+        </div>
+
+        <div class="test-instructions">
+            <h3><i class="fas fa-info-circle"></i> Test Instructions</h3>
+            <ul>
+                <li><strong>On Mobile:</strong> Tap each field and use the "Enter/Return" key on your virtual keyboard</li>
+                <li><strong>On Desktop:</strong> Use the Enter key to navigate between fields</li>
+                <li><strong>Expected Behavior:</strong> Each Enter press should move to the next field</li>
+                <li><strong>Final Field:</strong> Pressing Enter on the last field should show a success message</li>
+            </ul>
+        </div>
+
+        <div class="test-form">
+            <div class="form-group">
+                <label for="test-field-1">Field 1 (Student ID)</label>
+                <input type="text" id="test-field-1" placeholder="Enter student ID" autofocus>
+                <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
+            </div>
+
+            <div class="form-group">
+                <label for="test-field-2">Field 2 (Student Name)</label>
+                <input type="text" id="test-field-2" placeholder="Enter student name">
+                <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
+            </div>
+
+            <div class="form-group">
+                <label for="test-field-3">Field 3 (Phone Number)</label>
+                <input type="tel" id="test-field-3" placeholder="Enter phone number">
+                <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
+            </div>
+
+            <div class="form-group">
+                <label for="test-field-4">Field 4 (Payment Amount)</label>
+                <input type="number" id="test-field-4" placeholder="Enter payment amount">
+                <div class="field-hint"><i class="fas fa-check"></i> Tap <strong>Enter/Return</strong> to complete</div>
+            </div>
+
+            <button class="btn" onclick="resetTest()">Reset Test</button>
+        </div>
+
+        <div class="test-result" id="test-result">
+            <h3><i class="fas fa-check-circle"></i> Test Completed Successfully!</h3>
+            <p>All fields were navigated using the Enter/Return key. The mobile entry functionality is working correctly.</p>
+        </div>
+    </div>
+
+    <script>
+        const fields = ['test-field-1', 'test-field-2', 'test-field-3', 'test-field-4'];
+        let currentFieldIndex = 0;
+
+        // Setup mobile-friendly event listeners
+        fields.forEach((fieldId, index) => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                const handleNavigation = () => {
+                    console.log(`Navigation triggered for field ${fieldId} (index: ${index})`);
+                    
+                    if (index < fields.length - 1) {
+                        // Move to next field
+                        const nextField = document.getElementById(fields[index + 1]);
+                        if (nextField) {
+                            nextField.focus();
+                        }
+                    } else {
+                        // Last field - show success message
+                        document.getElementById('test-result').classList.add('show');
+                    }
+                };
+
+                // Multiple event listeners for mobile compatibility
+                field.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        e.preventDefault();
+                        handleNavigation();
+                    }
+                });
+
+                field.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        e.preventDefault();
+                        handleNavigation();
+                    }
+                });
+
+                field.addEventListener('input', (e) => {
+                    if (e.inputType === 'insertLineBreak' || e.data === '\n') {
+                        e.preventDefault();
+                        handleNavigation();
+                    }
+                });
+
+                // Mobile optimization
+                if (fieldId === 'test-field-3') {
+                    field.setAttribute('inputmode', 'numeric');
+                } else if (fieldId === 'test-field-4') {
+                    field.setAttribute('inputmode', 'decimal');
+                }
+
+                field.setAttribute('autocomplete', 'off');
+                field.setAttribute('autocorrect', 'off');
+                field.setAttribute('autocapitalize', 'off');
+                field.setAttribute('spellcheck', 'false');
+            }
+        });
+
+        function resetTest() {
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.value = '';
+                }
+            });
+            document.getElementById('test-result').classList.remove('show');
+            document.getElementById('test-field-1').focus();
+        }
+    </script>
+</body>
+</html>

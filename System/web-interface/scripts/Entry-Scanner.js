@@ -524,7 +524,8 @@
           <i class="fas fa-book-open"></i>
           Homework Score (0-10)
         </label>
-        <input id="hw" type="number" min="0" max="10" step="0.5" placeholder="Enter homework score" />
+        <input id="hw" type="number" min="0" max="10" step="0.5" placeholder="Enter homework score" autofocus />
+        <div class="field-hint"><i class="fas fa-arrow-right"></i> Press <strong>Enter</strong> to move to next field</div>
       </div>
       
       <div class="form-group">
@@ -533,6 +534,7 @@
           Extra Sessions
         </label>
         <input id="extra" type="number" min="0" value="0" placeholder="Number of extra sessions" />
+        <div class="field-hint"><i class="fas fa-arrow-right"></i> Press <strong>Enter</strong> to move to next field</div>
       </div>
       
       <div class="payment-section">
@@ -543,6 +545,7 @@
             Payment Amount
           </label>
           <input id="payment-amount" type="number" step="0.01" min="0" placeholder="0.00" />
+          <div class="field-hint"><i class="fas fa-arrow-right"></i> Press <strong>Enter</strong> to move to next field</div>
         </div>
       </div>
       
@@ -552,6 +555,7 @@
           Comment
         </label>
         <textarea id="comment" placeholder="Optional comment about the session..."></textarea>
+        <div class="field-hint"><i class="fas fa-check"></i> Press <strong>Enter</strong> to register student</div>
       </div>
       
       <div class="form-actions">
@@ -575,8 +579,10 @@
       }
     };
     
-    // Focus on homework score input
-    document.getElementById('hw').focus();
+    // Setup easy Enter key navigation
+    setTimeout(() => {
+      setupEasyQRForm();
+    }, 100);
   }
 
   function registerStudent(studentId, student) {
@@ -1097,7 +1103,13 @@
       <div class="simple-entry-form">
         <div class="form-header">
           <h3><i class="fas fa-keyboard"></i> Quick Student Entry</h3>
-          <p class="form-instructions">Press <strong>Enter</strong> to move to next field. Final <strong>Enter</strong> registers student. <em>All fields are optional.</em></p>
+          <p class="form-instructions">
+            <i class="fas fa-mobile-alt"></i> 
+            <strong>Mobile:</strong> Tap <strong>Enter/Return</strong> on your keyboard to move to next field. 
+            <br><i class="fas fa-desktop"></i> 
+            <strong>Desktop:</strong> Press <strong>Enter</strong> key. 
+            <br><em>Final Enter/Return registers the student. All fields are optional.</em>
+          </p>
         </div>
         
         <div class="form-steps">
@@ -1140,43 +1152,43 @@
             <div class="field-group active" data-field="1">
               <label for="simple-id">Student ID (Optional)</label>
               <input type="text" id="simple-id" placeholder="Enter student ID (optional)" autofocus>
-              <div class="field-hint">Press Enter to continue (leave empty to skip ID)</div>
+              <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue (leave empty to skip ID)</div>
             </div>
             
             <div class="field-group" data-field="2">
               <label for="simple-name">Student Name</label>
               <input type="text" id="simple-name" placeholder="Enter student name">
-              <div class="field-hint">Press Enter to continue</div>
+              <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
             </div>
             
             <div class="field-group" data-field="3">
               <label for="simple-center">Center</label>
               <input type="text" id="simple-center" placeholder="Enter center name">
-              <div class="field-hint">Press Enter to continue</div>
+              <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
             </div>
             
             <div class="field-group" data-field="4">
               <label for="simple-grade">Grade</label>
               <input type="text" id="simple-grade" placeholder="Enter grade">
-              <div class="field-hint">Press Enter to continue</div>
+              <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
             </div>
             
             <div class="field-group" data-field="5">
               <label for="simple-phone">Phone</label>
               <input type="text" id="simple-phone" placeholder="Enter phone number">
-              <div class="field-hint">Press Enter to continue</div>
+              <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
             </div>
             
             <div class="field-group" data-field="6">
               <label for="simple-subject">Subject</label>
               <input type="text" id="simple-subject" placeholder="Enter subject">
-              <div class="field-hint">Press Enter to continue</div>
+              <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
             </div>
             
             <div class="field-group" data-field="7">
               <label for="simple-payment">Payment Amount</label>
               <input type="text" id="simple-payment" placeholder="Enter payment amount">
-              <div class="field-hint">Press Enter to register student</div>
+              <div class="field-hint"><i class="fas fa-check"></i> Tap <strong>Enter/Return</strong> to register student</div>
             </div>
             
             <div class="field-group" data-field="8">
@@ -1410,25 +1422,127 @@
     
     console.log('✅ All form fields found, setting up event listeners');
     
-    // Add Enter key listeners to all fields
+    // Add Enter key listeners to all fields (mobile-friendly)
     fields.forEach((fieldId, index) => {
       const field = document.getElementById(fieldId);
       console.log(`🔧 Setting up field ${fieldId} (index: ${index}):`, field);
       if (field) {
+        // Function to handle field navigation
+        const handleFieldNavigation = () => {
+          console.log(`🔧 Processing navigation for field ${fieldId} (index: ${index})`);
+          if (index < fields.length - 1) {
+            // Move to next field (index + 2 because data attributes start from 1)
+            console.log(`🔧 Moving to next field: ${index + 2}`);
+            moveToNextField(index + 2);
+          } else {
+            // Last field - automatically register student
+            console.log('🔧 Last field - automatically registering student');
+            registerSimpleStudent();
+          }
+        };
+
+        // Multiple event listeners for better mobile compatibility
         field.addEventListener('keydown', (e) => {
-          console.log(`🔧 Enter key pressed on field ${fieldId} (index: ${index})`);
-          if (e.key === 'Enter') {
+          console.log(`🔧 Keydown event on field ${fieldId}:`, e.key);
+          if (e.key === 'Enter' || e.keyCode === 13) {
             e.preventDefault();
-            console.log(`🔧 Processing Enter key for field ${fieldId}`);
-            if (index < fields.length - 1) {
-              // Move to next field (index + 2 because data attributes start from 1)
-              console.log(`🔧 Moving to next field: ${index + 2}`);
-              moveToNextField(index + 2);
-            } else {
-              // Last field - automatically register student
-              console.log('🔧 Last field - automatically registering student');
-              registerSimpleStudent();
+            handleFieldNavigation();
+          }
+        });
+
+        // Mobile-specific: keyup event (some mobile keyboards use this)
+        field.addEventListener('keyup', (e) => {
+          console.log(`🔧 Keyup event on field ${fieldId}:`, e.key);
+          if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            handleFieldNavigation();
+          }
+        });
+
+        // Mobile-specific: input event for virtual keyboards
+        field.addEventListener('input', (e) => {
+          // Check if this is likely an Enter key press from mobile keyboard
+          if (e.inputType === 'insertLineBreak' || e.data === '\n') {
+            console.log(`🔧 Input event with line break on field ${fieldId}`);
+            e.preventDefault();
+            handleFieldNavigation();
+          }
+        });
+
+        // Mobile-specific: blur event with timeout (fallback for mobile keyboards)
+        let blurTimeout;
+        let lastValue = '';
+        
+        field.addEventListener('blur', () => {
+          // Small delay to check if user pressed Enter
+          blurTimeout = setTimeout(() => {
+            // This is a fallback - only trigger if field has content and value changed
+            if (field.value.trim() && field.value !== lastValue) {
+              console.log(`🔧 Blur fallback for field ${fieldId} - value changed`);
+              handleFieldNavigation();
             }
+          }, 150);
+        });
+
+        // Clear timeout if field gets focus again
+        field.addEventListener('focus', () => {
+          if (blurTimeout) {
+            clearTimeout(blurTimeout);
+          }
+          lastValue = field.value;
+        });
+
+        // Track value changes for better mobile detection
+        field.addEventListener('input', (e) => {
+          lastValue = field.value;
+        });
+
+        // Mobile optimization: Set appropriate input types
+        if (fieldId === 'simple-phone') {
+          field.type = 'tel';
+          field.setAttribute('inputmode', 'numeric');
+        } else if (fieldId === 'simple-payment') {
+          field.type = 'number';
+          field.setAttribute('inputmode', 'decimal');
+        } else if (fieldId === 'simple-id') {
+          field.type = 'text';
+          field.setAttribute('inputmode', 'text');
+        } else {
+          field.type = 'text';
+          field.setAttribute('inputmode', 'text');
+        }
+
+        // Add mobile-friendly attributes
+        field.setAttribute('autocomplete', 'off');
+        field.setAttribute('autocorrect', 'off');
+        field.setAttribute('autocapitalize', 'off');
+        field.setAttribute('spellcheck', 'false');
+
+        // Add visual feedback for mobile users
+        field.addEventListener('focus', () => {
+          field.style.borderColor = '#3498db';
+          field.style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+          
+          // Add a subtle animation to indicate Enter key functionality
+          const hint = field.parentElement.querySelector('.field-hint');
+          if (hint) {
+            hint.style.background = '#d1ecf1';
+            hint.style.borderLeftColor = '#17a2b8';
+            hint.style.transform = 'scale(1.02)';
+            hint.style.transition = 'all 0.2s ease';
+          }
+        });
+
+        field.addEventListener('blur', () => {
+          field.style.borderColor = '#e9ecef';
+          field.style.boxShadow = 'none';
+          
+          // Reset hint styling
+          const hint = field.parentElement.querySelector('.field-hint');
+          if (hint) {
+            hint.style.background = '#e9ecef';
+            hint.style.borderLeftColor = '#3498db';
+            hint.style.transform = 'scale(1)';
           }
         });
       } else {
@@ -1729,6 +1843,36 @@
     currentResult.style.display = 'block';
   }
   
+  // Simple QR Form Enter Key Navigation
+  function setupEasyQRForm() {
+    const fields = ['hw', 'extra', 'payment-amount', 'comment'];
+    
+    fields.forEach((fieldId, index) => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            
+            if (index < fields.length - 1) {
+              // Move to next field
+              const nextField = document.getElementById(fields[index + 1]);
+              if (nextField) {
+                nextField.focus();
+              }
+            } else {
+              // Last field - register student
+              const registerBtn = document.getElementById('btn-register');
+              if (registerBtn) {
+                registerBtn.click();
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+
   // QR Student Form Functions
   function setupQRStudentForm() {
     const fields = ['qr-payment-amount', 'qr-homework-score', 'qr-comment'];
@@ -1756,34 +1900,116 @@
     
     console.log('✅ All QR form fields found, setting up event listeners');
     
-    // Add Enter key listeners to all fields
+    // Add Enter key listeners to all fields (mobile-friendly)
     fields.forEach((fieldId, index) => {
       const field = document.getElementById(fieldId);
       console.log(`🔧 Setting up QR field ${fieldId} (index: ${index}):`, field);
       if (field) {
+        // Function to handle QR field navigation
+        const handleQRFieldNavigation = () => {
+          console.log(`🔧 Processing QR navigation for field ${fieldId} (index: ${index})`);
+          if (index < fields.length - 1) {
+            // Move to next field (index + 2 because data attributes start from 1)
+            console.log(`🔧 Moving to next QR field: ${index + 2}`);
+            moveToNextQRField(index + 2);
+          } else {
+            // Last field - show summary first, then user can register
+            console.log('🔧 Last QR field - showing summary');
+            showQRStudentSummary();
+          }
+        };
+
+        // Multiple event listeners for better mobile compatibility
         field.addEventListener('keydown', (e) => {
-          console.log(`🔧 Enter key pressed on QR field ${fieldId} (index: ${index})`);
-          if (e.key === 'Enter') {
+          console.log(`🔧 Keydown event on QR field ${fieldId}:`, e.key);
+          if (e.key === 'Enter' || e.keyCode === 13) {
             e.preventDefault();
-            console.log(`🔧 Processing Enter key for QR field ${fieldId}`);
-            if (index < fields.length - 1) {
-              // Move to next field (index + 2 because data attributes start from 1)
-              console.log(`🔧 Moving to next QR field: ${index + 2}`);
-              moveToNextQRField(index + 2);
-            } else {
-              // Last field - automatically register student
-              console.log('🔧 Last QR field - automatically registering student');
-              // Get the student data from the QR scan
-              const studentId = window.currentQRStudentId || '';
-              const studentName = window.currentQRStudentName || '';
-              registerQRStudent(studentId, studentName);
-            }
+            handleQRFieldNavigation();
+          }
+        });
+
+        // Mobile-specific: keyup event (some mobile keyboards use this)
+        field.addEventListener('keyup', (e) => {
+          console.log(`🔧 Keyup event on QR field ${fieldId}:`, e.key);
+          if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            handleQRFieldNavigation();
+          }
+        });
+
+        // Mobile-specific: input event for virtual keyboards
+        field.addEventListener('input', (e) => {
+          // Check if this is likely an Enter key press from mobile keyboard
+          if (e.inputType === 'insertLineBreak' || e.data === '\n') {
+            console.log(`🔧 Input event with line break on QR field ${fieldId}`);
+            e.preventDefault();
+            handleQRFieldNavigation();
+          }
+        });
+
+        // Mobile optimization: Set appropriate input types
+        if (fieldId === 'qr-payment-amount') {
+          field.type = 'number';
+          field.setAttribute('inputmode', 'decimal');
+        } else if (fieldId === 'qr-homework-score') {
+          field.type = 'number';
+          field.setAttribute('inputmode', 'numeric');
+        } else {
+          field.type = 'text';
+          field.setAttribute('inputmode', 'text');
+        }
+
+        // Add mobile-friendly attributes
+        field.setAttribute('autocomplete', 'off');
+        field.setAttribute('autocorrect', 'off');
+        field.setAttribute('autocapitalize', 'off');
+        field.setAttribute('spellcheck', 'false');
+
+        // Add visual feedback for mobile users
+        field.addEventListener('focus', () => {
+          field.style.borderColor = '#3498db';
+          field.style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+          
+          // Add a subtle animation to indicate Enter key functionality
+          const hint = field.parentElement.querySelector('.field-hint');
+          if (hint) {
+            hint.style.background = '#d1ecf1';
+            hint.style.borderLeftColor = '#17a2b8';
+            hint.style.transform = 'scale(1.02)';
+            hint.style.transition = 'all 0.2s ease';
+          }
+        });
+
+        field.addEventListener('blur', () => {
+          field.style.borderColor = '#e9ecef';
+          field.style.boxShadow = 'none';
+          
+          // Reset hint styling
+          const hint = field.parentElement.querySelector('.field-hint');
+          if (hint) {
+            hint.style.background = '#e9ecef';
+            hint.style.borderLeftColor = '#3498db';
+            hint.style.transform = 'scale(1)';
           }
         });
       } else {
         console.error(`❌ QR field not found: ${fieldId}`);
       }
     });
+    
+    // Add click event listener to register button
+    const registerBtn = document.getElementById('register-qr-btn');
+    if (registerBtn) {
+      registerBtn.addEventListener('click', () => {
+        console.log('🔧 QR Register button clicked');
+        const studentId = window.currentQRStudentId || '';
+        const studentName = window.currentQRStudentName || '';
+        registerQRStudent(studentId, studentName);
+      });
+      console.log('✅ QR Register button event listener added');
+    } else {
+      console.error('❌ QR Register button not found');
+    }
     
     console.log('✅ QR student form setup complete');
   }
@@ -1842,10 +2068,10 @@
       <h4><i class="fas fa-user-check"></i> Registration Summary</h4>
       <div class="summary-details">
         <div class="summary-item">
-          <strong>Payment Amount:</strong> ${paymentAmount || '0.00'}
+          <strong>Payment Amount:</strong> ${paymentAmount ? '$' + paymentAmount : 'No payment'}
         </div>
         <div class="summary-item">
-          <strong>Homework Score:</strong> ${homeworkScore || '0'}
+          <strong>Homework Score:</strong> ${homeworkScore || '0'}/10
         </div>
         <div class="summary-item">
           <strong>Comments:</strong> ${comment || 'None'}

@@ -1,0 +1,22 @@
+<DOCTYPE html> 
+<html> 
+<head> 
+<title>LocalStorage Test</title> 
+</head> 
+<body> 
+<script> 
+try { 
+  localStorage.setItem('test_key', 'test_value'); 
+  const value = localStorage.getItem('test_key'); 
+  if (value === 'test_value') { 
+    console.log('✅ LocalStorage working'); 
+  } else { 
+    console.log('❌ LocalStorage not working'); 
+  } 
+  localStorage.removeItem('test_key'); 
+} catch (error) { 
+  console.log('❌ LocalStorage error:', error.message); 
+} 
+</script> 
+</body> 
+</html> 

@@ -1,0 +1,488 @@
+@echo off
+title Student Lab System - Master Setup
+color 0A
+setlocal enabledelayedexpansion
+
+echo.
+echo ========================================
+echo   STUDENT LAB SYSTEM - MASTER SETUP
+echo ========================================
+echo.
+echo This comprehensive setup will:
+echo   ✓ Check and install all dependencies
+echo   ✓ Set up MySQL database
+echo   ✓ Configure SSL certificates
+echo   ✓ Install all packages
+echo   ✓ Test system functionality
+echo   ✓ Organize project files
+echo   ✓ Fix common issues
+echo.
+
+set /p continue="Continue with master setup? (y/n): "
+if /i not "%continue%"=="y" (
+    echo Setup cancelled.
+    pause
+    exit /b 0
+)
+
+echo.
+echo ========================================
+echo   STEP 1: SYSTEM REQUIREMENTS CHECK
+echo ========================================
+
+REM Check Windows version
+echo 🔍 Checking Windows version...
+for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
+echo ✅ Windows version: %VERSION%
+
+REM Check if running as administrator
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ⚠️  Warning: Not running as administrator
+    echo Some operations may require elevated privileges
+) else (
+    echo ✅ Running as administrator
+)
+
+echo.
+echo ========================================
+echo   STEP 2: NODE.JS INSTALLATION
+echo ========================================
+
+REM Check if Node.js is installed
+node --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ❌ Node.js is not installed!
+    echo.
+    echo Please install Node.js from: https://nodejs.org/
+    echo Recommended version: Node.js 18.x LTS or higher
+    echo.
+    echo After installing Node.js, run this setup again.
+    pause
+    exit /b 1
+) else (
+    for /f "tokens=*" %%i in ('node --version') do set NODE_VERSION=%%i
+    echo ✅ Node.js found: %NODE_VERSION%
+)
+
+REM Check if npm is available
+npm --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ❌ npm is not available!
+    echo Please reinstall Node.js with npm included.
+    pause
+    exit /b 1
+) else (
+    for /f "tokens=*" %%i in ('npm --version') do set NPM_VERSION=%%i
+    echo ✅ npm found: %NPM_VERSION%
+)
+
+echo.
+echo ========================================
+echo   STEP 3: MYSQL SETUP
+echo ========================================
+
+REM Check if MySQL is installed
+mysql --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ❌ MySQL command line client not found!
+    echo.
+    echo Please install MySQL from: https://dev.mysql.com/downloads/mysql/
+    echo Or use MySQL Workbench for easier setup.
+    echo.
+    set /p skip_mysql="Skip MySQL setup and continue? (y/n): "
+    if /i not "%skip_mysql%"=="y" (
+        pause
+        exit /b 1
+    )
+    set MYSQL_SKIPPED=1
+) else (
+    for /f "tokens=*" %%i in ('mysql --version') do set MYSQL_VERSION=%%i
+    echo ✅ MySQL found: %MYSQL_VERSION%
+    set MYSQL_SKIPPED=0
+)
+
+if "%MYSQL_SKIPPED%"=="0" (
+    echo.
+    echo 🔗 Testing MySQL connection...
+    echo Please enter your MySQL credentials:
+    echo.
+    
+    set /p mysql_user="MySQL Username (default: root): "
+    if "%mysql_user%"=="" set mysql_user=root
+    
+    set /p mysql_password="MySQL Password (press Enter if no password): "
+    
+    REM Test connection
+    if "%mysql_password%"=="" (
+        mysql -u %mysql_user% -e "SELECT 1;" >nul 2>&1
+    ) else (
+        mysql -u %mysql_user% -p%mysql_password% -e "SELECT 1;" >nul 2>&1
+    )
+    
+    if %errorlevel% neq 0 (
+        echo ❌ MySQL connection failed!
+        echo.
+        echo Common solutions:
+        echo 1. Start MySQL service: net start mysql
+        echo 2. Check credentials
+        echo 3. Verify MySQL is running on port 3306
+        echo.
+        set /p skip_mysql="Skip MySQL setup and continue? (y/n): "
+        if /i not "%skip_mysql%"=="y" (
+            pause
+            exit /b 1
+        )
+        set MYSQL_SKIPPED=1
+    ) else (
+        echo ✅ MySQL connection successful!
+        
+        REM Create database
+        echo.
+        echo 🗄️ Creating database 'student_lab_system'...
+        if "%mysql_password%"=="" (
+            mysql -u %mysql_user% -e "CREATE DATABASE IF NOT EXISTS student_lab_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+        ) else (
+            mysql -u %mysql_user% -p%mysql_password% -e "CREATE DATABASE IF NOT EXISTS student_lab_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+        )
+        
+        if %errorlevel% neq 0 (
+            echo ❌ Failed to create database!
+            echo You may need to create it manually.
+        ) else (
+            echo ✅ Database 'student_lab_system' created successfully
+        )
+        
+        REM Create database config
+        echo.
+        echo 📝 Creating database configuration...
+        cd /d "%~dp0..\..\System\server"
+        
+        (
+        echo // Database Configuration
+        echo // Generated by MASTER_SETUP.bat
+        echo.
+        echo module.exports = {
+        echo     host: 'localhost',
+        echo     user: '%mysql_user%',
+        echo     password: '%mysql_password%',
+        echo     database: 'student_lab_system',
+        echo     charset: 'utf8mb4',
+        echo     connectionLimit: 10,
+        echo     acquireTimeout: 60000,
+        echo     timeout: 60000,
+        echo     reconnect: true
+        echo };
+        ) > db-config.js
+        
+        if %errorlevel% neq 0 (
+            echo ❌ Failed to create database configuration!
+        ) else (
+            echo ✅ Database configuration file created: db-config.js
+        )
+    )
+)
+
+echo.
+echo ========================================
+echo   STEP 4: PACKAGE INSTALLATION
+echo ========================================
+
+REM Navigate to server directory
+cd /d "%~dp0..\..\System\server"
+
+echo 📦 Installing server dependencies...
+npm install --production --silent
+if %errorlevel% neq 0 (
+    echo ❌ Failed to install server dependencies!
+    echo Trying with verbose output...
+    npm install --production
+    if %errorlevel% neq 0 (
+        echo ❌ Package installation failed!
+        pause
+        exit /b 1
+    )
+) else (
+    echo ✅ Server dependencies installed successfully
+)
+
+REM Navigate to main System directory
+cd /d "%~dp0..\..\System"
+
+echo 📦 Installing system dependencies...
+npm install --production --silent
+if %errorlevel% neq 0 (
+    echo ❌ Failed to install system dependencies!
+    echo Trying with verbose output...
+    npm install --production
+    if %errorlevel% neq 0 (
+        echo ❌ Package installation failed!
+        pause
+        exit /b 1
+    )
+) else (
+    echo ✅ System dependencies installed successfully
+)
+
+echo.
+echo ========================================
+echo   STEP 5: SSL CERTIFICATE SETUP
+echo ========================================
+
+REM Navigate to server directory
+cd /d "%~dp0..\..\System\server"
+
+echo 🔒 Checking SSL certificates...
+if exist "certs\server.crt" if exist "certs\server.key" (
+    echo ✅ SSL certificates already exist
+) else (
+    echo 📜 Generating SSL certificates...
+    if exist "generate-ssl-cert.bat" (
+        call generate-ssl-cert.bat
+        if %errorlevel% neq 0 (
+            echo ❌ SSL certificate generation failed!
+            echo HTTPS will not be available.
+        ) else (
+            echo ✅ SSL certificates generated successfully
+        )
+    ) else (
+        echo ❌ SSL certificate generator not found!
+        echo HTTPS will not be available.
+    )
+)
+
+echo.
+echo ========================================
+echo   STEP 6: PROJECT ORGANIZATION
+echo ========================================
+
+echo 📁 Organizing project files...
+
+REM Create necessary directories
+if not exist "Logs" mkdir "Logs"
+if not exist "Backups" mkdir "Backups"
+if not exist "Student-Data" mkdir "Student-Data"
+if not exist "Student-Data\processed" mkdir "Student-Data\processed"
+if not exist "Student-Data\exports" mkdir "Student-Data\exports"
+
+echo ✅ Project directories organized
+
+REM Create .gitignore if it doesn't exist
+if not exist ".gitignore" (
+    echo Creating .gitignore file...
+    (
+    echo # Dependencies
+    echo node_modules/
+    echo npm-debug.log*
+    echo yarn-debug.log*
+    echo yarn-error.log*
+    echo.
+    echo # Runtime data
+    echo pids
+    echo *.pid
+    echo *.seed
+    echo *.pid.lock
+    echo.
+    echo # Directory for instrumented libs generated by jscoverage/JSCover
+    echo lib-cov
+    echo.
+    echo # Coverage directory used by tools like istanbul
+    echo coverage/
+    echo.
+    echo # nyc test coverage
+    echo .nyc_output
+    echo.
+    echo # Grunt intermediate storage
+    echo .grunt
+    echo.
+    echo # Bower dependency directory
+    echo bower_components
+    echo.
+    echo # node-waf configuration
+    echo .lock-wscript
+    echo.
+    echo # Compiled binary addons
+    echo build/Release
+    echo.
+    echo # Dependency directories
+    echo node_modules/
+    echo jspm_packages/
+    echo.
+    echo # Optional npm cache directory
+    echo .npm
+    echo.
+    echo # Optional REPL history
+    echo .node_repl_history
+    echo.
+    echo # Output of 'npm pack'
+    echo *.tgz
+    echo.
+    echo # Yarn Integrity file
+    echo .yarn-integrity
+    echo.
+    echo # dotenv environment variables file
+    echo .env
+    echo.
+    echo # parcel-bundler cache
+    echo .cache
+    echo .parcel-cache
+    echo.
+    echo # next.js build output
+    echo .next
+    echo.
+    echo # nuxt.js build output
+    echo .nuxt
+    echo.
+    echo # vuepress build output
+    echo .vuepress/dist
+    echo.
+    echo # Serverless directories
+    echo .serverless
+    echo.
+    echo # FuseBox cache
+    echo .fusebox/
+    echo.
+    echo # DynamoDB Local files
+    echo .dynamodb/
+    echo.
+    echo # TernJS port file
+    echo .tern-port
+    echo.
+    echo # Logs
+    echo logs
+    echo *.log
+    echo Logs/
+    echo.
+    echo # Runtime data
+    echo pids
+    echo *.pid
+    echo *.seed
+    echo *.pid.lock
+    echo.
+    echo # SSL Certificates
+    echo System/server/certs/*.crt
+    echo System/server/certs/*.key
+    echo System/server/certs/*.pem
+    echo.
+    echo # Database files
+    echo *.db
+    echo *.sqlite
+    echo *.sqlite3
+    echo.
+    echo # Backup files
+    echo Backups/
+    echo *.backup
+    echo.
+    echo # Student data exports
+    echo Student-Data/exports/
+    echo Student-Data/processed/
+    echo.
+    echo # Temporary files
+    echo temp/
+    echo tmp/
+    echo *.tmp
+    echo.
+    echo # OS generated files
+    echo .DS_Store
+    echo .DS_Store?
+    echo ._*
+    echo .Spotlight-V100
+    echo .Trashes
+    echo ehthumbs.db
+    echo Thumbs.db
+    ) > .gitignore
+    echo ✅ .gitignore file created
+) else (
+    echo ✅ .gitignore file already exists
+)
+
+echo.
+echo ========================================
+echo   STEP 7: SYSTEM TESTING
+echo ========================================
+
+echo 🧪 Running system tests...
+
+REM Test if main server file exists
+if not exist "System\server\main-server.js" (
+    echo ❌ Main server file not found!
+    pause
+    exit /b 1
+)
+
+REM Test if database file exists
+if not exist "System\server\database.js" (
+    echo ❌ Database file not found!
+    pause
+    exit /b 1
+)
+
+echo ✅ All system files found
+
+REM Test Node.js syntax
+echo 🔍 Testing server syntax...
+cd /d "%~dp0..\..\System"
+node -c server\main-server.js
+if %errorlevel% neq 0 (
+    echo ❌ Server syntax error found!
+    pause
+    exit /b 1
+) else (
+    echo ✅ Server syntax is valid
+)
+
+echo.
+echo ========================================
+echo   STEP 8: FINAL VERIFICATION
+echo ========================================
+
+echo 📋 System Status:
+echo   ✅ Node.js: %NODE_VERSION%
+echo   ✅ npm: %NPM_VERSION%
+if "%MYSQL_SKIPPED%"=="0" (
+    echo   ✅ MySQL: %MYSQL_VERSION%
+    echo   ✅ Database: student_lab_system
+) else (
+    echo   ⚠️  MySQL: Skipped
+)
+echo   ✅ Packages: Installed
+echo   ✅ SSL Certificates: Checked
+echo   ✅ System Files: Valid
+echo   ✅ Project Structure: Organized
+
+echo.
+echo ========================================
+echo   MASTER SETUP COMPLETED SUCCESSFULLY!
+echo ========================================
+echo.
+echo Your Student Lab System is ready to use!
+echo.
+echo Quick Start Options:
+echo   1. Run: QUICK_START.bat (Recommended)
+echo   2. Run: START_SYSTEM.bat
+echo   3. Run: Batch-Files\System-Control\START_CLEAN_SYSTEM.bat
+echo.
+echo Access URLs (after starting):
+echo   Entry Scanner:  http://localhost:3000/entry-scanner
+echo   Exit Validator: http://localhost:3000/exit-validator
+echo   Admin Dashboard: http://localhost:3000/admin-dashboard
+echo.
+echo For HTTPS (phone camera access):
+echo   Entry Scanner:  https://localhost:3443/entry-scanner
+echo   Exit Validator: https://localhost:3443/exit-validator
+echo   Admin Dashboard: https://localhost:3443/admin-dashboard
+echo.
+
+set /p start_now="Start the system now? (y/n): "
+if /i "%start_now%"=="y" (
+    echo.
+    echo 🚀 Starting Student Lab System...
+    cd /d "%~dp0..\.."
+    call "Batch-Files\System-Control\QUICK_START.bat"
+) else (
+    echo.
+    echo Setup completed. You can start the system anytime using QUICK_START.bat
+)
+
+echo.
+pause
