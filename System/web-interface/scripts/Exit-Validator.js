@@ -150,6 +150,14 @@
         lastDisconnect: lastHeartbeatResponse
       }));
       
+      // Request today's registered students for offline scanning
+      setTimeout(() => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'request_todays_students' }));
+          console.log('📚 Requested today\'s registered students for offline scanning');
+        }
+      }, 1000); // Wait 1 second after connection
+      
       // Start heartbeat system
       startHeartbeat();
       
@@ -210,6 +218,48 @@
         if (data.type === 'network_scan_response') {
           console.log('Network scan response:', data);
           updateNetworkStatus(data.networkStatus);
+        }
+        
+        if (data.type === 'student_cache_update' || data.type === 'all_students_response') {
+          // Handle student cache update for offline scanning
+          if (data.cache) {
+            localStudentDatabase = data.cache;
+            
+            // Save to local storage for offline use
+            localStorage.setItem('localStudentDatabase', JSON.stringify(localStudentDatabase));
+            localStorage.setItem('backupStudentDatabase', JSON.stringify(localStudentDatabase));
+            
+            console.log(`📚 Received ${data.totalStudents} students for offline scanning`);
+            showNotification(`📚 Loaded ${data.totalStudents} students for offline scanning`, 'success');
+            
+            // Update data integrity counters
+            dataIntegrity.localRecords = Object.keys(localStudentDatabase).length + localValidationDatabase.length;
+            criticalDataFlags.studentsLoaded = true;
+            
+            // Update UI to show we have student data
+            updateStudentsTable();
+          }
+        }
+        
+        if (data.type === 'todays_students_response') {
+          // Handle today's registered students for offline scanning
+          if (data.cache) {
+            localStudentDatabase = data.cache;
+            
+            // Save to local storage for offline use
+            localStorage.setItem('localStudentDatabase', JSON.stringify(localStudentDatabase));
+            localStorage.setItem('backupStudentDatabase', JSON.stringify(localStudentDatabase));
+            
+            console.log(`📚 Received ${data.totalStudents} today's registered students for offline scanning`);
+            showNotification(`📚 Loaded ${data.totalStudents} today's students for offline scanning`, 'success');
+            
+            // Update data integrity counters
+            dataIntegrity.localRecords = Object.keys(localStudentDatabase).length + localValidationDatabase.length;
+            criticalDataFlags.studentsLoaded = true;
+            
+            // Update UI to show we have student data
+            updateStudentsTable();
+          }
         }
       } catch (error) {
         console.error('Error processing WebSocket message:', error);
@@ -290,13 +340,37 @@
     const day = todayKey();
     const todayMap = registeredByDate[day] || JSON.parse(localStorage.getItem('exitValidatorToday') || '{}');
     
+    // First check if student is registered for today
     if (todayMap && todayMap[studentId]) {
       const rec = todayMap[studentId];
       showResult('PASSED', 'Student validated successfully', studentId, rec);
       logValidation(studentId, 'PASSED', rec);
+      return;
+    }
+    
+    // If not registered for today, check if student exists in local database (offline scanning)
+    if (localStudentDatabase && localStudentDatabase[studentId]) {
+      const student = localStudentDatabase[studentId];
+      const offlineRecord = {
+        student_id: studentId,
+        student_name: student.name || 'Unknown',
+        center: student.center || '',
+        grade: student.grade || '',
+        phone: student.phone || '',
+        parent_phone: student.parent_phone || '',
+        subject: student.subject || '',
+        fees: student.fees || 0,
+        timestamp: new Date().toISOString(),
+        source: 'offline_scan'
+      };
+      
+      showResult('PASSED', 'Student validated (offline scan)', studentId, offlineRecord);
+      logValidation(studentId, 'PASSED_OFFLINE', offlineRecord);
+      console.log(`📱 Offline scan successful for student: ${studentId} - ${student.name}`);
     } else {
-      showResult('BLOCKED', 'Student not registered today', studentId);
+      showResult('BLOCKED', 'Student not found in local data', studentId);
       logValidation(studentId, 'BLOCKED', null);
+      console.log(`❌ Student not found in local data: ${studentId}`);
     }
   }
 
@@ -842,7 +916,7 @@
 
   function resetAllData() {
     try {
-      // Clear all local storage data
+      // Clear all local storage data EXCEPT backup data
       localStorage.removeItem('exitValidatorToday');
       localStorage.removeItem('exitValidatorLogs');
       localStorage.removeItem('exitValidatorOfflineValidations');
@@ -864,14 +938,26 @@
         lastBackup: null
       };
       
+      // PRESERVE BACKUP DATA - DO NOT DELETE THESE:
+      // localStorage.getItem('backupValidationDatabase') - KEEP
+      // localStorage.getItem('backupStudentDatabase') - KEEP  
+      // localStorage.getItem('emergencyValidationBackup') - KEEP
+      // localStorage.getItem('lastBackupTimestamp') - KEEP
+      
+      console.log('💾 Backup data preserved during reset:');
+      console.log('  - backupValidationDatabase: PRESERVED');
+      console.log('  - backupStudentDatabase: PRESERVED');
+      console.log('  - emergencyValidationBackup: PRESERVED');
+      console.log('  - lastBackupTimestamp: PRESERVED');
+      
       // Update UI
       updateStudentsTable();
       updateSyncStatusUI();
       
       // Show success notification
-      showNotification('✅ All data has been reset successfully!', 'success');
+      showNotification('✅ All data has been reset successfully! (Backups preserved)', 'success');
       
-      console.log('All Exit Validator data has been reset (including hybrid system data)');
+      console.log('All Exit Validator data has been reset (backup data preserved)');
       
     } catch (error) {
       console.error('Failed to reset data:', error);

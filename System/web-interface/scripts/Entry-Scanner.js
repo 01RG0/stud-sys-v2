@@ -2766,7 +2766,7 @@
 
   function resetAllData() {
     try {
-      // Clear all localStorage data
+      // Clear all localStorage data EXCEPT backup data
       localStorage.removeItem('entryScanRecords');
       localStorage.removeItem('entryScanOfflineQueue');
       localStorage.removeItem('entryScannerOfflineRegistrations');
@@ -2789,12 +2789,24 @@
         lastBackup: null
       };
       
+      // PRESERVE BACKUP DATA - DO NOT DELETE THESE:
+      // localStorage.getItem('backupStudentDatabase') - KEEP
+      // localStorage.getItem('backupRegistrationDatabase') - KEEP  
+      // localStorage.getItem('emergencyBackup') - KEEP
+      // localStorage.getItem('lastBackupTimestamp') - KEEP
+      
+      console.log('💾 Backup data preserved during reset:');
+      console.log('  - backupStudentDatabase: PRESERVED');
+      console.log('  - backupRegistrationDatabase: PRESERVED');
+      console.log('  - emergencyBackup: PRESERVED');
+      console.log('  - lastBackupTimestamp: PRESERVED');
+      
       // Reset UI
       updateSyncStatusUI();
       
-      showNotification('✅ All data has been reset successfully!', 'success');
+      showNotification('✅ All data has been reset successfully! (Backups preserved)', 'success');
       
-      console.log('All Entry Scanner data has been reset (including hybrid system data)');
+      console.log('All Entry Scanner data has been reset (backup data preserved)');
       
     } catch (error) {
       console.error('Failed to reset data:', error);

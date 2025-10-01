@@ -1972,7 +1972,7 @@ function handleWebSocketConnection(ws, source) {
           logToSystem('success', `Device registered: ${data.name} (${data.role})`);
         }
         
-        // AUTO-PUSH: Send student cache to Entry Scanner devices only once upon initial connection
+        // AUTO-PUSH: Send student cache to Entry Scanner devices only
         const deviceInfo = devices.get(ws);
         if (data.role === 'first_scan' && deviceInfo && !deviceInfo.initialDataPushed) {
           const studentCount = Object.keys(studentCache).length;
@@ -2050,6 +2050,55 @@ function handleWebSocketConnection(ws, source) {
           serverStatus: 'online',
           connectedDevices: devices.size
         }));
+        return;
+      }
+      
+      if (data.type === 'request_todays_students') {
+        // Handle request for today's registered students (for offline scanning)
+        try {
+          const today = new Date().toISOString().split('T')[0];
+          const registrations = await Database.getEntryRegistrationsByDate(today);
+          
+          // Create student cache from today's registrations
+          const todaysStudents = {};
+          registrations.forEach(record => {
+            if (record.student_id) {
+              const studentData = studentCache[record.student_id] || {};
+              todaysStudents[record.student_id] = {
+                id: record.student_id,
+                name: studentData.name || record.student_name || 'Unknown',
+                center: studentData.center || record.center || '',
+                grade: studentData.grade || record.grade || '',
+                phone: studentData.phone || record.phone || '',
+                parent_phone: studentData.parent_phone || record.parent_phone || '',
+                subject: studentData.subject || record.subject || '',
+                fees: studentData.fees || record.fees || 0,
+                registered_at: record.timestamp
+              };
+            }
+          });
+          
+          ws.send(JSON.stringify({
+            type: 'todays_students_response',
+            cache: todaysStudents,
+            timestamp: new Date().toISOString(),
+            totalStudents: Object.keys(todaysStudents).length,
+            date: today
+          }));
+          
+          const deviceInfo = devices.get(ws);
+          const deviceName = deviceInfo ? deviceInfo.name : 'Unknown';
+          logToSystem('info', `Sent ${Object.keys(todaysStudents).length} today's students to ${deviceName} for offline scanning`);
+        } catch (error) {
+          logToSystem('error', `Failed to get today's students: ${error.message}`);
+          ws.send(JSON.stringify({
+            type: 'todays_students_response',
+            cache: {},
+            timestamp: new Date().toISOString(),
+            totalStudents: 0,
+            error: error.message
+          }));
+        }
         return;
       }
       
