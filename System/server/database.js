@@ -315,6 +315,16 @@ class Database {
       const result = await pool.execute(`
         INSERT INTO students (id, name, center, grade, phone, parent_phone, subject, fees, email, address)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+        name = VALUES(name),
+        center = VALUES(center),
+        grade = VALUES(grade),
+        phone = VALUES(phone),
+        parent_phone = VALUES(parent_phone),
+        subject = VALUES(subject),
+        fees = VALUES(fees),
+        email = VALUES(email),
+        address = VALUES(address)
       `, [
         studentId, 
         name || null, 

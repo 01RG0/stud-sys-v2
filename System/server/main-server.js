@@ -19,6 +19,9 @@ const OFFLINE_MODE = process.env.OFFLINE_MODE || true; // Enable offline-first m
 const HOTSPOT_ONLY = process.env.HOTSPOT_ONLY || true; // Work with hotspot/router only
 const ZERO_DATA_LOSS = process.env.ZERO_DATA_LOSS || true; // Enable zero data loss protection
 
+// Manual operation tracking to prevent Excel file interference
+let manualOperationInProgress = false;
+
 // Function to get real IP address
 function getRealIP() {
   const os = require('os');
@@ -458,18 +461,24 @@ function setupAutoExcelImport() {
     return;
   }
 
-  // Auto-import Excel files on startup
+  // Auto-import Excel files on startup only (not continuously)
   autoImportExcelFiles();
 
-  // Set up periodic scanning (every 30 seconds)
+  // Set up periodic scanning (every 5 minutes) - but skip manager files
   setInterval(() => {
     autoImportExcelFiles();
-  }, 30000);
+  }, 300000); // 5 minutes
 
   logToSystem('success', 'Auto Excel import system initialized');
 }
 
 async function autoImportExcelFiles() {
+  // Skip auto-import if manual operations are in progress
+  if (manualOperationInProgress) {
+    logToSystem('info', 'Skipping auto-import: manual operation in progress');
+    return;
+  }
+  
   const studentDataPath = path.join(__dirname, '..', '..', 'Student-Data');
   
   try {
@@ -489,6 +498,57 @@ async function autoImportExcelFiles() {
 
     for (const file of dataFiles) {
       const filePath = path.join(studentDataPath, file);
+      
+      // Skip if file is being processed or is a backup
+      if (file.includes('_processed_') || file.includes('_backup_') || file.includes('_imported_')) {
+        logToSystem('info', `Skipping processed/backup/imported file: ${file}`);
+        continue;
+      }
+      
+      // IMPORTANT: Skip the main manager Excel file to prevent editing it
+      // This is the file that the Data Collection Manager uses
+      if (file.toLowerCase().includes('students-database') || 
+          file.toLowerCase().includes('main') || 
+          file.toLowerCase().includes('manager') ||
+          file.toLowerCase().includes('primary')) {
+        logToSystem('info', `Skipping main manager Excel file: ${file} (protected from auto-import)`);
+        continue;
+      }
+      
+      // Check if this file has already been imported by looking for a backup copy
+      const backupPath = path.join(__dirname, '..', '..', 'Student-Data', 'processed');
+      if (fs.existsSync(backupPath)) {
+        const backupFiles = fs.readdirSync(backupPath);
+        const hasBeenImported = backupFiles.some(backupFile => 
+          backupFile.includes(file.replace(/\.[^/.]+$/, "")) && backupFile.includes('_imported_')
+        );
+        
+        if (hasBeenImported) {
+          logToSystem('info', `Skipping already imported file: ${file}`);
+          continue;
+        }
+      }
+      
+      // Check if file was recently modified (within last 10 minutes)
+      try {
+        const stats = fs.statSync(filePath);
+        const now = Date.now();
+        const fileAge = now - stats.mtime.getTime();
+        
+        // Skip files that were modified recently (might be in use or being edited)
+        if (fileAge < 600000) { // 10 minutes
+          logToSystem('info', `Skipping recently modified file: ${file} (modified ${Math.round(fileAge/60000)} minutes ago)`);
+          continue;
+        }
+        
+        // Additional check: skip if file is currently being accessed
+        fs.accessSync(filePath, fs.constants.R_OK | fs.constants.W_OK);
+        
+      } catch (error) {
+        logToSystem('info', `Skipping file in use or inaccessible: ${file}`);
+        continue;
+      }
+      
       await processAutoImportFile(filePath, file);
     }
 
@@ -582,16 +642,26 @@ async function processAutoImportFile(filePath, fileName) {
       });
     }
 
-    // Move processed file to backup folder
-    await moveProcessedFile(filePath, fileName);
+    // DO NOT move the original Excel file - keep it for reference
+    // Only create a backup copy, don't move the original
+    await createBackupCopy(filePath, fileName);
 
   } catch (error) {
     logToSystem('error', `Auto-import failed for ${fileName}: ${error.message}`);
   }
 }
 
-async function moveProcessedFile(filePath, fileName) {
+async function createBackupCopy(filePath, fileName) {
   try {
+    // IMPORTANT: Don't create backup for main manager files
+    if (fileName.toLowerCase().includes('students-database') || 
+        fileName.toLowerCase().includes('main') || 
+        fileName.toLowerCase().includes('manager') ||
+        fileName.toLowerCase().includes('primary')) {
+      logToSystem('info', `Skipping backup creation for main manager file: ${fileName} (protected)`);
+      return;
+    }
+    
     const backupPath = path.join(__dirname, '..', '..', 'Student-Data', 'processed');
     
     // Create backup folder if it doesn't exist
@@ -603,17 +673,23 @@ async function moveProcessedFile(filePath, fileName) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const ext = path.extname(fileName);
     const name = path.basename(fileName, ext);
-    const backupFileName = `${name}_processed_${timestamp}${ext}`;
+    const backupFileName = `${name}_imported_${timestamp}${ext}`;
     const backupFilePath = path.join(backupPath, backupFileName);
 
-    // Move file to backup folder
-    fs.renameSync(filePath, backupFilePath);
+    // COPY file to backup folder (don't move the original)
+    fs.copyFileSync(filePath, backupFilePath);
     
-    logToSystem('info', `Moved processed file to: ${backupFileName}`);
+    logToSystem('info', `Created backup copy: ${backupFileName} (original file preserved)`);
 
   } catch (error) {
-    logToSystem('warning', `Failed to move processed file ${fileName}: ${error.message}`);
+    logToSystem('warning', `Failed to create backup copy of ${fileName}: ${error.message}`);
   }
+}
+
+// Keep the old function for backward compatibility but mark it as deprecated
+async function moveProcessedFile(filePath, fileName) {
+  logToSystem('warning', `DEPRECATED: moveProcessedFile called for ${fileName} - using createBackupCopy instead`);
+  await createBackupCopy(filePath, fileName);
 }
 
 // Enhanced logging system
@@ -1435,8 +1511,17 @@ app.post('/api/sync', async (req, res) => {
     
     switch (operation) {
       case 'create_student':
-        result = await Database.createStudent(data);
-        logToSystem('success', `Student synced to MySQL: ${data.name} (ID: ${data.id}) from ${deviceName}`);
+        // Set manual operation flag to prevent Excel file interference
+        manualOperationInProgress = true;
+        try {
+          result = await Database.createStudent(data);
+          logToSystem('success', `Student synced to MySQL: ${data.name} (ID: ${data.id}) from ${deviceName}`);
+        } finally {
+          // Clear flag after operation completes
+          setTimeout(() => {
+            manualOperationInProgress = false;
+          }, 5000); // 5 second delay to ensure operation is complete
+        }
         break;
         
       case 'update_student':

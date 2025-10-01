@@ -36,6 +36,10 @@
     lastBackup: null
   };
   
+  // Enter key navigation cooldown to prevent fast clicking
+  let lastNavigationTime = 0;
+  const NAVIGATION_COOLDOWN = 300; // 300ms cooldown between navigations
+  
   // ZERO DATA LOSS SYSTEM - Multiple backup layers
   let localStudentDatabase = {}; // Complete local copy of ALL students
   let localRegistrationDatabase = []; // ALL registrations ever made on this device
@@ -1248,9 +1252,13 @@
       return;
     }
 
-    // Keep ID empty if not provided
+    // Generate unique ID if not provided
     if (!studentId) {
-      studentId = '';
+      // Generate "null" + timestamp + random number for unique ID
+      const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+      const randomNumber = Math.floor(Math.random() * 1000); // 3-digit random number
+      studentId = `null${timestamp}${randomNumber}`;
+      console.log(`Generated unique ID for manual student: ${studentId}`);
     }
     
     // Create student record (same format as QR scan)
@@ -1427,9 +1435,28 @@
       const field = document.getElementById(fieldId);
       console.log(`🔧 Setting up field ${fieldId} (index: ${index}):`, field);
       if (field) {
-        // Function to handle field navigation
+        // Function to handle field navigation with cooldown
         const handleFieldNavigation = () => {
+          const now = Date.now();
+          
+          // Check cooldown to prevent fast clicking
+          if (now - lastNavigationTime < NAVIGATION_COOLDOWN) {
+            console.log(`🔧 Navigation cooldown active - ignoring fast Enter key press`);
+            
+            // Show visual feedback for cooldown
+            field.style.borderColor = '#ffc107';
+            field.style.boxShadow = '0 0 0 3px rgba(255, 193, 7, 0.3)';
+            setTimeout(() => {
+              field.style.borderColor = '';
+              field.style.boxShadow = '';
+            }, 200);
+            
+            return;
+          }
+          
+          lastNavigationTime = now;
           console.log(`🔧 Processing navigation for field ${fieldId} (index: ${index})`);
+          
           if (index < fields.length - 1) {
             // Move to next field (index + 2 because data attributes start from 1)
             console.log(`🔧 Moving to next field: ${index + 2}`);
@@ -1761,8 +1788,15 @@
     // No validation required - all fields are optional
     console.log('✅ All fields are optional - proceeding with registration');
     
-    // Use provided ID or null if empty (no auto-generation)
-    const studentId = id || null;
+    // Generate unique ID if not provided
+    let studentId = id;
+    if (!studentId) {
+      // Generate "null" + timestamp + random number for unique ID
+      const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+      const randomNumber = Math.floor(Math.random() * 1000); // 3-digit random number
+      studentId = `null${timestamp}${randomNumber}`;
+      console.log(`Generated unique ID for simple manual student: ${studentId}`);
+    }
     
     // Create student record
     const record = {
@@ -1843,7 +1877,7 @@
     currentResult.style.display = 'block';
   }
   
-  // Simple QR Form Enter Key Navigation
+  // Simple QR Form Enter Key Navigation with cooldown
   function setupEasyQRForm() {
     const fields = ['hw', 'extra', 'payment-amount', 'comment'];
     
@@ -1853,6 +1887,25 @@
         field.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
             e.preventDefault();
+            
+            const now = Date.now();
+            
+            // Check cooldown to prevent fast clicking
+            if (now - lastNavigationTime < NAVIGATION_COOLDOWN) {
+              console.log(`🔧 QR Form navigation cooldown active - ignoring fast Enter key press`);
+              
+              // Show visual feedback for cooldown
+              field.style.borderColor = '#ffc107';
+              field.style.boxShadow = '0 0 0 3px rgba(255, 193, 7, 0.3)';
+              setTimeout(() => {
+                field.style.borderColor = '';
+                field.style.boxShadow = '';
+              }, 200);
+              
+              return;
+            }
+            
+            lastNavigationTime = now;
             
             if (index < fields.length - 1) {
               // Move to next field
