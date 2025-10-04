@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Sync Test - Entry Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { 
+            background-color: #6c757d; 
+            cursor: not-allowed; 
+        }
+        .btn-sync { background-color: #28a745; }
+        .btn-sync:hover { background-color: #218838; }
+        .btn-force { background-color: #dc3545; }
+        .btn-force:hover { background-color: #c82333; }
+        .btn-info { background-color: #17a2b8; }
+        .btn-info:hover { background-color: #138496; }
+        .status-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .feature-list li:before {
+            content: "✅ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔄 Manual Sync Test - Entry Scanner</h1>
+    
+    <div class="test-container">
+        <h2>📋 Manual Sync Features</h2>
+        <p>The Entry Scanner now has enhanced manual sync capabilities:</p>
+        
+        <ul class="feature-list">
+            <li><strong>Additional Manual Sync:</strong> Click to manually sync all unsent students (separate from auto sync)</li>
+            <li><strong>Preserves Auto Sync:</strong> Existing auto sync functionality continues to work normally</li>
+            <li><strong>Duplicate Prevention:</strong> Automatically prevents sending the same student twice</li>
+            <li><strong>Sync Details:</strong> Right-click sync button to see what will be synced</li>
+            <li><strong>Force Sync:</strong> Emergency function to resend all students (Ctrl+Shift+S)</li>
+            <li><strong>Progress Indicators:</strong> Visual feedback during sync operations</li>
+            <li><strong>QR + Manual Coverage:</strong> Syncs both QR code and manual registrations</li>
+        </ul>
+    </div>
+    
+    <div class="test-container">
+        <h2>🧪 Test Manual Sync Functions</h2>
+        
+        <div class="button-group">
+            <button onclick="testNormalSync()" class="btn-sync">
+                🔄 Test Normal Sync
+            </button>
+            <button onclick="testForceSync()" class="btn-force">
+                🚨 Test Force Sync
+            </button>
+            <button onclick="showSyncDetails()" class="btn-info">
+                📊 Show Sync Details
+            </button>
+            <button onclick="simulateStudents()" class="btn-info">
+                👥 Simulate Students
+            </button>
+            <button onclick="clearTestData()" class="btn-info">
+                🗑️ Clear Test Data
+            </button>
+        </div>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> Force Sync will send ALL students again, potentially creating duplicates in the database. Only use this if there was a sync bug.
+        </div>
+        
+        <div class="info">
+            <strong>💡 Tips:</strong>
+            <ul>
+                <li>Manual sync is ADDITIONAL to existing auto sync - both work together</li>
+                <li>Right-click the sync button in Entry Scanner to see sync details</li>
+                <li>Use Ctrl+Shift+S for emergency force sync</li>
+                <li>Normal sync prevents duplicates automatically</li>
+                <li>Auto sync continues to work normally in the background</li>
+                <li>Check the console for detailed sync logs</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📊 Current Status</h2>
+        <div id="status-display" class="status-display">
+            Click "Show Sync Details" to see current sync status
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📝 Test Log</h2>
+        <div id="test-log" class="log">
+            Manual Sync Test Ready
+            Click buttons above to test the sync functionality
+        </div>
+    </div>
+
+    <script>
+        let testLog = [];
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            testLog.push(`[${timestamp}] ${message}`);
+            document.getElementById('test-log').textContent = testLog.join('\n');
+            console.log(message);
+        }
+        
+        function testNormalSync() {
+            log('🔄 Testing Normal Sync...');
+            log('This simulates the normal manual sync function');
+            log('✅ Normal sync would:');
+            log('  • Check for duplicates before sending');
+            log('  • Send only unsent students');
+            log('  • Process offline queue items');
+            log('  • Process sync queue items');
+            log('  • Show progress indicators');
+            log('  • Provide completion feedback');
+            log('');
+            log('💡 In real Entry Scanner: Click the sync button in the header');
+        }
+        
+        function testForceSync() {
+            log('🚨 Testing Force Sync...');
+            log('This simulates the emergency force sync function');
+            log('⚠️ Force sync would:');
+            log('  • Send ALL students again (bypass duplicate check)');
+            log('  • May create duplicate records in database');
+            log('  • Show warning confirmation dialog');
+            log('  • Process all queues and registrations');
+            log('  • Only use if there was a sync bug');
+            log('');
+            log('💡 In real Entry Scanner: Press Ctrl+Shift+S or call forceSyncAllStudents()');
+        }
+        
+        function showSyncDetails() {
+            log('📊 Showing Sync Details...');
+            
+            // Simulate current status
+            const mockStatus = {
+                totalStudents: Math.floor(Math.random() * 20) + 5,
+                sentStudents: Math.floor(Math.random() * 10) + 2,
+                offlineQueue: Math.floor(Math.random() * 5),
+                offlineRegistrations: Math.floor(Math.random() * 3),
+                syncQueue: Math.floor(Math.random() * 2)
+            };
+            
+            const unsentStudents = mockStatus.totalStudents - mockStatus.sentStudents;
+            
+            const statusText = `
+🔄 Manual Sync Details
+
+📊 Current Status:
+• Total students registered today: ${mockStatus.totalStudents}
+• Already sent to server: ${mockStatus.sentStudents}
+• Pending sync: ${unsentStudents}
+• Offline queue items: ${mockStatus.offlineQueue}
+• Offline registrations: ${mockStatus.offlineRegistrations}
+• Sync queue items: ${mockStatus.syncQueue}
+
+📋 What will be synced:
+• ${unsentStudents} unsent students
+• ${mockStatus.offlineQueue} offline queue items
+• ${mockStatus.offlineRegistrations} offline registrations
+• ${mockStatus.syncQueue} sync queue items
+
+💡 Tip: Right-click the sync button to see this info anytime
+            `;
+            
+            document.getElementById('status-display').textContent = statusText;
+            log('✅ Sync details displayed above');
+            log('💡 In real Entry Scanner: Right-click the sync button to see this');
+        }
+        
+        function simulateStudents() {
+            log('👥 Simulating student registrations...');
+            
+            const students = [
+                { id: '12345', name: 'John Doe', method: 'QR Code' },
+                { id: '67890', name: 'Jane Smith', method: 'Manual Entry' },
+                { id: '11111', name: 'Bob Johnson', method: 'QR Code' },
+                { id: '22222', name: 'Alice Brown', method: 'Manual Entry' },
+                { id: '33333', name: 'Charlie Wilson', method: 'QR Code' }
+            ];
+            
+            students.forEach((student, index) => {
+                setTimeout(() => {
+                    log(`✅ Student registered: ${student.name} (${student.id}) via ${student.method}`);
+                }, index * 200);
+            });
+            
+            setTimeout(() => {
+                log('📊 Simulation complete - 5 students registered');
+                log('💡 These would be available for manual sync');
+            }, students.length * 200 + 500);
+        }
+        
+        function clearTestData() {
+            testLog = [];
+            document.getElementById('test-log').textContent = 'Test log cleared';
+            document.getElementById('status-display').textContent = 'Status cleared - Click "Show Sync Details" to refresh';
+            log('🗑️ Test data cleared');
+        }
+        
+        // Simulate keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+                e.preventDefault();
+                log('⌨️ Ctrl+Shift+S detected - This would trigger Force Sync in Entry Scanner');
+                testForceSync();
+            }
+        });
+        
+        // Initialize
+        log('🧪 Manual Sync Test Ready');
+        log('This page demonstrates the Entry Scanner manual sync features');
+        log('Use the buttons above to test different sync functions');
+        log('');
+        log('📋 Available Functions:');
+        log('  • manualSync() - Normal sync with duplicate prevention');
+        log('  • forceSyncAllStudents() - Emergency sync (bypass duplicates)');
+        log('  • showSyncDetails() - Show what will be synced');
+        log('  • Ctrl+Shift+S - Keyboard shortcut for force sync');
+    </script>
+</body>
+</html>

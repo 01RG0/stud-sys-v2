@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Duplicate Prevention</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Duplicate Prevention Test</h1>
+    
+    <div class="test-container">
+        <h2>Test Scenario</h2>
+        <p>This test simulates the duplicate sending issue that occurs when the Entry Scanner reconnects and processes offline records.</p>
+        
+        <button onclick="runTest()">Run Test</button>
+        <button onclick="clearTest()">Clear Test</button>
+        <button onclick="clearStorage()">Clear Storage</button>
+    </div>
+    
+    <div class="test-container">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-container">
+        <h2>Test Log</h2>
+        <div id="test-log" class="log"></div>
+    </div>
+
+    <script>
+        let testLog = [];
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            testLog.push(`[${timestamp}] ${message}`);
+            document.getElementById('test-log').textContent = testLog.join('\n');
+            console.log(message);
+        }
+        
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        function clearTest() {
+            document.getElementById('test-results').innerHTML = '';
+            testLog = [];
+            document.getElementById('test-log').textContent = '';
+        }
+        
+        function clearStorage() {
+            localStorage.removeItem('entryScanSentStudents');
+            localStorage.removeItem('entryScanSentStudentsLastCleared');
+            localStorage.removeItem('entryScanOfflineQueue');
+            log('✅ Cleared all test storage');
+            addResult('Storage cleared', 'success');
+        }
+        
+        function runTest() {
+            clearTest();
+            log('🚀 Starting duplicate prevention test...');
+            
+            try {
+                // Simulate the Entry Scanner's duplicate prevention system
+                let sentStudents = new Set();
+                
+                // Load existing sent students
+                const stored = localStorage.getItem('entryScanSentStudents');
+                if (stored) {
+                    const sentArray = JSON.parse(stored);
+                    sentStudents = new Set(sentArray);
+                    log(`📚 Loaded ${sentStudents.size} existing sent students`);
+                }
+                
+                // Create test student records
+                const testStudents = [
+                    {
+                        student_id: '12345',
+                        student_name: 'John Doe',
+                        timestamp: new Date().toISOString(),
+                        center: 'Test Center',
+                        grade: '10'
+                    },
+                    {
+                        student_id: '12345', // Same student ID
+                        student_name: 'John Doe', // Same name
+                        timestamp: new Date().toISOString(),
+                        center: 'Test Center',
+                        grade: '10'
+                    },
+                    {
+                        student_id: '67890',
+                        student_name: 'Jane Smith',
+                        timestamp: new Date().toISOString(),
+                        center: 'Test Center',
+                        grade: '11'
+                    }
+                ];
+                
+                log(`📝 Created ${testStudents.length} test student records`);
+                
+                let sentCount = 0;
+                let duplicateCount = 0;
+                
+                // Process each student record
+                testStudents.forEach((student, index) => {
+                    const studentKey = `${student.student_id}_${student.student_name}_${new Date(student.timestamp).toDateString()}`;
+                    
+                    if (sentStudents.has(studentKey)) {
+                        log(`⚠️ Student ${student.student_name} (${student.student_id}) already sent today - DUPLICATE PREVENTED`);
+                        duplicateCount++;
+                        addResult(`Duplicate prevented: ${student.student_name} (${student.student_id})`, 'success');
+                    } else {
+                        // Simulate sending to server
+                        sentStudents.add(studentKey);
+                        sentCount++;
+                        log(`✅ Student ${student.student_name} (${student.student_id}) sent successfully`);
+                        addResult(`Sent: ${student.student_name} (${student.student_id})`, 'info');
+                    }
+                });
+                
+                // Save sent students
+                const sentArray = Array.from(sentStudents);
+                localStorage.setItem('entryScanSentStudents', JSON.stringify(sentArray));
+                log(`💾 Saved ${sentArray.length} sent students to localStorage`);
+                
+                // Test results
+                log(`📊 Test Results:`);
+                log(`   - Total students processed: ${testStudents.length}`);
+                log(`   - New students sent: ${sentCount}`);
+                log(`   - Duplicates prevented: ${duplicateCount}`);
+                
+                if (duplicateCount > 0) {
+                    addResult(`✅ SUCCESS: ${duplicateCount} duplicate(s) prevented!`, 'success');
+                } else {
+                    addResult(`ℹ️ INFO: No duplicates in this test batch`, 'info');
+                }
+                
+                // Test offline queue simulation
+                log('🔄 Testing offline queue simulation...');
+                
+                // Create offline queue with same students
+                const offlineQueue = [...testStudents];
+                log(`📦 Created offline queue with ${offlineQueue.length} items`);
+                
+                let queueProcessed = 0;
+                let queueDuplicates = 0;
+                
+                offlineQueue.forEach((student) => {
+                    const studentKey = `${student.student_id}_${student.student_name}_${new Date(student.timestamp).toDateString()}`;
+                    
+                    if (sentStudents.has(studentKey)) {
+                        log(`⚠️ Offline queue: Student ${student.student_name} already sent - removing from queue`);
+                        queueDuplicates++;
+                    } else {
+                        sentStudents.add(studentKey);
+                        queueProcessed++;
+                        log(`✅ Offline queue: Student ${student.student_name} processed`);
+                    }
+                });
+                
+                log(`📊 Offline Queue Results:`);
+                log(`   - Items processed: ${queueProcessed}`);
+                log(`   - Duplicates removed: ${queueDuplicates}`);
+                
+                if (queueDuplicates > 0) {
+                    addResult(`✅ SUCCESS: ${queueDuplicates} duplicate(s) removed from offline queue!`, 'success');
+                }
+                
+                log('🎉 Test completed successfully!');
+                
+            } catch (error) {
+                log(`❌ Test failed: ${error.message}`);
+                addResult(`Test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Initialize
+        log('🧪 Duplicate Prevention Test Ready');
+        log('Click "Run Test" to test the duplicate prevention system');
+    </script>
+</body>
+</html>

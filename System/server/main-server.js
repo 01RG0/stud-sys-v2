@@ -147,39 +147,386 @@ function detectColumnMappings(headers) {
     address: null
   };
   
-  // Common variations for each field
+  // Enhanced field variations with comprehensive case variations
   const fieldVariations = {
-    id: ['id', 'student_id', 'studentid', 'student id', 'رقم الطالب', 'رقم الطالب', 'رقم', 'number', 'no', '#'],
-    name: ['name', 'student_name', 'studentname', 'student name', 'full_name', 'fullname', 'الاسم', 'اسم الطالب', 'الاسم الكامل'],
-    center: ['center', 'centre', 'branch', 'location', 'المركز', 'الفرع', 'المكان', 'branch_name'],
-    subject: ['subject', 'course', 'material', 'المادة', 'المقرر', 'الدرس', 'course_name'],
-    grade: ['grade', 'level', 'class', 'الصف', 'المستوى', 'الدرجة', 'class_name'],
-    fees: ['fees', 'fee', 'amount', 'price', 'cost', 'الرسوم', 'المبلغ', 'التكلفة', 'السعر'],
-    phone: ['phone', 'mobile', 'tel', 'telephone', 'phone_number', 'mobile_number', 'الهاتف', 'الجوال', 'رقم الهاتف'],
-    parent_phone: ['parent_phone', 'parentphone', 'parent phone', 'guardian_phone', 'guardianphone', 'هاتف الوالد', 'هاتف الوالدة', 'رقم ولي الأمر'],
-    email: ['email', 'e_mail', 'email_address', 'البريد الإلكتروني', 'الإيميل'],
-    address: ['address', 'location', 'العنوان', 'المكان', 'الموقع']
+    id: [
+      // English variations - all case combinations
+      'id', 'ID', 'Id', 'iD',
+      'student_id', 'STUDENT_ID', 'Student_ID', 'student_ID', 'STUDENT_id',
+      'studentid', 'STUDENTID', 'StudentID', 'studentID', 'STUDENTid',
+      'student id', 'STUDENT ID', 'Student ID', 'student ID', 'STUDENT id',
+      'student number', 'STUDENT NUMBER', 'Student Number', 'student NUMBER', 'STUDENT number',
+      'student no', 'STUDENT NO', 'Student No', 'student NO', 'STUDENT no',
+      'student #', 'STUDENT #', 'Student #', 'student #', 'STUDENT #',
+      'roll number', 'ROLL NUMBER', 'Roll Number', 'roll NUMBER', 'ROLL number',
+      'roll no', 'ROLL NO', 'Roll No', 'roll NO', 'ROLL no',
+      'roll#', 'ROLL#', 'Roll#', 'roll#', 'ROLL#',
+      'registration number', 'REGISTRATION NUMBER', 'Registration Number', 'registration NUMBER', 'REGISTRATION number',
+      'reg no', 'REG NO', 'Reg No', 'reg NO', 'REG no',
+      'reg#', 'REG#', 'Reg#', 'reg#', 'REG#',
+      'serial number', 'SERIAL NUMBER', 'Serial Number', 'serial NUMBER', 'SERIAL number',
+      'serial no', 'SERIAL NO', 'Serial No', 'serial NO', 'SERIAL no',
+      'serial#', 'SERIAL#', 'Serial#', 'serial#', 'SERIAL#',
+      'number', 'NUMBER', 'Number', 'number', 'NUMBER',
+      'no', 'NO', 'No', 'no', 'NO',
+      '#', 'num', 'NUM', 'Num', 'num', 'NUM',
+      // Arabic variations
+      'رقم الطالب', 'رقم الطالب', 'رقم', 'الرقم', 'رقم التسجيل', 'رقم القيد',
+      // Other languages
+      'numero', 'número', 'numéro', 'номер', '番号', '번호'
+    ],
+    name: [
+      // English variations - all case combinations
+      'name', 'NAME', 'Name', 'nAmE',
+      'student_name', 'STUDENT_NAME', 'Student_Name', 'student_NAME', 'STUDENT_name',
+      'studentname', 'STUDENTNAME', 'StudentName', 'studentNAME', 'STUDENTname',
+      'student name', 'STUDENT NAME', 'Student Name', 'student NAME', 'STUDENT name',
+      'full_name', 'FULL_NAME', 'Full_Name', 'full_NAME', 'FULL_name',
+      'fullname', 'FULLNAME', 'FullName', 'fullNAME', 'FULLname',
+      'first_name', 'FIRST_NAME', 'First_Name', 'first_NAME', 'FIRST_name',
+      'last_name', 'LAST_NAME', 'Last_Name', 'last_NAME', 'LAST_name',
+      'firstname', 'FIRSTNAME', 'FirstName', 'firstNAME', 'FIRSTname',
+      'lastname', 'LASTNAME', 'LastName', 'lastNAME', 'LASTname',
+      'given_name', 'GIVEN_NAME', 'Given_Name', 'given_NAME', 'GIVEN_name',
+      'family_name', 'FAMILY_NAME', 'Family_Name', 'family_NAME', 'FAMILY_name',
+      'complete name', 'COMPLETE NAME', 'Complete Name', 'complete NAME', 'COMPLETE name',
+      'full name', 'FULL NAME', 'Full Name', 'full NAME', 'FULL name',
+      'student full name', 'STUDENT FULL NAME', 'Student Full Name', 'student FULL NAME', 'STUDENT full name',
+      'student complete name', 'STUDENT COMPLETE NAME', 'Student Complete Name', 'student COMPLETE NAME', 'STUDENT complete name',
+      // Arabic variations
+      'الاسم', 'اسم الطالب', 'الاسم الكامل', 'الاسم الأول', 'الاسم الأخير',
+      'اسم العائلة', 'الاسم الثلاثي', 'الاسم الرباعي',
+      // Other languages
+      'nombre', 'nom', 'имя', '名前', '이름'
+    ],
+    center: [
+      // English variations - all case combinations
+      'center', 'CENTER', 'Center', 'cEnTeR',
+      'centre', 'CENTRE', 'Centre', 'cEnTrE',
+      'branch', 'BRANCH', 'Branch', 'bRaNcH',
+      'location', 'LOCATION', 'Location', 'lOcAtIoN',
+      'branch_name', 'BRANCH_NAME', 'Branch_Name', 'branch_NAME', 'BRANCH_name',
+      'center_name', 'CENTER_NAME', 'Center_Name', 'center_NAME', 'CENTER_name',
+      'institution', 'INSTITUTION', 'Institution', 'iNsTiTuTiOn',
+      'school', 'SCHOOL', 'School', 'sChOoL',
+      'college', 'COLLEGE', 'College', 'cOlLeGe',
+      'university', 'UNIVERSITY', 'University', 'uNiVeRsItY',
+      'academy', 'ACADEMY', 'Academy', 'aCaDeMy',
+      'institute', 'INSTITUTE', 'Institute', 'iNsTiTuTe',
+      'campus', 'CAMPUS', 'Campus', 'cAmPuS',
+      'site', 'SITE', 'Site', 'sItE',
+      'office', 'OFFICE', 'Office', 'oFfIcE',
+      'department', 'DEPARTMENT', 'Department', 'dEpArTmEnT',
+      'division', 'DIVISION', 'Division', 'dIvIsIoN',
+      'section', 'SECTION', 'Section', 'sEcTiOn',
+      // Arabic variations
+      'المركز', 'الفرع', 'المكان', 'المؤسسة', 'المدرسة', 'الكلية', 'الجامعة',
+      'الأكاديمية', 'المعهد', 'الحرم', 'الموقع', 'المكتب', 'القسم', 'الشعبة',
+      // Other languages
+      'centro', 'CENTRO', 'Centro', 'cEnTrO',
+      'centre', 'CENTRE', 'Centre', 'cEnTrE',
+      'центр', 'ЦЕНТР', 'Центр', 'цЕнТр',
+      'センター', 'センダー', '센터', '센터'
+    ],
+    subject: [
+      // English variations - all case combinations
+      'subject', 'SUBJECT', 'Subject', 'sUbJeCt',
+      'course', 'COURSE', 'Course', 'cOuRsE',
+      'material', 'MATERIAL', 'Material', 'mAtErIaL',
+      'course_name', 'COURSE_NAME', 'Course_Name', 'course_NAME', 'COURSE_name',
+      'subject_name', 'SUBJECT_NAME', 'Subject_Name', 'subject_NAME', 'SUBJECT_name',
+      'discipline', 'DISCIPLINE', 'Discipline', 'dIsCiPlInE',
+      'field', 'FIELD', 'Field', 'fIeLd',
+      'major', 'MAJOR', 'Major', 'mAjOr',
+      'specialization', 'SPECIALIZATION', 'Specialization', 'sPeCiAlIzAtIoN',
+      'program', 'PROGRAM', 'Program', 'pRoGrAm',
+      'curriculum', 'CURRICULUM', 'Curriculum', 'cUrRiCuLuM',
+      'syllabus', 'SYLLABUS', 'Syllabus', 'sYlLaBuS',
+      'topic', 'TOPIC', 'Topic', 'tOpIc',
+      'theme', 'THEME', 'Theme', 'tHeMe',
+      'area', 'AREA', 'Area', 'aReA',
+      'domain', 'DOMAIN', 'Domain', 'dOmAiN',
+      'branch of study', 'BRANCH OF STUDY', 'Branch Of Study', 'branch OF STUDY', 'BRANCH of study',
+      // Arabic variations
+      'المادة', 'المقرر', 'الدرس', 'التخصص', 'المجال', 'الفرع', 'البرنامج',
+      'المنهج', 'الموضوع', 'الموضوع الدراسي', 'الفرع الدراسي',
+      // Other languages
+      'materia', 'MATERIA', 'Materia', 'mAtErIa',
+      'matière', 'MATIÈRE', 'Matière', 'mAtIèRe',
+      'предмет', 'ПРЕДМЕТ', 'Предмет', 'пРеДмЕт',
+      '科目', '과목', '과목'
+    ],
+    grade: [
+      // English variations - all case combinations
+      'grade', 'GRADE', 'Grade', 'gRaDe',
+      'level', 'LEVEL', 'Level', 'lEvEl',
+      'class', 'CLASS', 'Class', 'cLaSs',
+      'class_name', 'CLASS_NAME', 'Class_Name', 'class_NAME', 'CLASS_name',
+      'year', 'YEAR', 'Year', 'yEaR',
+      'academic_year', 'ACADEMIC_YEAR', 'Academic_Year', 'academic_YEAR', 'ACADEMIC_year',
+      'semester', 'SEMESTER', 'Semester', 'sEmEsTeR',
+      'term', 'TERM', 'Term', 'tErM',
+      'stage', 'STAGE', 'Stage', 'sTaGe',
+      'phase', 'PHASE', 'Phase', 'pHaSe',
+      'step', 'STEP', 'Step', 'sTeP',
+      'degree', 'DEGREE', 'Degree', 'dEgReE',
+      'standard', 'STANDARD', 'Standard', 'sTaNdArD',
+      'form', 'FORM', 'Form', 'fOrM',
+      'grade level', 'GRADE LEVEL', 'Grade Level', 'grade LEVEL', 'GRADE level',
+      'class level', 'CLASS LEVEL', 'Class Level', 'class LEVEL', 'CLASS level',
+      'academic level', 'ACADEMIC LEVEL', 'Academic Level', 'academic LEVEL', 'ACADEMIC level',
+      'education level', 'EDUCATION LEVEL', 'Education Level', 'education LEVEL', 'EDUCATION level',
+      // Arabic variations
+      'الصف', 'المستوى', 'الدرجة', 'السنة', 'السنة الأكاديمية', 'الفصل',
+      'المرحلة', 'المرحلة الدراسية', 'الدرجة الدراسية', 'المستوى الدراسي',
+      // Other languages
+      'grado', 'GRADO', 'Grado', 'gRaDo',
+      'niveau', 'NIVEAU', 'Niveau', 'nIvEaU',
+      'класс', 'КЛАСС', 'Класс', 'кЛаСс',
+      '学年', '학년', '학년'
+    ],
+    fees: [
+      // English variations - all case combinations
+      'fees', 'FEES', 'Fees', 'fEeS',
+      'fee', 'FEE', 'Fee', 'fEe',
+      'amount', 'AMOUNT', 'Amount', 'aMoUnT',
+      'price', 'PRICE', 'Price', 'pRiCe',
+      'cost', 'COST', 'Cost', 'cOsT',
+      'payment', 'PAYMENT', 'Payment', 'pAyMeNt',
+      'tuition', 'TUITION', 'Tuition', 'tUiTiOn',
+      'tuition_fee', 'TUITION_FEE', 'Tuition_Fee', 'tuition_FEE', 'TUITION_fee',
+      'total_fee', 'TOTAL_FEE', 'Total_Fee', 'total_FEE', 'TOTAL_fee',
+      'total_fees', 'TOTAL_FEES', 'Total_Fees', 'total_FEES', 'TOTAL_fees',
+      'total_amount', 'TOTAL_AMOUNT', 'Total_Amount', 'total_AMOUNT', 'TOTAL_amount',
+      'total_cost', 'TOTAL_COST', 'Total_Cost', 'total_COST', 'TOTAL_cost',
+      'total_price', 'TOTAL_PRICE', 'Total_Price', 'total_PRICE', 'TOTAL_price',
+      'registration_fee', 'REGISTRATION_FEE', 'Registration_Fee', 'registration_FEE', 'REGISTRATION_fee',
+      'enrollment_fee', 'ENROLLMENT_FEE', 'Enrollment_Fee', 'enrollment_FEE', 'ENROLLMENT_fee',
+      'admission_fee', 'ADMISSION_FEE', 'Admission_Fee', 'admission_FEE', 'ADMISSION_fee',
+      'course_fee', 'COURSE_FEE', 'Course_Fee', 'course_FEE', 'COURSE_fee',
+      'monthly_fee', 'MONTHLY_FEE', 'Monthly_Fee', 'monthly_FEE', 'MONTHLY_fee',
+      'annual_fee', 'ANNUAL_FEE', 'Annual_Fee', 'annual_FEE', 'ANNUAL_fee',
+      'semester_fee', 'SEMESTER_FEE', 'Semester_Fee', 'semester_FEE', 'SEMESTER_fee',
+      'term_fee', 'TERM_FEE', 'Term_Fee', 'term_FEE', 'TERM_fee',
+      // Arabic variations
+      'الرسوم', 'المبلغ', 'التكلفة', 'السعر', 'الدفع', 'رسوم الدراسة',
+      'الرسوم الإجمالية', 'المبلغ الإجمالي', 'التكلفة الإجمالية',
+      'رسوم التسجيل', 'رسوم القبول', 'رسوم المقرر', 'الرسوم الشهرية',
+      // Other languages
+      'tarifa', 'TARIFA', 'Tarifa', 'tArIfA',
+      'frais', 'FRAIS', 'Frais', 'fRaIs',
+      'плата', 'ПЛАТА', 'Плата', 'пЛаТа',
+      '料金', '수수료', '수수료'
+    ],
+    phone: [
+      // English variations - all case combinations
+      'phone', 'PHONE', 'Phone', 'pHoNe',
+      'mobile', 'MOBILE', 'Mobile', 'mObIlE',
+      'tel', 'TEL', 'Tel', 'tEl',
+      'telephone', 'TELEPHONE', 'Telephone', 'tElEpHoNe',
+      'phone_number', 'PHONE_NUMBER', 'Phone_Number', 'phone_NUMBER', 'PHONE_number',
+      'mobile_number', 'MOBILE_NUMBER', 'Mobile_Number', 'mobile_NUMBER', 'MOBILE_number',
+      'contact_number', 'CONTACT_NUMBER', 'Contact_Number', 'contact_NUMBER', 'CONTACT_number',
+      'contact_phone', 'CONTACT_PHONE', 'Contact_Phone', 'contact_PHONE', 'CONTACT_phone',
+      'personal_phone', 'PERSONAL_PHONE', 'Personal_Phone', 'personal_PHONE', 'PERSONAL_phone',
+      'student_phone', 'STUDENT_PHONE', 'Student_Phone', 'student_PHONE', 'STUDENT_phone',
+      'cell', 'CELL', 'Cell', 'cElL',
+      'cellphone', 'CELLPHONE', 'Cellphone', 'cElLpHoNe',
+      'cell_phone', 'CELL_PHONE', 'Cell_Phone', 'cell_PHONE', 'CELL_phone',
+      'mobile_phone', 'MOBILE_PHONE', 'Mobile_Phone', 'mobile_PHONE', 'MOBILE_phone',
+      'handphone', 'HANDPHONE', 'Handphone', 'hAnDpHoNe',
+      'whatsapp', 'WHATSAPP', 'Whatsapp', 'wHaTsApP',
+      'whatsapp_number', 'WHATSAPP_NUMBER', 'Whatsapp_Number', 'whatsapp_NUMBER', 'WHATSAPP_number',
+      'telegram', 'TELEGRAM', 'Telegram', 'tElEgRaM',
+      'telegram_number', 'TELEGRAM_NUMBER', 'Telegram_Number', 'telegram_NUMBER', 'TELEGRAM_number',
+      // Arabic variations
+      'الهاتف', 'الجوال', 'رقم الهاتف', 'رقم الجوال', 'رقم الاتصال',
+      'هاتف الطالب', 'هاتف شخصي', 'رقم الواتساب', 'رقم التليجرام',
+      // Other languages
+      'teléfono', 'TELÉFONO', 'Teléfono', 'tElÉfOnO',
+      'téléphone', 'TÉLÉPHONE', 'Téléphone', 'tÉlÉpHoNe',
+      'телефон', 'ТЕЛЕФОН', 'Телефон', 'тЕлЕфОн',
+      '電話', '전화', '전화'
+    ],
+    parent_phone: [
+      // English variations - all case combinations
+      'parent_phone', 'PARENT_PHONE', 'Parent_Phone', 'parent_PHONE', 'PARENT_phone',
+      'parentphone', 'PARENTPHONE', 'Parentphone', 'parentPHONE', 'PARENTphone',
+      'parent phone', 'PARENT PHONE', 'Parent Phone', 'parent PHONE', 'PARENT phone',
+      'guardian_phone', 'GUARDIAN_PHONE', 'Guardian_Phone', 'guardian_PHONE', 'GUARDIAN_phone',
+      'guardianphone', 'GUARDIANPHONE', 'Guardianphone', 'guardianPHONE', 'GUARDIANphone',
+      'guardian phone', 'GUARDIAN PHONE', 'Guardian Phone', 'guardian PHONE', 'GUARDIAN phone',
+      'father_phone', 'FATHER_PHONE', 'Father_Phone', 'father_PHONE', 'FATHER_phone',
+      'mother_phone', 'MOTHER_PHONE', 'Mother_Phone', 'mother_PHONE', 'MOTHER_phone',
+      'father phone', 'FATHER PHONE', 'Father Phone', 'father PHONE', 'FATHER phone',
+      'mother phone', 'MOTHER PHONE', 'Mother Phone', 'mother PHONE', 'MOTHER phone',
+      'parent_contact', 'PARENT_CONTACT', 'Parent_Contact', 'parent_CONTACT', 'PARENT_contact',
+      'guardian_contact', 'GUARDIAN_CONTACT', 'Guardian_Contact', 'guardian_CONTACT', 'GUARDIAN_contact',
+      'emergency_contact', 'EMERGENCY_CONTACT', 'Emergency_Contact', 'emergency_CONTACT', 'EMERGENCY_contact',
+      'emergency_phone', 'EMERGENCY_PHONE', 'Emergency_Phone', 'emergency_PHONE', 'EMERGENCY_phone',
+      'family_phone', 'FAMILY_PHONE', 'Family_Phone', 'family_PHONE', 'FAMILY_phone',
+      'home_phone', 'HOME_PHONE', 'Home_Phone', 'home_PHONE', 'HOME_phone',
+      'parent_mobile', 'PARENT_MOBILE', 'Parent_Mobile', 'parent_MOBILE', 'PARENT_mobile',
+      'guardian_mobile', 'GUARDIAN_MOBILE', 'Guardian_Mobile', 'guardian_MOBILE', 'GUARDIAN_mobile',
+      // Arabic variations
+      'هاتف الوالد', 'هاتف الوالدة', 'رقم ولي الأمر', 'هاتف ولي الأمر',
+      'هاتف الأب', 'هاتف الأم', 'رقم الأب', 'رقم الأم', 'هاتف العائلة',
+      'هاتف الطوارئ', 'رقم الطوارئ', 'هاتف المنزل',
+      // Other languages
+      'teléfono del padre', 'TELÉFONO DEL PADRE', 'Teléfono Del Padre', 'teléfono DEL PADRE', 'TELÉFONO del padre',
+      'téléphone parent', 'TÉLÉPHONE PARENT', 'Téléphone Parent', 'téléphone PARENT', 'TÉLÉPHONE parent',
+      'телефон родителя', 'ТЕЛЕФОН РОДИТЕЛЯ', 'Телефон Родителя', 'телефон РОДИТЕЛЯ', 'ТЕЛЕФОН родителя',
+      '親の電話', '부모 전화', '부모 전화'
+    ],
+    email: [
+      // English variations - all case combinations
+      'email', 'EMAIL', 'Email', 'eMaIl',
+      'e_mail', 'E_MAIL', 'E_Mail', 'e_MAIL', 'E_mail',
+      'email_address', 'EMAIL_ADDRESS', 'Email_Address', 'email_ADDRESS', 'EMAIL_address',
+      'mail', 'MAIL', 'Mail', 'mAiL',
+      'electronic_mail', 'ELECTRONIC_MAIL', 'Electronic_Mail', 'electronic_MAIL', 'ELECTRONIC_mail',
+      'e-mail', 'E-MAIL', 'E-Mail', 'e-MAIL', 'E-mail',
+      'student_email', 'STUDENT_EMAIL', 'Student_Email', 'student_EMAIL', 'STUDENT_email',
+      'personal_email', 'PERSONAL_EMAIL', 'Personal_Email', 'personal_EMAIL', 'PERSONAL_email',
+      'contact_email', 'CONTACT_EMAIL', 'Contact_Email', 'contact_EMAIL', 'CONTACT_email',
+      'primary_email', 'PRIMARY_EMAIL', 'Primary_Email', 'primary_EMAIL', 'PRIMARY_email',
+      // Arabic variations
+      'البريد الإلكتروني', 'الإيميل', 'البريد', 'البريد الإلكتروني للطالب',
+      'البريد الشخصي', 'البريد الأساسي',
+      // Other languages
+      'correo', 'CORREO', 'Correo', 'cOrReO',
+      'courriel', 'COURRIEL', 'Courriel', 'cOuRrIeL',
+      'электронная почта', 'ЭЛЕКТРОННАЯ ПОЧТА', 'Электронная Почта', 'электронная ПОЧТА', 'ЭЛЕКТРОННАЯ почта',
+      'メール', '이메일', '이메일'
+    ],
+    address: [
+      // English variations - all case combinations
+      'address', 'ADDRESS', 'Address', 'aDdReSs',
+      'location', 'LOCATION', 'Location', 'lOcAtIoN',
+      'home_address', 'HOME_ADDRESS', 'Home_Address', 'home_ADDRESS', 'HOME_address',
+      'residence', 'RESIDENCE', 'Residence', 'rEsIdEnCe',
+      'residential_address', 'RESIDENTIAL_ADDRESS', 'Residential_Address', 'residential_ADDRESS', 'RESIDENTIAL_address',
+      'permanent_address', 'PERMANENT_ADDRESS', 'Permanent_Address', 'permanent_ADDRESS', 'PERMANENT_address',
+      'current_address', 'CURRENT_ADDRESS', 'Current_Address', 'current_ADDRESS', 'CURRENT_address',
+      'mailing_address', 'MAILING_ADDRESS', 'Mailing_Address', 'mailing_ADDRESS', 'MAILING_address',
+      'contact_address', 'CONTACT_ADDRESS', 'Contact_Address', 'contact_ADDRESS', 'CONTACT_address',
+      'street_address', 'STREET_ADDRESS', 'Street_Address', 'street_ADDRESS', 'STREET_address',
+      'full_address', 'FULL_ADDRESS', 'Full_Address', 'full_ADDRESS', 'FULL_address',
+      'complete_address', 'COMPLETE_ADDRESS', 'Complete_Address', 'complete_ADDRESS', 'COMPLETE_address',
+      'detailed_address', 'DETAILED_ADDRESS', 'Detailed_Address', 'detailed_ADDRESS', 'DETAILED_address',
+      // Arabic variations
+      'العنوان', 'المكان', 'الموقع', 'عنوان المنزل', 'عنوان السكن',
+      'العنوان الدائم', 'العنوان الحالي', 'عنوان المراسلة', 'عنوان الاتصال',
+      'عنوان الشارع', 'العنوان الكامل', 'العنوان التفصيلي',
+      // Other languages
+      'dirección', 'DIRECCIÓN', 'Dirección', 'dIrEcCiÓn',
+      'adresse', 'ADRESSE', 'Adresse', 'aDrEsSe',
+      'адрес', 'АДРЕС', 'Адрес', 'аДрЕс',
+      '住所', '주소', '주소'
+    ]
   };
   
-  // Convert headers to lowercase for comparison
+  // Enhanced matching algorithm
   const lowerHeaders = headers.map(h => h ? h.toString().toLowerCase().trim() : '');
   
-  // Find matches for each field
+  // Find matches for each field with improved scoring
   for (const [field, variations] of Object.entries(fieldVariations)) {
+    let bestMatch = null;
+    let bestScore = 0;
+    
     for (let i = 0; i < lowerHeaders.length; i++) {
       const header = lowerHeaders[i];
-      if (variations.some(variation => 
-        header.includes(variation) || 
-        variation.includes(header) ||
-        header === variation
-      )) {
-        mappings[field] = i;
-        break;
+      if (!header) continue;
+      
+      // Calculate match score
+      let score = 0;
+      
+      for (const variation of variations) {
+        const lowerVariation = variation.toLowerCase();
+        
+        // Exact match gets highest score
+        if (header === lowerVariation) {
+          score = 100;
+          break;
+        }
+        
+        // Contains match gets medium score
+        if (header.includes(lowerVariation) || lowerVariation.includes(header)) {
+          score = Math.max(score, 80);
+        }
+        
+        // Word boundary match gets good score
+        const words = header.split(/[\s\-_\.]+/);
+        const variationWords = lowerVariation.split(/[\s\-_\.]+/);
+        
+        for (const word of words) {
+          for (const vWord of variationWords) {
+            if (word === vWord) {
+              score = Math.max(score, 60);
+            } else if (word.includes(vWord) || vWord.includes(word)) {
+              score = Math.max(score, 40);
+            }
+          }
+        }
+        
+        // Fuzzy match for similar words
+        if (calculateSimilarity(header, lowerVariation) > 0.7) {
+          score = Math.max(score, 30);
+        }
       }
+      
+      if (score > bestScore && score >= 30) {
+        bestScore = score;
+        bestMatch = i;
+      }
+    }
+    
+    if (bestMatch !== null) {
+      mappings[field] = bestMatch;
     }
   }
   
   return mappings;
+}
+
+// Helper function to calculate string similarity
+function calculateSimilarity(str1, str2) {
+  const longer = str1.length > str2.length ? str1 : str2;
+  const shorter = str1.length > str2.length ? str2 : str1;
+  
+  if (longer.length === 0) return 1.0;
+  
+  const editDistance = levenshteinDistance(longer, shorter);
+  return (longer.length - editDistance) / longer.length;
+}
+
+// Helper function to calculate Levenshtein distance
+function levenshteinDistance(str1, str2) {
+  const matrix = [];
+  
+  for (let i = 0; i <= str2.length; i++) {
+    matrix[i] = [i];
+  }
+  
+  for (let j = 0; j <= str1.length; j++) {
+    matrix[0][j] = j;
+  }
+  
+  for (let i = 1; i <= str2.length; i++) {
+    for (let j = 1; j <= str1.length; j++) {
+      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  
+  return matrix[str2.length][str1.length];
 }
 
 function parseStudentData(worksheet, mappings) {
@@ -196,9 +543,50 @@ function parseStudentData(worksheet, mappings) {
       if (colIndex !== null) {
         const cellAddress = XLSX.utils.encode_cell({ r: row, c: colIndex });
         const cell = worksheet[cellAddress];
+        
         if (cell && cell.v !== undefined && cell.v !== null && cell.v !== '') {
-          student[field] = cell.v.toString().trim();
-          hasData = true;
+          let value = cell.v;
+          
+          // Enhanced data processing based on field type
+          switch (field) {
+            case 'id':
+              // Clean and format ID
+              value = cleanAndFormatId(value);
+              break;
+            case 'name':
+              // Clean and format name
+              value = cleanAndFormatName(value);
+              break;
+            case 'phone':
+            case 'parent_phone':
+              // Clean and format phone numbers
+              value = cleanAndFormatPhone(value);
+              break;
+            case 'email':
+              // Clean and format email
+              value = cleanAndFormatEmail(value);
+              break;
+            case 'fees':
+              // Clean and format fees
+              value = cleanAndFormatFees(value);
+              break;
+            case 'center':
+            case 'subject':
+            case 'grade':
+            case 'address':
+              // Clean and format text fields
+              value = cleanAndFormatText(value);
+              break;
+            default:
+              value = value.toString().trim();
+          }
+          
+          if (value && value !== '') {
+            student[field] = value;
+            hasData = true;
+          } else {
+            student[field] = null;
+          }
         } else {
           student[field] = null;
         }
@@ -214,21 +602,114 @@ function parseStudentData(worksheet, mappings) {
         student.id = '';
       }
       
-      // Keep fields empty if not provided (no default values)
-      // student.center = student.center || '';
-      // student.subject = student.subject || '';
-      // student.grade = student.grade || '';
-      // student.fees = student.fees || '0';
-      // student.phone = student.phone || '';
-      // student.parent_phone = student.parent_phone || '';
-      // student.email = student.email || '';
-      // student.address = student.address || '';
-      
       students.push(student);
     }
   }
   
   return students;
+}
+
+// Enhanced data cleaning and formatting functions
+function cleanAndFormatId(value) {
+  if (!value) return '';
+  
+  let id = value.toString().trim();
+  
+  // Remove common prefixes/suffixes
+  id = id.replace(/^(id|student|no|number|#|رقم|الرقم)[\s\-_\.:]*/i, '');
+  id = id.replace(/[\s\-_\.:]*$/i, '');
+  
+  // Remove extra spaces and normalize
+  id = id.replace(/\s+/g, ' ').trim();
+  
+  return id;
+}
+
+function cleanAndFormatName(value) {
+  if (!value) return '';
+  
+  let name = value.toString().trim();
+  
+  // Remove extra spaces and normalize
+  name = name.replace(/\s+/g, ' ').trim();
+  
+  // Capitalize first letter of each word (for English names)
+  if (/^[a-zA-Z\s]+$/.test(name)) {
+    name = name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+  }
+  
+  return name;
+}
+
+function cleanAndFormatPhone(value) {
+  if (!value) return '';
+  
+  let phone = value.toString().trim();
+  
+  // Remove all non-digit characters except + at the beginning
+  phone = phone.replace(/[^\d+]/g, '');
+  
+  // Remove leading zeros and normalize
+  if (phone.startsWith('+')) {
+    phone = '+' + phone.substring(1).replace(/^0+/, '');
+  } else {
+    phone = phone.replace(/^0+/, '');
+  }
+  
+  // Add country code if missing (assuming local format)
+  if (phone.length > 0 && !phone.startsWith('+')) {
+    // This is a simple heuristic - you might want to customize based on your region
+    if (phone.length === 10) {
+      phone = '+1' + phone; // Assuming US format
+    } else if (phone.length === 11 && phone.startsWith('1')) {
+      phone = '+' + phone;
+    }
+  }
+  
+  return phone;
+}
+
+function cleanAndFormatEmail(value) {
+  if (!value) return '';
+  
+  let email = value.toString().trim().toLowerCase();
+  
+  // Basic email validation and cleaning
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (emailRegex.test(email)) {
+    return email;
+  }
+  
+  return '';
+}
+
+function cleanAndFormatFees(value) {
+  if (!value) return '';
+  
+  let fees = value.toString().trim();
+  
+  // Remove currency symbols and text
+  fees = fees.replace(/[$£€¥₹₽₩₪₦₨₴₸₼₾₿\s,]/g, '');
+  fees = fees.replace(/[^\d\.]/g, '');
+  
+  // Convert to number
+  const numFees = parseFloat(fees);
+  if (!isNaN(numFees) && numFees >= 0) {
+    return numFees.toString();
+  }
+  
+  return '';
+}
+
+function cleanAndFormatText(value) {
+  if (!value) return '';
+  
+  let text = value.toString().trim();
+  
+  // Remove extra spaces and normalize
+  text = text.replace(/\s+/g, ' ').trim();
+  
+  return text;
 }
 
 function analyzeExcelFile(filePath) {
@@ -257,12 +738,23 @@ function analyzeExcelFile(filePath) {
     // Parse student data
     const students = parseStudentData(worksheet, mappings);
     
+    // Detect column mappings with enhanced feedback
+    const mappingQuality = assessMappingQuality(mappings, headers);
+    
+    // Analyze data quality
+    const dataQuality = analyzeDataQuality(students);
+    
     return {
       success: true,
       headers: headers,
       mappings: mappings,
       students: students,
       totalRows: range.e.r - range.s.r,
+      dataRows: students.length,
+      sheetName,
+      mappingQuality,
+      dataQuality,
+      recommendations: generateRecommendations(mappings, dataQuality),
       detectedFields: Object.keys(mappings).filter(field => mappings[field] !== null)
     };
     
@@ -272,6 +764,134 @@ function analyzeExcelFile(filePath) {
       error: error.message
     };
   }
+}
+
+// Assess the quality of column mappings
+function assessMappingQuality(mappings, headers) {
+  const quality = {
+    score: 0,
+    mappedFields: 0,
+    totalFields: Object.keys(mappings).length,
+    missingFields: [],
+    mappedColumns: []
+  };
+  
+  for (const [field, colIndex] of Object.entries(mappings)) {
+    if (colIndex !== null) {
+      quality.mappedFields++;
+      quality.mappedColumns.push({
+        field,
+        column: headers[colIndex],
+        index: colIndex
+      });
+    } else {
+      quality.missingFields.push(field);
+    }
+  }
+  
+  quality.score = Math.round((quality.mappedFields / quality.totalFields) * 100);
+  
+  return quality;
+}
+
+// Analyze the quality of parsed student data
+function analyzeDataQuality(students) {
+  const quality = {
+    totalStudents: students.length,
+    validStudents: 0,
+    studentsWithId: 0,
+    studentsWithPhone: 0,
+    studentsWithEmail: 0,
+    studentsWithFees: 0,
+    issues: []
+  };
+  
+  students.forEach((student, index) => {
+    let isValid = true;
+    
+    // Check required fields
+    if (!student.name || student.name.trim() === '') {
+      quality.issues.push(`Row ${index + 2}: Missing student name`);
+      isValid = false;
+    }
+    
+    // Count optional fields
+    if (student.id && student.id.trim() !== '') {
+      quality.studentsWithId++;
+    }
+    
+    if (student.phone && student.phone.trim() !== '') {
+      quality.studentsWithPhone++;
+    }
+    
+    if (student.email && student.email.trim() !== '') {
+      quality.studentsWithEmail++;
+    }
+    
+    if (student.fees && student.fees.trim() !== '') {
+      quality.studentsWithFees++;
+    }
+    
+    if (isValid) {
+      quality.validStudents++;
+    }
+  });
+  
+  return quality;
+}
+
+// Generate recommendations for improving the import
+function generateRecommendations(mappings, dataQuality) {
+  const recommendations = [];
+  
+  // Check for missing critical mappings
+  if (!mappings.name) {
+    recommendations.push({
+      type: 'critical',
+      message: 'Student name column not detected. Please ensure your Excel file has a column with student names (e.g., "Name", "Student Name", "Full Name").'
+    });
+  }
+  
+  if (!mappings.id) {
+    recommendations.push({
+      type: 'warning',
+      message: 'Student ID column not detected. Consider adding a column with student IDs for better tracking.'
+    });
+  }
+  
+  // Check data quality issues
+  if (dataQuality.issues.length > 0) {
+    recommendations.push({
+      type: 'warning',
+      message: `${dataQuality.issues.length} data quality issues found. Please review and fix these issues for better import results.`
+    });
+  }
+  
+  // Check for low completion rates
+  const completionRate = dataQuality.validStudents / dataQuality.totalStudents;
+  if (completionRate < 0.8) {
+    recommendations.push({
+      type: 'info',
+      message: `Only ${Math.round(completionRate * 100)}% of rows have valid student data. Consider reviewing your data format.`
+    });
+  }
+  
+  // Suggest improvements
+  if (dataQuality.studentsWithPhone / dataQuality.totalStudents < 0.5) {
+    recommendations.push({
+      type: 'suggestion',
+      message: 'Consider adding phone numbers for better student contact information.'
+    });
+  }
+  
+  if (dataQuality.studentsWithEmail / dataQuality.totalStudents < 0.3) {
+    recommendations.push({
+      type: 'suggestion',
+      message: 'Consider adding email addresses for digital communication.'
+    });
+  }
+  
+  return recommendations;
 }
 
 // Analyze CSV files
