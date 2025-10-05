@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Entry Scanner - Student Lab System</title>
   <link rel="stylesheet" href="/styles/common.css" />
   <link rel="stylesheet" href="/styles/entry-scanner.css" />
@@ -45,26 +45,22 @@
         </div>
       </div>
       <div id="header-controls">
-        <div id="connection-status" class="status-offline">
-          <i class="fas fa-circle"></i>
-          <span>Disconnected</span>
-        </div>
-        <div id="network-status" class="network-status">
-          <i class="fas fa-wifi"></i>
-          <span>Network: Unknown</span>
-        </div>
-        <div id="device-count" class="device-count">
-          <i class="fas fa-desktop"></i>
-          <span>Devices: 0</span>
-        </div>
-        <div id="sync-status" class="sync-status">
-          <i class="fas fa-database"></i>
-          <span>Sync: Ready</span>
-        </div>
         <button id="manual-sync-btn" class="btn btn-sync" title="Manual Sync to MySQL">
           <i class="fas fa-sync-alt"></i>
           <span>Sync</span>
         </button>
+        <button id="permanent-reconnect-btn" class="btn btn-reconnect" title="Reconnect to Server">
+          <i class="fas fa-sync-alt"></i>
+          <span>Reconnect</span>
+        </button>
+        <button id="permanent-refresh-btn" class="btn btn-refresh" title="Refresh Data">
+          <i class="fas fa-refresh"></i>
+          <span>Refresh</span>
+        </button>
+        <div id="connection-status" class="status-offline">
+          <i class="fas fa-circle"></i>
+          <span>Disconnected</span>
+        </div>
         <button id="logout-btn" class="btn btn-logout" title="Logout Device">
           <i class="fas fa-sign-out-alt"></i>
           <span>Logout</span>
@@ -157,25 +153,6 @@
     </div>
     </div>
 
-    <!-- Permanent Manual Reconnect Button -->
-    <div id="permanent-reconnect-bar" class="permanent-reconnect-bar">
-        <div class="reconnect-content">
-            <div class="reconnect-info">
-                <i class="fas fa-wifi"></i>
-                <span id="reconnect-status-text">Connection Status</span>
-            </div>
-            <div class="reconnect-actions">
-                <button id="permanent-reconnect-btn" class="btn btn-reconnect">
-                    <i class="fas fa-sync-alt"></i>
-                    Reconnect
-                </button>
-                <button id="permanent-refresh-btn" class="btn btn-refresh">
-                    <i class="fas fa-refresh"></i>
-                    Refresh
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Manual Reconnect Button - REMOVED -->
 

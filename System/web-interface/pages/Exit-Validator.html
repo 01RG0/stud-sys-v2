@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Exit Validator - Student Lab System</title>
   <link rel="stylesheet" href="/styles/common.css" />
   <link rel="stylesheet" href="/styles/exit-validator.css" />
@@ -22,22 +22,6 @@
         </div>
       </div>
       <div id="header-controls">
-        <div id="connection-status" class="status-offline">
-          <i class="fas fa-circle"></i>
-          <span>Disconnected</span>
-        </div>
-        <div id="network-status" class="network-status">
-          <i class="fas fa-wifi"></i>
-          <span>Network: Unknown</span>
-        </div>
-        <div id="device-count" class="device-count">
-          <i class="fas fa-desktop"></i>
-          <span>Devices: 0</span>
-        </div>
-        <div id="sync-status" class="sync-status">
-          <i class="fas fa-database"></i>
-          <span>Sync: Ready</span>
-        </div>
         <button id="manual-sync-btn" class="btn btn-sync" title="Manual Sync to MySQL">
           <i class="fas fa-sync-alt"></i>
           <span>Sync</span>
@@ -46,17 +30,21 @@
           <i class="fas fa-sync-alt"></i>
           <span>Reconnect</span>
         </button>
-        <button id="permanent-refresh-btn" class="btn btn-refresh" title="Refresh Connection">
-          <i class="fas fa-refresh"></i>
+        <button id="refresh-table" class="btn btn-refresh" title="Refresh Table">
+          <i class="fas fa-sync-alt"></i>
           <span>Refresh</span>
+        </button>
+        <div id="connection-status" class="status-offline">
+          <i class="fas fa-circle"></i>
+          <span>Disconnected</span>
+        </div>
+        <button id="export-btn" class="export-button" title="Export all student data to Excel">
+          <i class="fas fa-file-excel"></i>
+          <span>Export</span>
         </button>
         <button id="reset-btn" class="reset-button" title="Clear all local data and reset system">
           <i class="fas fa-trash-alt"></i>
-          <span>Reset Data</span>
-        </button>
-        <button id="export-btn" class="export-button" title="Export all student data to Excel">
-          <i class="fas fa-file-excel"></i>
-          <span>Export to Excel</span>
+          <span>Reset</span>
         </button>
       </div>
     </div>
@@ -126,11 +114,6 @@
         <div id="student-table-container">
           <div class="table-header">
             <h3><i class="fas fa-table"></i> Today's Registered Students</h3>
-            <div class="table-controls">
-              <button class="refresh-btn" id="refresh-table" title="Refresh table">
-                <i class="fas fa-sync-alt"></i>
-              </button>
-            </div>
           </div>
           <div id="table-wrapper">
             <table id="students-table">

@@ -1466,52 +1466,7 @@
     // Create simplified step-by-step manual entry form
     studentForm.innerHTML = `
       <div class="simple-entry-form">
-        <div class="form-header">
-          <h3><i class="fas fa-keyboard"></i> Quick Student Entry</h3>
-          <p class="form-instructions">
-            <i class="fas fa-mobile-alt"></i> 
-            <strong>Mobile:</strong> Tap <strong>Enter/Return</strong> on your keyboard to move to next field. 
-            <br><i class="fas fa-desktop"></i> 
-            <strong>Desktop:</strong> Press <strong>Enter</strong> key. 
-            <br><em>Final Enter/Return registers the student. All fields are optional.</em>
-          </p>
-        </div>
         
-        <div class="form-steps">
-          <div class="step-indicator">
-            <div class="step active" data-step="1">
-              <span class="step-number">1</span>
-              <span class="step-label">ID</span>
-            </div>
-            <div class="step" data-step="2">
-              <span class="step-number">2</span>
-              <span class="step-label">Name</span>
-            </div>
-            <div class="step" data-step="3">
-              <span class="step-number">3</span>
-              <span class="step-label">Center</span>
-            </div>
-            <div class="step" data-step="4">
-              <span class="step-number">4</span>
-              <span class="step-label">Grade</span>
-            </div>
-            <div class="step" data-step="5">
-              <span class="step-number">5</span>
-              <span class="step-label">Phone</span>
-            </div>
-            <div class="step" data-step="6">
-              <span class="step-number">6</span>
-              <span class="step-label">Subject</span>
-            </div>
-            <div class="step" data-step="7">
-              <span class="step-number">7</span>
-              <span class="step-label">Payment</span>
-            </div>
-            <div class="step" data-step="8">
-              <span class="step-number">8</span>
-              <span class="step-label">Register</span>
-            </div>
-          </div>
           
           <div class="form-fields">
             <div class="field-group active" data-field="1">
@@ -1545,18 +1500,24 @@
             </div>
             
             <div class="field-group" data-field="6">
+              <label for="simple-parent-phone">Parent Phone</label>
+              <input type="text" id="simple-parent-phone" placeholder="Enter parent phone number">
+              <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
+            </div>
+            
+            <div class="field-group" data-field="7">
               <label for="simple-subject">Subject</label>
               <input type="text" id="simple-subject" placeholder="Enter subject">
               <div class="field-hint"><i class="fas fa-arrow-right"></i> Tap <strong>Enter/Return</strong> to continue</div>
             </div>
             
-            <div class="field-group" data-field="7">
+            <div class="field-group" data-field="8">
               <label for="simple-payment">Payment Amount</label>
               <input type="text" id="simple-payment" placeholder="Enter payment amount">
               <div class="field-hint"><i class="fas fa-check"></i> Tap <strong>Enter/Return</strong> to register student</div>
             </div>
             
-            <div class="field-group" data-field="8">
+            <div class="field-group" data-field="9">
               <div class="register-confirmation">
                 <div class="student-summary" id="student-summary">
                   <!-- Student summary will be shown here -->
@@ -1807,7 +1768,7 @@
 
   // Simple Entry Form Functions
   function setupSimpleEntryForm() {
-    const fields = ['simple-id', 'simple-name', 'simple-center', 'simple-grade', 'simple-phone', 'simple-subject', 'simple-payment'];
+      const fields = ['simple-id', 'simple-name', 'simple-center', 'simple-grade', 'simple-phone', 'simple-parent-phone', 'simple-subject', 'simple-payment'];
     let currentFieldIndex = 0;
     
     console.log('🔧 Setting up simple entry form with fields:', fields);
@@ -1872,8 +1833,9 @@
 
         // Multiple event listeners for better mobile compatibility
         field.addEventListener('keydown', (e) => {
-          console.log(`🔧 Keydown event on field ${fieldId}:`, e.key);
+          console.log(`🔧 Keydown event on field ${fieldId}:`, e.key, 'keyCode:', e.keyCode);
           if (e.key === 'Enter' || e.keyCode === 13) {
+            console.log(`🔧 Enter key detected on field ${fieldId}, calling handleFieldNavigation`);
             e.preventDefault();
             handleFieldNavigation();
           }
@@ -1881,8 +1843,9 @@
 
         // Mobile-specific: keyup event (some mobile keyboards use this)
         field.addEventListener('keyup', (e) => {
-          console.log(`🔧 Keyup event on field ${fieldId}:`, e.key);
+          console.log(`🔧 Keyup event on field ${fieldId}:`, e.key, 'keyCode:', e.keyCode);
           if (e.key === 'Enter' || e.keyCode === 13) {
+            console.log(`🔧 Enter key detected on field ${fieldId} (keyup), calling handleFieldNavigation`);
             e.preventDefault();
             handleFieldNavigation();
           }
@@ -1997,21 +1960,17 @@
   function moveToNextField(nextIndex) {
     console.log(`🔧 moveToNextField called with nextIndex: ${nextIndex}`);
     
-    // Remove active class from all fields and steps
+    // Remove active class from all fields
     document.querySelectorAll('.field-group').forEach(f => f.classList.remove('active'));
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     
-    // Show the next field and step
+    // Show the next field
     const nextField = document.querySelector(`[data-field="${nextIndex}"]`);
-    const nextStep = document.querySelector(`[data-step="${nextIndex}"]`);
     
     console.log(`🔧 Looking for field with data-field="${nextIndex}":`, nextField);
-    console.log(`🔧 Looking for step with data-step="${nextIndex}":`, nextStep);
     
-    if (nextField && nextStep) {
-      // Add active class to next field and step
+    if (nextField) {
+      // Add active class to next field
       nextField.classList.add('active');
-      nextStep.classList.add('active');
       
       // Focus on the input field
       const input = nextField.querySelector('input');
@@ -2021,7 +1980,7 @@
       }
       console.log(`🔧 Successfully moved to field ${nextIndex}`);
     } else {
-      console.error(`❌ Could not find field or step with index ${nextIndex}`);
+      console.error(`❌ Could not find field with index ${nextIndex}`);
     }
   }
   
@@ -2034,17 +1993,19 @@
     const centerElement = document.getElementById('simple-center');
     const gradeElement = document.getElementById('simple-grade');
     const phoneElement = document.getElementById('simple-phone');
+    const parentPhoneElement = document.getElementById('simple-parent-phone');
     const subjectElement = document.getElementById('simple-subject');
     const paymentElement = document.getElementById('simple-payment');
     
     // Check if all elements exist
-    if (!idElement || !nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement || !paymentElement) {
+    if (!idElement || !nameElement || !centerElement || !gradeElement || !phoneElement || !parentPhoneElement || !subjectElement || !paymentElement) {
       console.error('❌ Form elements not found in showStudentSummary:', {
         idElement: !!idElement,
         nameElement: !!nameElement,
         centerElement: !!centerElement,
         gradeElement: !!gradeElement,
         phoneElement: !!phoneElement,
+        parentPhoneElement: !!parentPhoneElement,
         subjectElement: !!subjectElement,
         paymentElement: !!paymentElement
       });
@@ -2058,10 +2019,11 @@
     const center = (centerElement && centerElement.value) ? String(centerElement.value).trim() : '';
     const grade = (gradeElement && gradeElement.value) ? String(gradeElement.value).trim() : '';
     const phone = (phoneElement && phoneElement.value) ? String(phoneElement.value).trim() : '';
+    const parentPhone = (parentPhoneElement && parentPhoneElement.value) ? String(parentPhoneElement.value).trim() : '';
     const subject = (subjectElement && subjectElement.value) ? String(subjectElement.value).trim() : '';
     const payment = (paymentElement && paymentElement.value) ? String(paymentElement.value).trim() : '';
     
-    console.log('🔧 Form values:', { id, name, center, grade, phone, subject, payment });
+    console.log('🔧 Form values:', { id, name, center, grade, phone, parentPhone, subject, payment });
     
     // Validate required field
     if (!name) {
@@ -2092,6 +2054,9 @@
           <strong>Phone:</strong> ${phone || 'Not specified'}
         </div>
         <div class="summary-item">
+          <strong>Parent Phone:</strong> ${parentPhone || 'Not specified'}
+        </div>
+        <div class="summary-item">
           <strong>Subject:</strong> ${subject || 'Not specified'}
         </div>
         <div class="summary-item">
@@ -2113,6 +2078,7 @@
     const centerElement = document.getElementById('simple-center');
     const gradeElement = document.getElementById('simple-grade');
     const phoneElement = document.getElementById('simple-phone');
+    const parentPhoneElement = document.getElementById('simple-parent-phone');
     const subjectElement = document.getElementById('simple-subject');
     const paymentElement = document.getElementById('simple-payment');
     
@@ -2122,18 +2088,20 @@
       centerElement: !!centerElement,
       gradeElement: !!gradeElement,
       phoneElement: !!phoneElement,
+      parentPhoneElement: !!parentPhoneElement,
       subjectElement: !!subjectElement,
       paymentElement: !!paymentElement
     });
     
     // Check if all elements exist
-    if (!idElement || !nameElement || !centerElement || !gradeElement || !phoneElement || !subjectElement || !paymentElement) {
+    if (!idElement || !nameElement || !centerElement || !gradeElement || !phoneElement || !parentPhoneElement || !subjectElement || !paymentElement) {
       console.error('❌ Form elements not found:', {
         idElement: !!idElement,
         nameElement: !!nameElement,
         centerElement: !!centerElement,
         gradeElement: !!gradeElement,
         phoneElement: !!phoneElement,
+        parentPhoneElement: !!parentPhoneElement,
         subjectElement: !!subjectElement,
         paymentElement: !!paymentElement
       });
@@ -2146,6 +2114,7 @@
         const retryCenterElement = document.getElementById('simple-center');
         const retryGradeElement = document.getElementById('simple-grade');
         const retryPhoneElement = document.getElementById('simple-phone');
+        const retryParentPhoneElement = document.getElementById('simple-parent-phone');
         const retrySubjectElement = document.getElementById('simple-subject');
         const retryPaymentElement = document.getElementById('simple-payment');
         
@@ -2155,13 +2124,14 @@
           centerElement: !!retryCenterElement,
           gradeElement: !!retryGradeElement,
           phoneElement: !!retryPhoneElement,
+          parentPhoneElement: !!retryParentPhoneElement,
           subjectElement: !!retrySubjectElement,
           paymentElement: !!retryPaymentElement
         });
         
-        if (retryIdElement && retryNameElement && retryCenterElement && retryGradeElement && retryPhoneElement && retrySubjectElement && retryPaymentElement) {
+        if (retryIdElement && retryNameElement && retryCenterElement && retryGradeElement && retryPhoneElement && retryParentPhoneElement && retrySubjectElement && retryPaymentElement) {
           console.log('🔧 Form elements found on retry, proceeding...');
-          registerSimpleStudentWithElements(retryIdElement, retryNameElement, retryCenterElement, retryGradeElement, retryPhoneElement, retrySubjectElement, retryPaymentElement);
+          registerSimpleStudentWithElements(retryIdElement, retryNameElement, retryCenterElement, retryGradeElement, retryPhoneElement, retryParentPhoneElement, retrySubjectElement, retryPaymentElement);
         } else {
           alert('Error: Form elements not found. Please refresh the page and try again.');
         }
@@ -2170,10 +2140,10 @@
     }
     
     // Proceed with registration
-    registerSimpleStudentWithElements(idElement, nameElement, centerElement, gradeElement, phoneElement, subjectElement, paymentElement);
+    registerSimpleStudentWithElements(idElement, nameElement, centerElement, gradeElement, phoneElement, parentPhoneElement, subjectElement, paymentElement);
   }
   
-  async function registerSimpleStudentWithElements(idElement, nameElement, centerElement, gradeElement, phoneElement, subjectElement, paymentElement) {
+  async function registerSimpleStudentWithElements(idElement, nameElement, centerElement, gradeElement, phoneElement, parentPhoneElement, subjectElement, paymentElement) {
     console.log('🔧 registerSimpleStudentWithElements called');
     
     // Get values safely with null checks - allow both strings and numbers
@@ -2182,10 +2152,11 @@
     const center = (centerElement && centerElement.value) ? String(centerElement.value).trim() : '';
     const grade = (gradeElement && gradeElement.value) ? String(gradeElement.value).trim() : '';
     const phone = (phoneElement && phoneElement.value) ? String(phoneElement.value).trim() : '';
+    const parentPhone = (parentPhoneElement && parentPhoneElement.value) ? String(parentPhoneElement.value).trim() : '';
     const subject = (subjectElement && subjectElement.value) ? String(subjectElement.value).trim() : '';
     const payment = (paymentElement && paymentElement.value) ? String(paymentElement.value).trim() : '';
     
-    console.log('🔧 Form values:', { id, name, center, grade, phone, subject, payment });
+    console.log('🔧 Form values:', { id, name, center, grade, phone, parentPhone, subject, payment });
     
     // No validation required - all fields are optional
     console.log('✅ All fields are optional - proceeding with registration');
@@ -2207,7 +2178,7 @@
       center: center || '',
       grade: grade || '',
       phone: phone || '',
-      parent_phone: '',
+      parent_phone: parentPhone || '',
       subject: subject || '',
       fees: payment ? (isNaN(parseFloat(payment)) ? 0 : parseFloat(payment)) : 0,
       fees_1: payment ? (isNaN(parseFloat(payment)) ? 0 : parseFloat(payment)) : 0,

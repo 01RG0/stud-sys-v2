@@ -570,6 +570,8 @@
     const today = todayKey();
     const todayRecords = registeredByDate[today] || {};
     
+    console.log('Updating students table:', { today, recordCount: Object.keys(todayRecords).length });
+    
     // Clear existing rows
     tbody.innerHTML = '';
     
@@ -588,21 +590,24 @@
         <td>${record.homework_score || ''}</td>
         <td>${record.exam_score || ''}</td>
         <td>${record.error || ''}</td>
-        <td>${record.timestamp}</td>
-        <td>${record.extra_sessions || ''}</td>
-        <td>${record.comment || ''}</td>
-        <td>${record.error_detail || ''}</td>
-        <td>${record.fees_1 || ''}</td>
-        <td>${record.subject || ''}</td>
-        <td>${record.grade || ''}</td>
-        <td>${record.session_sequence || ''}</td>
-        <td>${record.guest_info || ''}</td>
         <td>${record.phone || ''}</td>
         <td>${record.parent_phone || ''}</td>
+        <td><span class="status-indicator validated">Validated</span></td>
       `;
       
       tbody.appendChild(row);
     });
+    
+    // If no records, add a placeholder row
+    if (Object.keys(todayRecords).length === 0) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td colspan="12" style="text-align: center; padding: 20px; color: #6c757d; font-style: italic;">
+          No students registered for exit validation today
+        </td>
+      `;
+      tbody.appendChild(row);
+    }
     
     // Update current result display
     const currentResult = document.getElementById('current-result');
@@ -1731,11 +1736,37 @@
     }
   }
 
+  // Test function to add sample data
+  function addTestData() {
+    const today = todayKey();
+    if (!registeredByDate[today]) {
+      registeredByDate[today] = {};
+    }
+    
+    const testRecord = {
+      student_id: 'TEST001',
+      student_name: 'Test Student',
+      center: 'Test Center',
+      fees: '100',
+      homework_score: '85',
+      exam_score: '90',
+      phone: '1234567890',
+      parent_phone: '0987654321',
+      timestamp: new Date().toISOString()
+    };
+    
+    registeredByDate[today]['TEST001'] = testRecord;
+    localStorage.setItem('exitValidatorToday', JSON.stringify(registeredByDate[today]));
+    updateStudentsTable();
+    console.log('Test data added to table');
+  }
+
   // Export functions for potential manual use
   window.ExitValidatorApp = {
     getTodayRegistrations: () => registeredByDate[todayKey()] || {},
     getValidationLogs: () => JSON.parse(localStorage.getItem('exitValidatorLogs') || '[]'),
     clearValidationLogs: () => localStorage.removeItem('exitValidatorLogs'),
+    addTestData: addTestData,
     manualValidation: (studentId) => onQr(studentId),
     exportToExcel: exportToExcel,
     manualSync,

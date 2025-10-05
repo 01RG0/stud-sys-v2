@@ -1,3 +1,6 @@
+// Load environment variables
+require('dotenv').config();
+
 const path = require('path');
 const express = require('express');
 const WebSocket = require('ws');
@@ -3245,17 +3248,34 @@ process.on('SIGINT', () => {
   console.log('\n🛑 Shutting down gracefully...');
   
   let closedCount = 0;
-  const totalServers = wssHttps ? 2 : 1;
+  const totalServers = (wssHttps ? 2 : 1) + 2; // WebSocket servers + HTTP servers
   
   const checkShutdown = () => {
     closedCount++;
     if (closedCount >= totalServers) {
-      logToSystem('success', 'All WebSocket servers closed successfully');
-      console.log('✅ All WebSocket servers closed');
+      logToSystem('success', 'All servers closed successfully');
+      console.log('✅ All servers closed');
       process.exit(0);
     }
   };
   
+  // Close HTTP server
+  if (httpServer) {
+    httpServer.close(() => {
+      logToSystem('success', 'HTTP server closed');
+      checkShutdown();
+    });
+  }
+  
+  // Close HTTPS server
+  if (httpsServer) {
+    httpsServer.close(() => {
+      logToSystem('success', 'HTTPS server closed');
+      checkShutdown();
+    });
+  }
+  
+  // Close WebSocket servers
   wss.close(() => {
     logToSystem('success', 'HTTP WebSocket server closed');
     checkShutdown();
@@ -3267,4 +3287,30 @@ process.on('SIGINT', () => {
       checkShutdown();
     });
   }
+  
+  // Force exit after 5 seconds if graceful shutdown fails
+  setTimeout(() => {
+    console.log('⚠️  Forcing exit after timeout...');
+    process.exit(1);
+  }, 5000);
+});
+
+// Handle SIGTERM for Windows
+process.on('SIGTERM', () => {
+  console.log('\n🛑 Received SIGTERM, shutting down...');
+  process.exit(0);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  logToSystem('error', `Uncaught Exception: ${error.message}`);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  logToSystem('error', `Unhandled Rejection: ${reason}`);
+  process.exit(1);
 });
