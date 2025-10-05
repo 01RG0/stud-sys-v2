@@ -2,6 +2,9 @@
 
 A comprehensive student management system with QR code scanning, manual entry, offline support, and real-time synchronization.
 
+# Custom MySQL password
+.\setup.ps1 -MySQLPassword "MyCustomPassword"
+
 ## 🚀 Features
 
 - **QR Code Scanning**: Quick student registration using QR codes
