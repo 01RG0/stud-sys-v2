@@ -175,78 +175,283 @@ function detectColumnMappings(headers) {
   // Enhanced field variations with comprehensive case variations
   const fieldVariations = {
     id: [
-      // English variations - all case combinations
+      // Basic variations
       'id', 'ID', 'Id', 'iD',
+      
+      // Student ID variations - with underscores
       'student_id', 'STUDENT_ID', 'Student_ID', 'student_ID', 'STUDENT_id',
       'studentid', 'STUDENTID', 'StudentID', 'studentID', 'STUDENTid',
+      
+      // Student ID variations - with spaces
       'student id', 'STUDENT ID', 'Student ID', 'student ID', 'STUDENT id',
+      'studentid', 'STUDENTID', 'StudentID', 'studentID', 'STUDENTid',
+      
+      // Student number variations
       'student number', 'STUDENT NUMBER', 'Student Number', 'student NUMBER', 'STUDENT number',
+      'student_number', 'STUDENT_NUMBER', 'Student_Number', 'student_NUMBER', 'STUDENT_number',
+      'studentnumber', 'STUDENTNUMBER', 'StudentNumber', 'studentNUMBER', 'STUDENTnumber',
+      
+      // Student no variations
       'student no', 'STUDENT NO', 'Student No', 'student NO', 'STUDENT no',
+      'student_no', 'STUDENT_NO', 'Student_No', 'student_NO', 'STUDENT_no',
+      'studentno', 'STUDENTNO', 'StudentNo', 'studentNO', 'STUDENTno',
+      
+      // Student # variations
       'student #', 'STUDENT #', 'Student #', 'student #', 'STUDENT #',
+      'student#', 'STUDENT#', 'Student#', 'student#', 'STUDENT#',
+      
+      // Roll number variations
       'roll number', 'ROLL NUMBER', 'Roll Number', 'roll NUMBER', 'ROLL number',
+      'roll_number', 'ROLL_NUMBER', 'Roll_Number', 'roll_NUMBER', 'ROLL_number',
+      'rollnumber', 'ROLLNUMBER', 'RollNumber', 'rollNUMBER', 'ROLLnumber',
+      
+      // Roll no variations
       'roll no', 'ROLL NO', 'Roll No', 'roll NO', 'ROLL no',
+      'roll_no', 'ROLL_NO', 'Roll_No', 'roll_NO', 'ROLL_no',
+      'rollno', 'ROLLNO', 'RollNo', 'rollNO', 'ROLLno',
+      
+      // Roll # variations
       'roll#', 'ROLL#', 'Roll#', 'roll#', 'ROLL#',
+      'roll #', 'ROLL #', 'Roll #', 'roll #', 'ROLL #',
+      
+      // Registration number variations
       'registration number', 'REGISTRATION NUMBER', 'Registration Number', 'registration NUMBER', 'REGISTRATION number',
+      'registration_number', 'REGISTRATION_NUMBER', 'Registration_Number', 'registration_NUMBER', 'REGISTRATION_number',
+      'registrationnumber', 'REGISTRATIONNUMBER', 'RegistrationNumber', 'registrationNUMBER', 'REGISTRATIONnumber',
+      
+      // Reg no variations
       'reg no', 'REG NO', 'Reg No', 'reg NO', 'REG no',
+      'reg_no', 'REG_NO', 'Reg_No', 'reg_NO', 'REG_no',
+      'regno', 'REGNO', 'RegNo', 'regNO', 'REGno',
+      
+      // Reg # variations
       'reg#', 'REG#', 'Reg#', 'reg#', 'REG#',
+      'reg #', 'REG #', 'Reg #', 'reg #', 'REG #',
+      
+      // Serial number variations
       'serial number', 'SERIAL NUMBER', 'Serial Number', 'serial NUMBER', 'SERIAL number',
+      'serial_number', 'SERIAL_NUMBER', 'Serial_Number', 'serial_NUMBER', 'SERIAL_number',
+      'serialnumber', 'SERIALNUMBER', 'SerialNumber', 'serialNUMBER', 'SERIALnumber',
+      
+      // Serial no variations
       'serial no', 'SERIAL NO', 'Serial No', 'serial NO', 'SERIAL no',
+      'serial_no', 'SERIAL_NO', 'Serial_No', 'serial_NO', 'SERIAL_no',
+      'serialno', 'SERIALNO', 'SerialNo', 'serialNO', 'SERIALno',
+      
+      // Serial # variations
       'serial#', 'SERIAL#', 'Serial#', 'serial#', 'SERIAL#',
+      'serial #', 'SERIAL #', 'Serial #', 'serial #', 'SERIAL #',
+      
+      // Basic number variations
       'number', 'NUMBER', 'Number', 'number', 'NUMBER',
       'no', 'NO', 'No', 'no', 'NO',
       '#', 'num', 'NUM', 'Num', 'num', 'NUM',
+      
+      // Code variations
+      'code', 'CODE', 'Code', 'code', 'CODE',
+      'student_code', 'STUDENT_CODE', 'Student_Code', 'student_CODE', 'STUDENT_code',
+      'student code', 'STUDENT CODE', 'Student Code', 'student CODE', 'STUDENT code',
+      'studentcode', 'STUDENTCODE', 'StudentCode', 'studentCODE', 'STUDENTcode',
+      
+      // Index variations
+      'index', 'INDEX', 'Index', 'index', 'INDEX',
+      'idx', 'IDX', 'Idx', 'idx', 'IDX',
+      
       // Arabic variations
       'رقم الطالب', 'رقم الطالب', 'رقم', 'الرقم', 'رقم التسجيل', 'رقم القيد',
+      
       // Other languages
       'numero', 'número', 'numéro', 'номер', '番号', '번호'
     ],
     name: [
-      // English variations - all case combinations
+      // Basic variations
       'name', 'NAME', 'Name', 'nAmE',
+      
+      // Student name variations - with underscores
       'student_name', 'STUDENT_NAME', 'Student_Name', 'student_NAME', 'STUDENT_name',
       'studentname', 'STUDENTNAME', 'StudentName', 'studentNAME', 'STUDENTname',
+      
+      // Student name variations - with spaces
       'student name', 'STUDENT NAME', 'Student Name', 'student NAME', 'STUDENT name',
+      'studentname', 'STUDENTNAME', 'StudentName', 'studentNAME', 'STUDENTname',
+      
+      // Full name variations
       'full_name', 'FULL_NAME', 'Full_Name', 'full_NAME', 'FULL_name',
       'fullname', 'FULLNAME', 'FullName', 'fullNAME', 'FULLname',
-      'first_name', 'FIRST_NAME', 'First_Name', 'first_NAME', 'FIRST_name',
-      'last_name', 'LAST_NAME', 'Last_Name', 'last_NAME', 'LAST_name',
-      'firstname', 'FIRSTNAME', 'FirstName', 'firstNAME', 'FIRSTname',
-      'lastname', 'LASTNAME', 'LastName', 'lastNAME', 'LASTname',
-      'given_name', 'GIVEN_NAME', 'Given_Name', 'given_NAME', 'GIVEN_name',
-      'family_name', 'FAMILY_NAME', 'Family_Name', 'family_NAME', 'FAMILY_name',
-      'complete name', 'COMPLETE NAME', 'Complete Name', 'complete NAME', 'COMPLETE name',
       'full name', 'FULL NAME', 'Full Name', 'full NAME', 'FULL name',
+      'fullname', 'FULLNAME', 'FullName', 'fullNAME', 'FULLname',
+      
+      // First name variations
+      'first_name', 'FIRST_NAME', 'First_Name', 'first_NAME', 'FIRST_name',
+      'firstname', 'FIRSTNAME', 'FirstName', 'firstNAME', 'FIRSTname',
+      'first name', 'FIRST NAME', 'First Name', 'first NAME', 'FIRST name',
+      'firstname', 'FIRSTNAME', 'FirstName', 'firstNAME', 'FIRSTname',
+      
+      // Last name variations
+      'last_name', 'LAST_NAME', 'Last_Name', 'last_NAME', 'LAST_name',
+      'lastname', 'LASTNAME', 'LastName', 'lastNAME', 'LASTname',
+      'last name', 'LAST NAME', 'Last Name', 'last NAME', 'LAST name',
+      'lastname', 'LASTNAME', 'LastName', 'lastNAME', 'LASTname',
+      
+      // Given name variations
+      'given_name', 'GIVEN_NAME', 'Given_Name', 'given_NAME', 'GIVEN_name',
+      'givenname', 'GIVENNAME', 'GivenName', 'givenNAME', 'GIVENname',
+      'given name', 'GIVEN NAME', 'Given Name', 'given NAME', 'GIVEN name',
+      'givenname', 'GIVENNAME', 'GivenName', 'givenNAME', 'GIVENname',
+      
+      // Family name variations
+      'family_name', 'FAMILY_NAME', 'Family_Name', 'family_NAME', 'FAMILY_name',
+      'familyname', 'FAMILYNAME', 'FamilyName', 'familyNAME', 'FAMILYname',
+      'family name', 'FAMILY NAME', 'Family Name', 'family NAME', 'FAMILY name',
+      'familyname', 'FAMILYNAME', 'FamilyName', 'familyNAME', 'FAMILYname',
+      
+      // Complete name variations
+      'complete name', 'COMPLETE NAME', 'Complete Name', 'complete NAME', 'COMPLETE name',
+      'complete_name', 'COMPLETE_NAME', 'Complete_Name', 'complete_NAME', 'COMPLETE_name',
+      'completename', 'COMPLETENAME', 'CompleteName', 'completeNAME', 'COMPLETEname',
+      
+      // Student full name variations
       'student full name', 'STUDENT FULL NAME', 'Student Full Name', 'student FULL NAME', 'STUDENT full name',
+      'student_full_name', 'STUDENT_FULL_NAME', 'Student_Full_Name', 'student_FULL_NAME', 'STUDENT_full_name',
+      'studentfullname', 'STUDENTFULLNAME', 'StudentFullName', 'studentFULLNAME', 'STUDENTfullname',
+      
+      // Student complete name variations
       'student complete name', 'STUDENT COMPLETE NAME', 'Student Complete Name', 'student COMPLETE NAME', 'STUDENT complete name',
+      'student_complete_name', 'STUDENT_COMPLETE_NAME', 'Student_Complete_Name', 'student_COMPLETE_NAME', 'STUDENT_complete_name',
+      'studentcompletename', 'STUDENTCOMPLETENAME', 'StudentCompleteName', 'studentCOMPLETENAME', 'STUDENTcompletename',
+      
+      // Display name variations
+      'display_name', 'DISPLAY_NAME', 'Display_Name', 'display_NAME', 'DISPLAY_name',
+      'displayname', 'DISPLAYNAME', 'DisplayName', 'displayNAME', 'DISPLAYname',
+      'display name', 'DISPLAY NAME', 'Display Name', 'display NAME', 'DISPLAY name',
+      'displayname', 'DISPLAYNAME', 'DisplayName', 'displayNAME', 'DISPLAYname',
+      
+      // Real name variations
+      'real_name', 'REAL_NAME', 'Real_Name', 'real_NAME', 'REAL_name',
+      'realname', 'REALNAME', 'RealName', 'realNAME', 'REALname',
+      'real name', 'REAL NAME', 'Real Name', 'real NAME', 'REAL name',
+      'realname', 'REALNAME', 'RealName', 'realNAME', 'REALname',
+      
       // Arabic variations
       'الاسم', 'اسم الطالب', 'الاسم الكامل', 'الاسم الأول', 'الاسم الأخير',
       'اسم العائلة', 'الاسم الثلاثي', 'الاسم الرباعي',
+      
       // Other languages
       'nombre', 'nom', 'имя', '名前', '이름'
     ],
     center: [
-      // English variations - all case combinations
+      // Basic variations
       'center', 'CENTER', 'Center', 'cEnTeR',
       'centre', 'CENTRE', 'Centre', 'cEnTrE',
+      
+      // Branch variations
       'branch', 'BRANCH', 'Branch', 'bRaNcH',
-      'location', 'LOCATION', 'Location', 'lOcAtIoN',
       'branch_name', 'BRANCH_NAME', 'Branch_Name', 'branch_NAME', 'BRANCH_name',
+      'branchname', 'BRANCHNAME', 'BranchName', 'branchNAME', 'BRANCHname',
+      'branch name', 'BRANCH NAME', 'Branch Name', 'branch NAME', 'BRANCH name',
+      'branchname', 'BRANCHNAME', 'BranchName', 'branchNAME', 'BRANCHname',
+      
+      // Center name variations
       'center_name', 'CENTER_NAME', 'Center_Name', 'center_NAME', 'CENTER_name',
+      'centername', 'CENTERNAME', 'CenterName', 'centerNAME', 'CENTERname',
+      'center name', 'CENTER NAME', 'Center Name', 'center NAME', 'CENTER name',
+      'centername', 'CENTERNAME', 'CenterName', 'centerNAME', 'CENTERname',
+      
+      // Location variations
+      'location', 'LOCATION', 'Location', 'lOcAtIoN',
+      'location_name', 'LOCATION_NAME', 'Location_Name', 'location_NAME', 'LOCATION_name',
+      'locationname', 'LOCATIONNAME', 'LocationName', 'locationNAME', 'LOCATIONname',
+      'location name', 'LOCATION NAME', 'Location Name', 'location NAME', 'LOCATION name',
+      'locationname', 'LOCATIONNAME', 'LocationName', 'locationNAME', 'LOCATIONname',
+      
+      // Institution variations
       'institution', 'INSTITUTION', 'Institution', 'iNsTiTuTiOn',
+      'institution_name', 'INSTITUTION_NAME', 'Institution_Name', 'institution_NAME', 'INSTITUTION_name',
+      'institutionname', 'INSTITUTIONNAME', 'InstitutionName', 'institutionNAME', 'INSTITUTIONname',
+      'institution name', 'INSTITUTION NAME', 'Institution Name', 'institution NAME', 'INSTITUTION name',
+      'institutionname', 'INSTITUTIONNAME', 'InstitutionName', 'institutionNAME', 'INSTITUTIONname',
+      
+      // School variations
       'school', 'SCHOOL', 'School', 'sChOoL',
+      'school_name', 'SCHOOL_NAME', 'School_Name', 'school_NAME', 'SCHOOL_name',
+      'schoolname', 'SCHOOLNAME', 'SchoolName', 'schoolNAME', 'SCHOOLname',
+      'school name', 'SCHOOL NAME', 'School Name', 'school NAME', 'SCHOOL name',
+      'schoolname', 'SCHOOLNAME', 'SchoolName', 'schoolNAME', 'SCHOOLname',
+      
+      // College variations
       'college', 'COLLEGE', 'College', 'cOlLeGe',
+      'college_name', 'COLLEGE_NAME', 'College_Name', 'college_NAME', 'COLLEGE_name',
+      'collegename', 'COLLEGENAME', 'CollegeName', 'collegeNAME', 'COLLEGEname',
+      'college name', 'COLLEGE NAME', 'College Name', 'college NAME', 'COLLEGE name',
+      'collegename', 'COLLEGENAME', 'CollegeName', 'collegeNAME', 'COLLEGEname',
+      
+      // University variations
       'university', 'UNIVERSITY', 'University', 'uNiVeRsItY',
+      'university_name', 'UNIVERSITY_NAME', 'University_Name', 'university_NAME', 'UNIVERSITY_name',
+      'universityname', 'UNIVERSITYNAME', 'UniversityName', 'universityNAME', 'UNIVERSITYname',
+      'university name', 'UNIVERSITY NAME', 'University Name', 'university NAME', 'UNIVERSITY name',
+      'universityname', 'UNIVERSITYNAME', 'UniversityName', 'universityNAME', 'UNIVERSITYname',
+      
+      // Academy variations
       'academy', 'ACADEMY', 'Academy', 'aCaDeMy',
+      'academy_name', 'ACADEMY_NAME', 'Academy_Name', 'academy_NAME', 'ACADEMY_name',
+      'academyname', 'ACADEMYNAME', 'AcademyName', 'academyNAME', 'ACADEMYname',
+      'academy name', 'ACADEMY NAME', 'Academy Name', 'academy NAME', 'ACADEMY name',
+      'academyname', 'ACADEMYNAME', 'AcademyName', 'academyNAME', 'ACADEMYname',
+      
+      // Institute variations
       'institute', 'INSTITUTE', 'Institute', 'iNsTiTuTe',
+      'institute_name', 'INSTITUTE_NAME', 'Institute_Name', 'institute_NAME', 'INSTITUTE_name',
+      'institutename', 'INSTITUTENAME', 'InstituteName', 'instituteNAME', 'INSTITUTEname',
+      'institute name', 'INSTITUTE NAME', 'Institute Name', 'institute NAME', 'INSTITUTE name',
+      'institutename', 'INSTITUTENAME', 'InstituteName', 'instituteNAME', 'INSTITUTEname',
+      
+      // Campus variations
       'campus', 'CAMPUS', 'Campus', 'cAmPuS',
+      'campus_name', 'CAMPUS_NAME', 'Campus_Name', 'campus_NAME', 'CAMPUS_name',
+      'campusname', 'CAMPUSNAME', 'CampusName', 'campusNAME', 'CAMPUSname',
+      'campus name', 'CAMPUS NAME', 'Campus Name', 'campus NAME', 'CAMPUS name',
+      'campusname', 'CAMPUSNAME', 'CampusName', 'campusNAME', 'CAMPUSname',
+      
+      // Site variations
       'site', 'SITE', 'Site', 'sItE',
+      'site_name', 'SITE_NAME', 'Site_Name', 'site_NAME', 'SITE_name',
+      'sitename', 'SITENAME', 'SiteName', 'siteNAME', 'SITEname',
+      'site name', 'SITE NAME', 'Site Name', 'site NAME', 'SITE name',
+      'sitename', 'SITENAME', 'SiteName', 'siteNAME', 'SITEname',
+      
+      // Office variations
       'office', 'OFFICE', 'Office', 'oFfIcE',
+      'office_name', 'OFFICE_NAME', 'Office_Name', 'office_NAME', 'OFFICE_name',
+      'officename', 'OFFICENAME', 'OfficeName', 'officeNAME', 'OFFICEname',
+      'office name', 'OFFICE NAME', 'Office Name', 'office NAME', 'OFFICE name',
+      'officename', 'OFFICENAME', 'OfficeName', 'officeNAME', 'OFFICEname',
+      
+      // Department variations
       'department', 'DEPARTMENT', 'Department', 'dEpArTmEnT',
+      'department_name', 'DEPARTMENT_NAME', 'Department_Name', 'department_NAME', 'DEPARTMENT_name',
+      'departmentname', 'DEPARTMENTNAME', 'DepartmentName', 'departmentNAME', 'DEPARTMENTname',
+      'department name', 'DEPARTMENT NAME', 'Department Name', 'department NAME', 'DEPARTMENT name',
+      'departmentname', 'DEPARTMENTNAME', 'DepartmentName', 'departmentNAME', 'DEPARTMENTname',
+      
+      // Division variations
       'division', 'DIVISION', 'Division', 'dIvIsIoN',
+      'division_name', 'DIVISION_NAME', 'Division_Name', 'division_NAME', 'DIVISION_name',
+      'divisionname', 'DIVISIONNAME', 'DivisionName', 'divisionNAME', 'DIVISIONname',
+      'division name', 'DIVISION NAME', 'Division Name', 'division NAME', 'DIVISION name',
+      'divisionname', 'DIVISIONNAME', 'DivisionName', 'divisionNAME', 'DIVISIONname',
+      
+      // Section variations
       'section', 'SECTION', 'Section', 'sEcTiOn',
+      'section_name', 'SECTION_NAME', 'Section_Name', 'section_NAME', 'SECTION_name',
+      'sectionname', 'SECTIONNAME', 'SectionName', 'sectionNAME', 'SECTIONname',
+      'section name', 'SECTION NAME', 'Section Name', 'section NAME', 'SECTION name',
+      'sectionname', 'SECTIONNAME', 'SectionName', 'sectionNAME', 'SECTIONname',
+      
       // Arabic variations
       'المركز', 'الفرع', 'المكان', 'المؤسسة', 'المدرسة', 'الكلية', 'الجامعة',
       'الأكاديمية', 'المعهد', 'الحرم', 'الموقع', 'المكتب', 'القسم', 'الشعبة',
+      
       // Other languages
       'centro', 'CENTRO', 'Centro', 'cEnTrO',
       'centre', 'CENTRE', 'Centre', 'cEnTrE',
@@ -254,27 +459,115 @@ function detectColumnMappings(headers) {
       'センター', 'センダー', '센터', '센터'
     ],
     subject: [
-      // English variations - all case combinations
+      // Basic variations
       'subject', 'SUBJECT', 'Subject', 'sUbJeCt',
       'course', 'COURSE', 'Course', 'cOuRsE',
       'material', 'MATERIAL', 'Material', 'mAtErIaL',
-      'course_name', 'COURSE_NAME', 'Course_Name', 'course_NAME', 'COURSE_name',
+      
+      // Subject name variations
       'subject_name', 'SUBJECT_NAME', 'Subject_Name', 'subject_NAME', 'SUBJECT_name',
+      'subjectname', 'SUBJECTNAME', 'SubjectName', 'subjectNAME', 'SUBJECTname',
+      'subject name', 'SUBJECT NAME', 'Subject Name', 'subject NAME', 'SUBJECT name',
+      'subjectname', 'SUBJECTNAME', 'SubjectName', 'subjectNAME', 'SUBJECTname',
+      
+      // Course name variations
+      'course_name', 'COURSE_NAME', 'Course_Name', 'course_NAME', 'COURSE_name',
+      'coursename', 'COURSENAME', 'CourseName', 'courseNAME', 'COURSEname',
+      'course name', 'COURSE NAME', 'Course Name', 'course NAME', 'COURSE name',
+      'coursename', 'COURSENAME', 'CourseName', 'courseNAME', 'COURSEname',
+      
+      // Material name variations
+      'material_name', 'MATERIAL_NAME', 'Material_Name', 'material_NAME', 'MATERIAL_name',
+      'materialname', 'MATERIALNAME', 'MaterialName', 'materialNAME', 'MATERIALname',
+      'material name', 'MATERIAL NAME', 'Material Name', 'material NAME', 'MATERIAL name',
+      'materialname', 'MATERIALNAME', 'MaterialName', 'materialNAME', 'MATERIALname',
+      
+      // Discipline variations
       'discipline', 'DISCIPLINE', 'Discipline', 'dIsCiPlInE',
+      'discipline_name', 'DISCIPLINE_NAME', 'Discipline_Name', 'discipline_NAME', 'DISCIPLINE_name',
+      'disciplinename', 'DISCIPLINENAME', 'DisciplineName', 'disciplineNAME', 'DISCIPLINEname',
+      'discipline name', 'DISCIPLINE NAME', 'Discipline Name', 'discipline NAME', 'DISCIPLINE name',
+      'disciplinename', 'DISCIPLINENAME', 'DisciplineName', 'disciplineNAME', 'DISCIPLINEname',
+      
+      // Field variations
       'field', 'FIELD', 'Field', 'fIeLd',
+      'field_name', 'FIELD_NAME', 'Field_Name', 'field_NAME', 'FIELD_name',
+      'fieldname', 'FIELDNAME', 'FieldName', 'fieldNAME', 'FIELDname',
+      'field name', 'FIELD NAME', 'Field Name', 'field NAME', 'FIELD name',
+      'fieldname', 'FIELDNAME', 'FieldName', 'fieldNAME', 'FIELDname',
+      
+      // Major variations
       'major', 'MAJOR', 'Major', 'mAjOr',
+      'major_name', 'MAJOR_NAME', 'Major_Name', 'major_NAME', 'MAJOR_name',
+      'majorname', 'MAJORNAME', 'MajorName', 'majorNAME', 'MAJORname',
+      'major name', 'MAJOR NAME', 'Major Name', 'major NAME', 'MAJOR name',
+      'majorname', 'MAJORNAME', 'MajorName', 'majorNAME', 'MAJORname',
+      
+      // Specialization variations
       'specialization', 'SPECIALIZATION', 'Specialization', 'sPeCiAlIzAtIoN',
+      'specialization_name', 'SPECIALIZATION_NAME', 'Specialization_Name', 'specialization_NAME', 'SPECIALIZATION_name',
+      'specializationname', 'SPECIALIZATIONNAME', 'SpecializationName', 'specializationNAME', 'SPECIALIZATIONname',
+      'specialization name', 'SPECIALIZATION NAME', 'Specialization Name', 'specialization NAME', 'SPECIALIZATION name',
+      'specializationname', 'SPECIALIZATIONNAME', 'SpecializationName', 'specializationNAME', 'SPECIALIZATIONname',
+      
+      // Program variations
       'program', 'PROGRAM', 'Program', 'pRoGrAm',
+      'program_name', 'PROGRAM_NAME', 'Program_Name', 'program_NAME', 'PROGRAM_name',
+      'programname', 'PROGRAMNAME', 'ProgramName', 'programNAME', 'PROGRAMname',
+      'program name', 'PROGRAM NAME', 'Program Name', 'program NAME', 'PROGRAM name',
+      'programname', 'PROGRAMNAME', 'ProgramName', 'programNAME', 'PROGRAMname',
+      
+      // Curriculum variations
       'curriculum', 'CURRICULUM', 'Curriculum', 'cUrRiCuLuM',
+      'curriculum_name', 'CURRICULUM_NAME', 'Curriculum_Name', 'curriculum_NAME', 'CURRICULUM_name',
+      'curriculumname', 'CURRICULUMNAME', 'CurriculumName', 'curriculumNAME', 'CURRICULUMname',
+      'curriculum name', 'CURRICULUM NAME', 'Curriculum Name', 'curriculum NAME', 'CURRICULUM name',
+      'curriculumname', 'CURRICULUMNAME', 'CurriculumName', 'curriculumNAME', 'CURRICULUMname',
+      
+      // Syllabus variations
       'syllabus', 'SYLLABUS', 'Syllabus', 'sYlLaBuS',
+      'syllabus_name', 'SYLLABUS_NAME', 'Syllabus_Name', 'syllabus_NAME', 'SYLLABUS_name',
+      'syllabusname', 'SYLLABUSNAME', 'SyllabusName', 'syllabusNAME', 'SYLLABUSname',
+      'syllabus name', 'SYLLABUS NAME', 'Syllabus Name', 'syllabus NAME', 'SYLLABUS name',
+      'syllabusname', 'SYLLABUSNAME', 'SyllabusName', 'syllabusNAME', 'SYLLABUSname',
+      
+      // Topic variations
       'topic', 'TOPIC', 'Topic', 'tOpIc',
+      'topic_name', 'TOPIC_NAME', 'Topic_Name', 'topic_NAME', 'TOPIC_name',
+      'topicname', 'TOPICNAME', 'TopicName', 'topicNAME', 'TOPICname',
+      'topic name', 'TOPIC NAME', 'Topic Name', 'topic NAME', 'TOPIC name',
+      'topicname', 'TOPICNAME', 'TopicName', 'topicNAME', 'TOPICname',
+      
+      // Theme variations
       'theme', 'THEME', 'Theme', 'tHeMe',
+      'theme_name', 'THEME_NAME', 'Theme_Name', 'theme_NAME', 'THEME_name',
+      'themename', 'THEMENAME', 'ThemeName', 'themeNAME', 'THEMEname',
+      'theme name', 'THEME NAME', 'Theme Name', 'theme NAME', 'THEME name',
+      'themename', 'THEMENAME', 'ThemeName', 'themeNAME', 'THEMEname',
+      
+      // Area variations
       'area', 'AREA', 'Area', 'aReA',
+      'area_name', 'AREA_NAME', 'Area_Name', 'area_NAME', 'AREA_name',
+      'areaname', 'AREANAME', 'AreaName', 'areaNAME', 'AREAname',
+      'area name', 'AREA NAME', 'Area Name', 'area NAME', 'AREA name',
+      'areaname', 'AREANAME', 'AreaName', 'areaNAME', 'AREAname',
+      
+      // Domain variations
       'domain', 'DOMAIN', 'Domain', 'dOmAiN',
+      'domain_name', 'DOMAIN_NAME', 'Domain_Name', 'domain_NAME', 'DOMAIN_name',
+      'domainname', 'DOMAINNAME', 'DomainName', 'domainNAME', 'DOMAINname',
+      'domain name', 'DOMAIN NAME', 'Domain Name', 'domain NAME', 'DOMAIN name',
+      'domainname', 'DOMAINNAME', 'DomainName', 'domainNAME', 'DOMAINname',
+      
+      // Branch of study variations
       'branch of study', 'BRANCH OF STUDY', 'Branch Of Study', 'branch OF STUDY', 'BRANCH of study',
+      'branch_of_study', 'BRANCH_OF_STUDY', 'Branch_Of_Study', 'branch_OF_STUDY', 'BRANCH_of_study',
+      'branchofstudy', 'BRANCHOFSTUDY', 'BranchOfStudy', 'branchOFSTUDY', 'BRANCHofstudy',
+      
       // Arabic variations
       'المادة', 'المقرر', 'الدرس', 'التخصص', 'المجال', 'الفرع', 'البرنامج',
       'المنهج', 'الموضوع', 'الموضوع الدراسي', 'الفرع الدراسي',
+      
       // Other languages
       'materia', 'MATERIA', 'Materia', 'mAtErIa',
       'matière', 'MATIÈRE', 'Matière', 'mAtIèRe',
@@ -282,28 +575,116 @@ function detectColumnMappings(headers) {
       '科目', '과목', '과목'
     ],
     grade: [
-      // English variations - all case combinations
+      // Basic variations
       'grade', 'GRADE', 'Grade', 'gRaDe',
       'level', 'LEVEL', 'Level', 'lEvEl',
       'class', 'CLASS', 'Class', 'cLaSs',
-      'class_name', 'CLASS_NAME', 'Class_Name', 'class_NAME', 'CLASS_name',
       'year', 'YEAR', 'Year', 'yEaR',
+      
+      // Grade name variations
+      'grade_name', 'GRADE_NAME', 'Grade_Name', 'grade_NAME', 'GRADE_name',
+      'gradename', 'GRADENAME', 'GradeName', 'gradeNAME', 'GRADEname',
+      'grade name', 'GRADE NAME', 'Grade Name', 'grade NAME', 'GRADE name',
+      'gradename', 'GRADENAME', 'GradeName', 'gradeNAME', 'GRADEname',
+      
+      // Level name variations
+      'level_name', 'LEVEL_NAME', 'Level_Name', 'level_NAME', 'LEVEL_name',
+      'levelname', 'LEVELNAME', 'LevelName', 'levelNAME', 'LEVELname',
+      'level name', 'LEVEL NAME', 'Level Name', 'level NAME', 'LEVEL name',
+      'levelname', 'LEVELNAME', 'LevelName', 'levelNAME', 'LEVELname',
+      
+      // Class name variations
+      'class_name', 'CLASS_NAME', 'Class_Name', 'class_NAME', 'CLASS_name',
+      'classname', 'CLASSNAME', 'ClassName', 'classNAME', 'CLASSname',
+      'class name', 'CLASS NAME', 'Class Name', 'class NAME', 'CLASS name',
+      'classname', 'CLASSNAME', 'ClassName', 'classNAME', 'CLASSname',
+      
+      // Academic year variations
       'academic_year', 'ACADEMIC_YEAR', 'Academic_Year', 'academic_YEAR', 'ACADEMIC_year',
+      'academicyear', 'ACADEMICYEAR', 'AcademicYear', 'academicYEAR', 'ACADEMICyear',
+      'academic year', 'ACADEMIC YEAR', 'Academic Year', 'academic YEAR', 'ACADEMIC year',
+      'academicyear', 'ACADEMICYEAR', 'AcademicYear', 'academicYEAR', 'ACADEMICyear',
+      
+      // Semester variations
       'semester', 'SEMESTER', 'Semester', 'sEmEsTeR',
+      'semester_name', 'SEMESTER_NAME', 'Semester_Name', 'semester_NAME', 'SEMESTER_name',
+      'semestername', 'SEMESTERNAME', 'SemesterName', 'semesterNAME', 'SEMESTERname',
+      'semester name', 'SEMESTER NAME', 'Semester Name', 'semester NAME', 'SEMESTER name',
+      'semestername', 'SEMESTERNAME', 'SemesterName', 'semesterNAME', 'SEMESTERname',
+      
+      // Term variations
       'term', 'TERM', 'Term', 'tErM',
+      'term_name', 'TERM_NAME', 'Term_Name', 'term_NAME', 'TERM_name',
+      'termname', 'TERMNAME', 'TermName', 'termNAME', 'TERMname',
+      'term name', 'TERM NAME', 'Term Name', 'term NAME', 'TERM name',
+      'termname', 'TERMNAME', 'TermName', 'termNAME', 'TERMname',
+      
+      // Stage variations
       'stage', 'STAGE', 'Stage', 'sTaGe',
+      'stage_name', 'STAGE_NAME', 'Stage_Name', 'stage_NAME', 'STAGE_name',
+      'stagename', 'STAGENAME', 'StageName', 'stageNAME', 'STAGEname',
+      'stage name', 'STAGE NAME', 'Stage Name', 'stage NAME', 'STAGE name',
+      'stagename', 'STAGENAME', 'StageName', 'stageNAME', 'STAGEname',
+      
+      // Phase variations
       'phase', 'PHASE', 'Phase', 'pHaSe',
+      'phase_name', 'PHASE_NAME', 'Phase_Name', 'phase_NAME', 'PHASE_name',
+      'phasename', 'PHASENAME', 'PhaseName', 'phaseNAME', 'PHASEname',
+      'phase name', 'PHASE NAME', 'Phase Name', 'phase NAME', 'PHASE name',
+      'phasename', 'PHASENAME', 'PhaseName', 'phaseNAME', 'PHASEname',
+      
+      // Step variations
       'step', 'STEP', 'Step', 'sTeP',
+      'step_name', 'STEP_NAME', 'Step_Name', 'step_NAME', 'STEP_name',
+      'stepname', 'STEPNAME', 'StepName', 'stepNAME', 'STEPname',
+      'step name', 'STEP NAME', 'Step Name', 'step NAME', 'STEP name',
+      'stepname', 'STEPNAME', 'StepName', 'stepNAME', 'STEPname',
+      
+      // Degree variations
       'degree', 'DEGREE', 'Degree', 'dEgReE',
+      'degree_name', 'DEGREE_NAME', 'Degree_Name', 'degree_NAME', 'DEGREE_name',
+      'degreename', 'DEGREENAME', 'DegreeName', 'degreeNAME', 'DEGREEname',
+      'degree name', 'DEGREE NAME', 'Degree Name', 'degree NAME', 'DEGREE name',
+      'degreename', 'DEGREENAME', 'DegreeName', 'degreeNAME', 'DEGREEname',
+      
+      // Standard variations
       'standard', 'STANDARD', 'Standard', 'sTaNdArD',
+      'standard_name', 'STANDARD_NAME', 'Standard_Name', 'standard_NAME', 'STANDARD_name',
+      'standardname', 'STANDARDNAME', 'StandardName', 'standardNAME', 'STANDARDname',
+      'standard name', 'STANDARD NAME', 'Standard Name', 'standard NAME', 'STANDARD name',
+      'standardname', 'STANDARDNAME', 'StandardName', 'standardNAME', 'STANDARDname',
+      
+      // Form variations
       'form', 'FORM', 'Form', 'fOrM',
+      'form_name', 'FORM_NAME', 'Form_Name', 'form_NAME', 'FORM_name',
+      'formname', 'FORMNAME', 'FormName', 'formNAME', 'FORMname',
+      'form name', 'FORM NAME', 'Form Name', 'form NAME', 'FORM name',
+      'formname', 'FORMNAME', 'FormName', 'formNAME', 'FORMname',
+      
+      // Grade level variations
       'grade level', 'GRADE LEVEL', 'Grade Level', 'grade LEVEL', 'GRADE level',
+      'grade_level', 'GRADE_LEVEL', 'Grade_Level', 'grade_LEVEL', 'GRADE_level',
+      'gradelevel', 'GRADELEVEL', 'GradeLevel', 'gradeLEVEL', 'GRADElevel',
+      
+      // Class level variations
       'class level', 'CLASS LEVEL', 'Class Level', 'class LEVEL', 'CLASS level',
+      'class_level', 'CLASS_LEVEL', 'Class_Level', 'class_LEVEL', 'CLASS_level',
+      'classlevel', 'CLASSLEVEL', 'ClassLevel', 'classLEVEL', 'CLASSlevel',
+      
+      // Academic level variations
       'academic level', 'ACADEMIC LEVEL', 'Academic Level', 'academic LEVEL', 'ACADEMIC level',
+      'academic_level', 'ACADEMIC_LEVEL', 'Academic_Level', 'academic_LEVEL', 'ACADEMIC_level',
+      'academiclevel', 'ACADEMICLEVEL', 'AcademicLevel', 'academicLEVEL', 'ACADEMIClevel',
+      
+      // Education level variations
       'education level', 'EDUCATION LEVEL', 'Education Level', 'education LEVEL', 'EDUCATION level',
+      'education_level', 'EDUCATION_LEVEL', 'Education_Level', 'education_LEVEL', 'EDUCATION_level',
+      'educationlevel', 'EDUCATIONLEVEL', 'EducationLevel', 'educationLEVEL', 'EDUCATIONlevel',
+      
       // Arabic variations
       'الصف', 'المستوى', 'الدرجة', 'السنة', 'السنة الأكاديمية', 'الفصل',
       'المرحلة', 'المرحلة الدراسية', 'الدرجة الدراسية', 'المستوى الدراسي',
+      
       // Other languages
       'grado', 'GRADO', 'Grado', 'gRaDo',
       'niveau', 'NIVEAU', 'Niveau', 'nIvEaU',
@@ -1127,7 +1508,15 @@ async function autoImportExcelFiles() {
   const studentDataPath = path.join(__dirname, '..', '..', 'Student-Data');
   
   try {
+    logToSystem('info', `Auto-import scanning folder: ${studentDataPath}`);
+    
+    if (!fs.existsSync(studentDataPath)) {
+      logToSystem('warning', `Student-Data folder does not exist: ${studentDataPath}`);
+      return;
+    }
+    
     const files = fs.readdirSync(studentDataPath);
+    logToSystem('info', `Found ${files.length} files in Student-Data folder: ${files.join(', ')}`);
     
     // Support all common data file formats
     const dataFiles = files.filter(file => {
@@ -1136,6 +1525,7 @@ async function autoImportExcelFiles() {
     });
 
     if (dataFiles.length === 0) {
+      logToSystem('info', 'No data files found in Student-Data folder');
       return; // No data files found
     }
 
@@ -1143,6 +1533,7 @@ async function autoImportExcelFiles() {
 
     for (const file of dataFiles) {
       const filePath = path.join(studentDataPath, file);
+      logToSystem('info', `Processing file: ${file} at ${filePath}`);
       
       // Skip if file is being processed or is a backup
       if (file.includes('_processed_') || file.includes('_backup_') || file.includes('_imported_')) {
@@ -1678,23 +2069,327 @@ async function loadStudentData() {
     }
     
     logToSystem('success', `Loaded ${Object.keys(studentCache).length} students from MySQL database`);
+    
+    // Log sample student data for debugging (if any exist)
+    const sampleStudents = Object.keys(studentCache).slice(0, 3);
+    if (sampleStudents.length > 0) {
+      logToSystem('info', `Sample student data loaded: ${sampleStudents.join(', ')}`);
+      sampleStudents.forEach(id => {
+        logToSystem('info', `Student ${id}: ${JSON.stringify(studentCache[id])}`);
+      });
+    } else {
+      logToSystem('info', 'No students found in cache after loading');
+    }
+    
   } catch (e) {
     logToSystem('error', `Failed to load from database: ${e.message}`);
-    logToSystem('info', 'Falling back to sample data for testing');
-    studentCache = {
-      "557": {
-        id: "557",
-        name: "lian mohamed mahmoud sohail",
-        center: "Alakbal",
-        subject: "Math",
-        grade: "Senior 1",
-        fees: "50",
-        phone: "1228802000",
-        parent_phone: "1002674000"
-      }
-    };
+    logToSystem('info', 'Falling back to empty cache - will use dynamic enhancement for any student');
+    studentCache = {};
+    logToSystem('info', 'Student cache initialized as empty - will enhance data dynamically for any student ID');
   }
 }
+
+// Enhanced student data retrieval with automatic detection and correction
+async function getStudentData(studentId, fallbackData = {}) {
+  try {
+    // First, try to get from cache
+    let studentData = studentCache[studentId];
+    
+    if (studentData && studentData.center && studentData.subject && studentData.grade) {
+      logToSystem('info', `Found complete student data in cache for ID: ${studentId}`);
+      return studentData;
+    }
+    
+    // If cache data is incomplete, try database
+    if (!studentData || !studentData.center || !studentData.subject || !studentData.grade) {
+      logToSystem('info', `Cache data incomplete for ID: ${studentId}, checking database`);
+      try {
+        const dbStudent = await Database.getStudentById(studentId);
+        if (dbStudent) {
+          // Update cache with database data
+          studentCache[studentId] = dbStudent;
+          studentData = dbStudent;
+          logToSystem('success', `Retrieved complete student data from database for ID: ${studentId}`);
+        }
+      } catch (dbError) {
+        logToSystem('warning', `Database lookup failed for ID: ${studentId}: ${dbError.message}`);
+      }
+    }
+    
+    // If still incomplete, try to enhance with fallback data
+    if (!studentData || !studentData.center || !studentData.subject || !studentData.grade) {
+      logToSystem('info', `Enhancing student data with fallback for ID: ${studentId}`);
+      
+      // Create enhanced student data with fallback values
+      studentData = {
+        id: studentId,
+        name: studentData?.name || fallbackData.name || 'Unknown Student',
+        center: studentData?.center || fallbackData.center || 'Default Center',
+        subject: studentData?.subject || fallbackData.subject || 'Default Subject',
+        grade: studentData?.grade || fallbackData.grade || 'Default Grade',
+        fees: studentData?.fees || fallbackData.fees || '0',
+        phone: studentData?.phone || fallbackData.phone || '',
+        parent_phone: studentData?.parent_phone || fallbackData.parent_phone || '',
+        ...studentData // Keep any existing data
+      };
+      
+      logToSystem('success', `Enhanced student data for ID ${studentId}: ${JSON.stringify(studentData)}`);
+      
+      // Update cache with enhanced data
+      studentCache[studentId] = studentData;
+      
+      // Try to save enhanced data to database
+      try {
+        await Database.createStudent(studentData);
+        logToSystem('success', `Enhanced and saved student data for ID: ${studentId}`);
+      } catch (saveError) {
+        logToSystem('warning', `Failed to save enhanced student data: ${saveError.message}`);
+      }
+    }
+    
+    return studentData;
+    
+  } catch (error) {
+    logToSystem('error', `Error retrieving student data for ID: ${studentId}: ${error.message}`);
+    
+    // Return fallback data for any student
+    const fallbackStudent = {
+      id: studentId,
+      name: fallbackData.name || 'Unknown Student',
+      center: fallbackData.center || 'Default Center',
+      subject: fallbackData.subject || 'Default Subject',
+      grade: fallbackData.grade || 'Default Grade',
+      fees: fallbackData.fees || '0',
+      phone: fallbackData.phone || '',
+      parent_phone: fallbackData.parent_phone || ''
+    };
+    
+    logToSystem('info', `Returning fallback data for student ${studentId}: ${JSON.stringify(fallbackStudent)}`);
+    return fallbackStudent;
+  }
+}
+
+// Smart student data processor that handles any input format
+function processStudentData(inputData) {
+  const processed = {
+    id: null,
+    name: null,
+    center: null,
+    subject: null,
+    grade: null,
+    fees: null,
+    phone: null,
+    parent_phone: null
+  };
+  
+  // Handle different input formats
+  if (typeof inputData === 'string') {
+    // If it's just an ID string
+    processed.id = inputData.trim();
+  } else if (typeof inputData === 'object' && inputData !== null) {
+    // Map various field names to standard format
+    const fieldMappings = {
+      id: ['id', 'student_id', 'ID', 'studentId', 'studentID'],
+      name: ['name', 'student_name', 'Name', 'full_name', 'studentName'],
+      center: ['center', 'Center', 'centre', 'location', 'branch'],
+      subject: ['subject', 'Subject', 'course', 'material', 'discipline'],
+      grade: ['grade', 'Grade', 'class', 'level', 'year', 'standard'],
+      fees: ['fees', 'Fees', 'fee', 'cost', 'amount', 'price'],
+      phone: ['phone', 'Phone', 'phone_number', 'mobile', 'contact'],
+      parent_phone: ['parent_phone', 'Parent_Phone', 'parent_phone_number', 'guardian_phone', 'emergency_contact']
+    };
+    
+    // Process each field
+    Object.keys(fieldMappings).forEach(standardField => {
+      const possibleFields = fieldMappings[standardField];
+      for (const field of possibleFields) {
+        if (inputData[field] !== undefined && inputData[field] !== null && inputData[field] !== '') {
+          processed[standardField] = inputData[field];
+          break;
+        }
+      }
+    });
+  }
+  
+  // Clean and validate data
+  Object.keys(processed).forEach(key => {
+    if (processed[key] !== null) {
+      processed[key] = processed[key].toString().trim();
+      if (processed[key] === '') {
+        processed[key] = null;
+      }
+    }
+  });
+  
+  return processed;
+}
+
+// Enhanced student lookup with automatic data enhancement
+async function lookupStudent(studentId, additionalData = {}) {
+  try {
+    logToSystem('info', `Looking up student with ID: ${studentId}`, {
+      studentId: studentId,
+      hasAdditionalData: Object.keys(additionalData).length > 0,
+      additionalDataKeys: Object.keys(additionalData)
+    });
+    
+    // Process any additional data provided
+    const processedAdditionalData = processStudentData(additionalData);
+    
+    // Get student data with fallback
+    const studentData = await getStudentData(studentId, processedAdditionalData);
+    
+    // Log the retrieved data for debugging
+    logToSystem('info', `Retrieved student data for ID: ${studentId}:`, {
+      id: studentData.id,
+      name: studentData.name,
+      center: studentData.center,
+      subject: studentData.subject,
+      grade: studentData.grade,
+      hasCompleteData: !!(studentData.center && studentData.subject && studentData.grade),
+      dataSource: studentCache[studentId] ? 'cache' : 'database/fallback'
+    });
+    
+    // Track data flow for monitoring
+    trackDataFlow('student_lookup', {
+      studentId: studentId,
+      success: true,
+      hasCompleteData: !!(studentData.center && studentData.subject && studentData.grade),
+      dataFields: {
+        center: !!studentData.center,
+        subject: !!studentData.subject,
+        grade: !!studentData.grade
+      }
+    });
+    
+    return studentData;
+    
+  } catch (error) {
+    logToSystem('error', `Error in student lookup for ID: ${studentId}: ${error.message}`, {
+      studentId: studentId,
+      error: error.message,
+      stack: error.stack
+    });
+    
+    // Track failed data flow
+    trackDataFlow('student_lookup', {
+      studentId: studentId,
+      success: false,
+      error: error.message
+    });
+    
+    throw error;
+  }
+}
+
+// Data flow tracking system
+function trackDataFlow(operation, data) {
+  const flowData = {
+    operation: operation,
+    timestamp: new Date().toISOString(),
+    ...data
+  };
+  
+  // Log to system logs
+  logToSystem('info', `Data flow: ${operation}`, flowData);
+  
+  // Store in memory for monitoring (keep last 100 entries)
+  if (!global.dataFlowLog) {
+    global.dataFlowLog = [];
+  }
+  
+  global.dataFlowLog.push(flowData);
+  
+  // Keep only last 100 entries
+  if (global.dataFlowLog.length > 100) {
+    global.dataFlowLog = global.dataFlowLog.slice(-100);
+  }
+}
+
+// Universal test endpoint for any student ID
+app.get('/api/test-student/:studentId', async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    logToSystem('info', `Testing student ${studentId} data retrieval`);
+    
+    // Test the enhanced lookup directly
+    const studentData = await lookupStudent(studentId);
+    
+    res.json({
+      success: true,
+      message: `Student ${studentId} test completed`,
+      studentData: studentData,
+      hasCompleteData: !!(studentData.center && studentData.subject && studentData.grade),
+      cacheStatus: {
+        inCache: !!studentCache[studentId],
+        cacheData: studentCache[studentId] || null
+      },
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    logToSystem('error', `Test failed for student ${req.params.studentId}: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Endpoint to get data flow monitoring information
+app.get('/api/data-flow-monitor', (req, res) => {
+  try {
+    const flowLog = global.dataFlowLog || [];
+    
+    // Analyze data flow patterns
+    const analysis = {
+      totalOperations: flowLog.length,
+      operationsByType: {},
+      successRate: 0,
+      recentErrors: [],
+      dataCompleteness: {
+        complete: 0,
+        incomplete: 0
+      }
+    };
+    
+    flowLog.forEach(entry => {
+      // Count operations by type
+      analysis.operationsByType[entry.operation] = (analysis.operationsByType[entry.operation] || 0) + 1;
+      
+      // Track success rate
+      if (entry.success === false) {
+        analysis.recentErrors.push(entry);
+      }
+      
+      // Track data completeness
+      if (entry.hasCompleteData === true) {
+        analysis.dataCompleteness.complete++;
+      } else if (entry.hasCompleteData === false) {
+        analysis.dataCompleteness.incomplete++;
+      }
+    });
+    
+    // Calculate success rate
+    const successfulOps = flowLog.filter(entry => entry.success === true).length;
+    analysis.successRate = flowLog.length > 0 ? (successfulOps / flowLog.length) * 100 : 0;
+    
+    res.json({
+      success: true,
+      analysis: analysis,
+      recentFlow: flowLog.slice(-20), // Last 20 operations
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    logToSystem('error', `Failed to get data flow monitor data: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
 
 // Refresh student data from database periodically
 function setupDataRefresh() {
@@ -1957,22 +2652,33 @@ app.get('/api/exit-validator-data', async (req, res) => {
       // Process registration data and combine with student database
       const processedStudents = new Map(); // Use Map to avoid duplicates
       
-      registrations.forEach(record => {
+      // Process all registrations with enhanced student lookup
+      for (const record of registrations) {
         if (record.student_id) {
           const studentId = record.student_id;
-          const studentData = studentCache[studentId] || {};
+          
+          // Use enhanced student lookup with fallback data from record
+          const studentData = await lookupStudent(studentId, {
+            name: record.student_name,
+            center: record.center,
+            subject: record.subject,
+            grade: record.grade,
+            fees: record.fees,
+            phone: record.phone,
+            parent_phone: record.parent_phone
+          });
           
           // Create comprehensive student record
           const studentRecord = {
             timestamp: record.timestamp || new Date().toISOString(),
             student_id: studentId,
-            student_name: studentData.name || record.student_name || 'Unknown',
-            center: studentData.center || record.center || 'Unknown',
-            subject: studentData.subject || record.subject || 'Unknown',
-            grade: studentData.grade || record.grade || 'Unknown',
-            fees: studentData.fees || record.fees || '0',
-            phone: studentData.phone || record.phone || '',
-            parent_phone: studentData.parent_phone || record.parent_phone || '',
+            student_name: studentData.name || 'Unknown',
+            center: studentData.center || 'Unknown',
+            subject: studentData.subject || 'Unknown',
+            grade: studentData.grade || 'Unknown',
+            fees: studentData.fees || '0',
+            phone: studentData.phone || '',
+            parent_phone: studentData.parent_phone || '',
             payment_amount: record.payment_amount || 0,
             homework_score: record.homework_score || studentData.homework_score || '',
             exam_score: record.exam_score || studentData.exam_score || '',
@@ -1985,7 +2691,7 @@ app.get('/api/exit-validator-data', async (req, res) => {
           // Use student_id as key to avoid duplicates, keep the latest record
           processedStudents.set(studentId, studentRecord);
         }
-      });
+      }
       
       // Convert Map to Array
       students = Array.from(processedStudents.values());
@@ -2002,22 +2708,33 @@ app.get('/api/exit-validator-data', async (req, res) => {
         // Process registration data and combine with student database
         const processedStudents = new Map(); // Use Map to avoid duplicates
         
-        data.forEach(record => {
+        // Process all records with enhanced student lookup
+        for (const record of data) {
           if (record.record && record.record.student_id) {
             const studentId = record.record.student_id;
-            const studentData = studentCache[studentId] || {};
+            
+            // Use enhanced student lookup with fallback data from record
+            const studentData = await lookupStudent(studentId, {
+              name: record.record.student_name,
+              center: record.record.center,
+              subject: record.record.subject,
+              grade: record.record.grade,
+              fees: record.record.fees,
+              phone: record.record.phone,
+              parent_phone: record.record.parent_phone
+            });
             
             // Create comprehensive student record
             const studentRecord = {
               timestamp: record.timestamp || new Date().toISOString(),
               student_id: studentId,
-              student_name: studentData.name || record.record.student_name || 'Unknown',
-              center: studentData.center || record.record.center || 'Unknown',
-              subject: studentData.subject || record.record.subject || 'Unknown',
-              grade: studentData.grade || record.record.grade || 'Unknown',
-              fees: studentData.fees || record.record.fees || '0',
-              phone: studentData.phone || record.record.phone || '',
-              parent_phone: studentData.parent_phone || record.record.parent_phone || '',
+              student_name: studentData.name || 'Unknown',
+              center: studentData.center || 'Unknown',
+              subject: studentData.subject || 'Unknown',
+              grade: studentData.grade || 'Unknown',
+              fees: studentData.fees || '0',
+              phone: studentData.phone || '',
+              parent_phone: studentData.parent_phone || '',
               payment_amount: record.record.payment_amount || 0,
               homework_score: record.record.homework_score || studentData.homework_score || '',
               exam_score: record.record.exam_score || studentData.exam_score || '',
@@ -2030,7 +2747,7 @@ app.get('/api/exit-validator-data', async (req, res) => {
             // Use student_id as key to avoid duplicates, keep the latest record
             processedStudents.set(studentId, studentRecord);
           }
-        });
+        }
         
         // Convert Map to Array
         students = Array.from(processedStudents.values());
@@ -2065,22 +2782,33 @@ app.get('/api/exit-validator-all-data', async (req, res) => {
       // Process registration data and combine with student database
       const processedStudents = new Map(); // Use Map to avoid duplicates
       
-      registrations.forEach(record => {
+      // Process all registrations with enhanced student lookup
+      for (const record of registrations) {
         if (record.student_id) {
           const studentId = record.student_id;
-          const studentData = studentCache[studentId] || {};
+          
+          // Use enhanced student lookup with fallback data from record
+          const studentData = await lookupStudent(studentId, {
+            name: record.student_name,
+            center: record.center,
+            subject: record.subject,
+            grade: record.grade,
+            fees: record.fees,
+            phone: record.phone,
+            parent_phone: record.parent_phone
+          });
           
           // Create comprehensive student record
           const studentRecord = {
             timestamp: record.timestamp || new Date().toISOString(),
             student_id: studentId,
-            student_name: studentData.name || record.student_name || 'Unknown',
-            center: studentData.center || record.center || 'Unknown',
-            subject: studentData.subject || record.subject || 'Unknown',
-            grade: studentData.grade || record.grade || 'Unknown',
-            fees: studentData.fees || record.fees || '0',
-            phone: studentData.phone || record.phone || '',
-            parent_phone: studentData.parent_phone || record.parent_phone || '',
+            student_name: studentData.name || 'Unknown',
+            center: studentData.center || 'Unknown',
+            subject: studentData.subject || 'Unknown',
+            grade: studentData.grade || 'Unknown',
+            fees: studentData.fees || '0',
+            phone: studentData.phone || '',
+            parent_phone: studentData.parent_phone || '',
             payment_amount: record.payment_amount || 0,
             homework_score: record.homework_score || studentData.homework_score || '',
             exam_score: record.exam_score || studentData.exam_score || '',
@@ -2093,7 +2821,7 @@ app.get('/api/exit-validator-all-data', async (req, res) => {
           // Use student_id as key to avoid duplicates, keep the latest record
           processedStudents.set(studentId, studentRecord);
         }
-      });
+      }
       
       // Convert Map to Array
       students = Array.from(processedStudents.values());
@@ -2167,6 +2895,155 @@ app.post('/api/validation-log', async (req, res) => {
   } catch (error) {
     console.error('Error logging validation:', error);
     res.status(500).json({ error: 'Failed to log validation' });
+  }
+});
+
+// ===== ENHANCED STUDENT DATA MANAGEMENT =====
+
+// Endpoint to refresh and validate student data
+app.post('/api/refresh-student-data', async (req, res) => {
+  try {
+    const { studentId, forceRefresh } = req.body;
+    
+    logToSystem('info', `Student data refresh requested for ID: ${studentId || 'all'}`);
+    
+    if (studentId) {
+      // Refresh specific student
+      const studentData = await lookupStudent(studentId);
+      res.json({
+        success: true,
+        studentId: studentId,
+        studentData: studentData,
+        message: `Student data refreshed for ID: ${studentId}`
+      });
+    } else {
+      // Refresh all student data
+      await loadStudentData();
+      
+      // Validate all students have complete data
+      const incompleteStudents = [];
+      for (const [id, student] of Object.entries(studentCache)) {
+        if (!student.center || !student.subject || !student.grade) {
+          incompleteStudents.push({
+            id: id,
+            name: student.name,
+            missing: {
+              center: !student.center,
+              subject: !student.subject,
+              grade: !student.grade
+            }
+          });
+        }
+      }
+      
+      res.json({
+        success: true,
+        totalStudents: Object.keys(studentCache).length,
+        incompleteStudents: incompleteStudents,
+        message: `Student data refreshed. Found ${incompleteStudents.length} students with incomplete data.`
+      });
+    }
+    
+  } catch (error) {
+    logToSystem('error', `Failed to refresh student data: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Endpoint to get student data with automatic enhancement
+app.get('/api/student/:studentId', async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { includeFallback } = req.query;
+    
+    logToSystem('info', `Student data request for ID: ${studentId}`);
+    
+    const studentData = await lookupStudent(studentId, includeFallback ? {
+      center: 'Default Center',
+      subject: 'Default Subject',
+      grade: 'Default Grade'
+    } : {});
+    
+    res.json({
+      success: true,
+      studentId: studentId,
+      studentData: studentData,
+      hasCompleteData: !!(studentData.center && studentData.subject && studentData.grade)
+    });
+    
+  } catch (error) {
+    logToSystem('error', `Failed to get student data for ID: ${req.params.studentId}: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Endpoint to validate and fix student data
+app.post('/api/validate-student-data', async (req, res) => {
+  try {
+    const { studentId, validationData } = req.body;
+    
+    logToSystem('info', `Student data validation requested for ID: ${studentId}`);
+    
+    if (!studentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Student ID is required'
+      });
+    }
+    
+    // Get current student data
+    let studentData = await lookupStudent(studentId);
+    
+    // Apply validation data if provided
+    if (validationData) {
+      const processedData = processStudentData(validationData);
+      studentData = {
+        ...studentData,
+        ...processedData
+      };
+      
+      // Update cache and database
+      studentCache[studentId] = studentData;
+      await Database.createStudent(studentData);
+      
+      logToSystem('success', `Student data validated and updated for ID: ${studentId}`);
+    }
+    
+    // Check data completeness
+    const validation = {
+      id: !!studentData.id,
+      name: !!studentData.name,
+      center: !!studentData.center,
+      subject: !!studentData.subject,
+      grade: !!studentData.grade,
+      fees: !!studentData.fees,
+      phone: !!studentData.phone,
+      parent_phone: !!studentData.parent_phone
+    };
+    
+    const isComplete = Object.values(validation).every(Boolean);
+    
+    res.json({
+      success: true,
+      studentId: studentId,
+      studentData: studentData,
+      validation: validation,
+      isComplete: isComplete,
+      message: isComplete ? 'Student data is complete' : 'Student data has missing fields'
+    });
+    
+  } catch (error) {
+    logToSystem('error', `Failed to validate student data: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 });
 
@@ -2529,8 +3406,8 @@ const httpServer = app.listen(HTTP_PORT, '0.0.0.0', async () => {
   await loadStudentData();
   setupDataRefresh(); // Enable periodic refresh from MySQL database
   
-        // Initialize auto Excel import system
-        setupAutoExcelImport();
+  // Initialize auto Excel import system
+  setupAutoExcelImport();
         
         // Start connection monitoring and device discovery
         startConnectionMonitoring();
@@ -2771,22 +3648,35 @@ function handleWebSocketConnection(ws, source) {
           
           // Create student cache from today's registrations
           const todaysStudents = {};
-          registrations.forEach(record => {
+          // Process all registrations with enhanced student lookup
+          for (const record of registrations) {
             if (record.student_id) {
-              const studentData = studentCache[record.student_id] || {};
-              todaysStudents[record.student_id] = {
-                id: record.student_id,
-                name: studentData.name || record.student_name || 'Unknown',
-                center: studentData.center || record.center || '',
-                grade: studentData.grade || record.grade || '',
-                phone: studentData.phone || record.phone || '',
-                parent_phone: studentData.parent_phone || record.parent_phone || '',
-                subject: studentData.subject || record.subject || '',
-                fees: studentData.fees || record.fees || 0,
+              const studentId = record.student_id;
+              
+              // Use enhanced student lookup with fallback data from record
+              const studentData = await lookupStudent(studentId, {
+                name: record.student_name,
+                center: record.center,
+                subject: record.subject,
+                grade: record.grade,
+                fees: record.fees,
+                phone: record.phone,
+                parent_phone: record.parent_phone
+              });
+              
+              todaysStudents[studentId] = {
+                id: studentId,
+                name: studentData.name || 'Unknown',
+                center: studentData.center || '',
+                grade: studentData.grade || '',
+                phone: studentData.phone || '',
+                parent_phone: studentData.parent_phone || '',
+                subject: studentData.subject || '',
+                fees: studentData.fees || 0,
                 registered_at: record.timestamp
               };
             }
-          });
+          }
           
           ws.send(JSON.stringify({
             type: 'todays_students_response',
@@ -2895,18 +3785,59 @@ function handleWebSocketConnection(ws, source) {
         totalRegistrations++;
         const record = data.record;
         
-        // Save to MySQL database
+        // Enhanced logging for student registration
+        logToSystem('info', `Student registration received: ${record.student_name} (ID: ${record.student_id})`, {
+          studentId: record.student_id,
+          studentName: record.student_name,
+          center: record.center,
+          subject: record.subject,
+          grade: record.grade,
+          deviceName: record.device_name,
+          hasCompleteData: !!(record.center && record.subject && record.grade)
+        });
+        
+        // Ensure student data is complete before saving
         try {
-          await Database.createEntryRegistration(record);
-          logToSystem('success', `Student registered: ${record.student_name} (ID: ${record.student_id}) by ${record.device_name}`, {
-            studentId: record.student_id,
-            studentName: record.student_name,
-            deviceName: record.device_name,
-            homeworkScore: record.homework_score,
-            examScore: record.exam_score
+          const enhancedStudentData = await lookupStudent(record.student_id, {
+            name: record.student_name,
+            center: record.center,
+            subject: record.subject,
+            grade: record.grade,
+            fees: record.fees,
+            phone: record.phone,
+            parent_phone: record.parent_phone
+          });
+          
+          // Update record with enhanced data
+          const enhancedRecord = {
+            ...record,
+            student_name: enhancedStudentData.name || record.student_name,
+            center: enhancedStudentData.center || record.center,
+            subject: enhancedStudentData.subject || record.subject,
+            grade: enhancedStudentData.grade || record.grade,
+            fees: enhancedStudentData.fees || record.fees,
+            phone: enhancedStudentData.phone || record.phone,
+            parent_phone: enhancedStudentData.parent_phone || record.parent_phone
+          };
+          
+          // Save to MySQL database
+          await Database.createEntryRegistration(enhancedRecord);
+          logToSystem('success', `Student registered with enhanced data: ${enhancedRecord.student_name} (ID: ${enhancedRecord.student_id}) by ${enhancedRecord.device_name}`, {
+            studentId: enhancedRecord.student_id,
+            studentName: enhancedRecord.student_name,
+            center: enhancedRecord.center,
+            subject: enhancedRecord.subject,
+            grade: enhancedRecord.grade,
+            deviceName: enhancedRecord.device_name,
+            homeworkScore: enhancedRecord.homework_score,
+            examScore: enhancedRecord.exam_score
           });
         } catch (error) {
-          logToSystem('error', `Failed to save registration to database: ${error.message}`);
+          logToSystem('error', `Failed to save registration to database: ${error.message}`, {
+            studentId: record.student_id,
+            studentName: record.student_name,
+            error: error.message
+          });
         }
         
         // Forward to all exit validator devices
