@@ -63,7 +63,8 @@ function Show-MainMenu {
     Write-Host "[4]  Package Manager (Install Dependencies)" -ForegroundColor White
     Write-Host "[5]  Server Control (Advanced)" -ForegroundColor White
     Write-Host "[6]  Generate SSL Certificate" -ForegroundColor White
-    Write-Host "[7]  Exit" -ForegroundColor White
+    Write-Host "[7]  Update Database (Offline Sync)" -ForegroundColor White
+    Write-Host "[8]  Exit" -ForegroundColor White
     Write-Host ""
 }
 
@@ -103,7 +104,7 @@ function Invoke-Script {
 
 # Function to get user choice
 function Get-UserChoice {
-    $choice = Read-Host "Enter your choice (1-7)"
+    $choice = Read-Host "Enter your choice (1-8)"
     
     if ([string]::IsNullOrEmpty($choice)) {
         Write-Host ""
@@ -163,6 +164,10 @@ function Start-MainLoop {
                 break
             }
             "7" {
+                Invoke-Script -ScriptName "UPDATE-DATABASE" -Description "Updating database for offline sync" -ScriptType "ps1"
+                break
+            }
+            "8" {
                 Write-Host ""
                 Write-Host "Goodbye! Thank you for using Student Lab System v2" -ForegroundColor Green
                 Write-Host ""
@@ -171,7 +176,7 @@ function Start-MainLoop {
             }
             default {
                 Write-Host ""
-                Write-Host "ERROR: Invalid choice. Please select 1-7." -ForegroundColor Red
+                Write-Host "ERROR: Invalid choice. Please select 1-8." -ForegroundColor Red
                 Write-Host ""
                 Write-Host "Press any key to return to main menu..." -ForegroundColor Yellow
                 Read-Host

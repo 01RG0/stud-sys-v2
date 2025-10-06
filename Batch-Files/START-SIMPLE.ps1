@@ -27,16 +27,87 @@ function Write-Success { param([string]$Message) Write-Host "[SUCCESS] $Message"
 function Write-Warning { param([string]$Message) Write-Host "[WARNING] $Message" -ForegroundColor Yellow }
 function Write-Error { param([string]$Message) Write-Host "[ERROR] $Message" -ForegroundColor Red }
 
-# Function to get system IP
+# Function to get system IP (Enhanced)
 function Get-SystemIP {
     try {
-        if (-not [string]::IsNullOrEmpty($CustomIP)) { return $CustomIP }
-        $adapters = Get-NetIPAddress -AddressFamily IPv4 | Where-Object { 
-            $_.IPAddress -notlike "127.*" -and $_.IPAddress -notlike "169.254.*" 
-        } | Sort-Object InterfaceIndex
-        return if ($adapters) { $adapters[0].IPAddress } else { "localhost" }
+        if (-not [string]::IsNullOrEmpty($CustomIP)) { 
+            Write-Status "Using custom IP: $CustomIP"
+            return $CustomIP 
+        }
+        
+        # Try multiple methods to get real IP
+        $ip = $null
+        
+        # Method 1: Get-NetIPAddress (most reliable)
+        try {
+            $adapters = Get-NetIPAddress -AddressFamily IPv4 | Where-Object { 
+                $_.IPAddress -notlike "127.*" -and 
+                $_.IPAddress -notlike "169.254.*" -and
+                $_.IPAddress -notlike "192.168.1.1" -and
+                $_.IPAddress -notlike "10.0.0.1"
+            } | Sort-Object InterfaceIndex
+            
+            if ($adapters) {
+                $ip = $adapters[0].IPAddress
+                Write-Status "Detected IP via Get-NetIPAddress: $ip"
+            }
+        } catch {
+            Write-Warning "Get-NetIPAddress failed: $($_.Exception.Message)"
+        }
+        
+        # Method 2: ipconfig (fallback)
+        if (-not $ip) {
+            try {
+                $ipconfig = ipconfig | Select-String "IPv4.*: (\d+\.\d+\.\d+\.\d+)" | ForEach-Object { $_.Matches[0].Groups[1].Value }
+                $validIPs = $ipconfig | Where-Object { 
+                    $_ -notlike "127.*" -and $_ -notlike "169.254.*" -and $_ -notlike "192.168.1.1" -and $_ -notlike "10.0.0.1"
+                }
+                if ($validIPs) {
+                    $ip = $validIPs[0]
+                    Write-Status "Detected IP via ipconfig: $ip"
+                }
+            } catch {
+                Write-Warning "ipconfig method failed: $($_.Exception.Message)"
+            }
+        }
+        
+        # Method 3: Network interfaces (last resort)
+        if (-not $ip) {
+            try {
+                $interfaces = [System.Net.NetworkInformation.NetworkInterface]::GetAllNetworkInterfaces()
+                foreach ($interface in $interfaces) {
+                    if ($interface.OperationalStatus -eq "Up" -and $interface.NetworkInterfaceType -ne "Loopback") {
+                        $props = $interface.GetIPProperties()
+                        foreach ($addr in $props.UnicastAddresses) {
+                            if ($addr.Address.AddressFamily -eq "InterNetwork") {
+                                $ipStr = $addr.Address.ToString()
+                                if ($ipStr -notlike "127.*" -and $ipStr -notlike "169.254.*" -and $ipStr -notlike "192.168.1.1" -and $ipStr -notlike "10.0.0.1") {
+                                    $ip = $ipStr
+                                    Write-Status "Detected IP via NetworkInterface: $ip"
+                                    break
+                                }
+                            }
+                        }
+                        if ($ip) { break }
+                    }
+                }
+            } catch {
+                Write-Warning "NetworkInterface method failed: $($_.Exception.Message)"
+            }
+        }
+        
+        if ($ip) {
+            Write-Success "Real IP detected: $ip"
+            return $ip
+        } else {
+            Write-Warning "Could not detect real IP, using localhost"
+            return "localhost"
+        }
     }
-    catch { return "localhost" }
+    catch { 
+        Write-Warning "IP detection failed: $($_.Exception.Message), using localhost"
+        return "localhost" 
+    }
 }
 
 # Function to check if port is in use
@@ -143,7 +214,7 @@ function Show-AccessURLs { param([string]$SystemIP, [bool]$SSLEnabled)
 function Start-Server { param([bool]$SSLEnabled)
     Write-Host ""
     Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "   STARTING SERVER" -ForegroundColor Cyan
+    Write-Host "   STARTING SERVER WITH LIVE LOGS" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
     
@@ -153,12 +224,19 @@ function Start-Server { param([bool]$SSLEnabled)
         Write-Status "Starting in HTTP-only mode"
     }
     
+    Write-Host ""
+    Write-Host "LIVE SERVER OUTPUT:" -ForegroundColor Red
     Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
     Write-Host ""
     
-    # Change to server directory and start
+    # Change to server directory and start with live output
     Set-Location $ServerPath
     try {
+        # Start server with live output - this will show real-time logs
+        Write-Host "Starting server... (Live logs will appear below)" -ForegroundColor Green
+        Write-Host ""
+        
+        # Run npm command directly to show live output
         & npm run dev-simple
     }
     catch {
@@ -262,9 +340,66 @@ if ($Help) {
     exit 0
 }
 
-# Start the system
+# Start the system - inline execution instead of function call
 try {
-    Start-System
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "   Student Lab System v2 - Simple Start" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host ""
+    
+    # Get system IP
+    $systemIP = Get-SystemIP
+    Write-Status "System IP: $systemIP"
+    
+    # Check system requirements
+    if (-not $SkipChecks) {
+        if (-not (Test-SystemRequirements)) {
+            Write-Error "System requirements not met. Fix issues above."
+            if (-not $Force) { Read-Host "Press Enter to exit"; exit 1 }
+        }
+    }
+    
+    # Check SSL certificates
+    $sslEnabled = $false
+    if (-not $NoSSL) {
+        $sslEnabled = Test-SSLCertificates
+    }
+    
+    # Check port availability
+    $portsInUse = Test-PortAvailability
+    if ($portsInUse.Count -gt 0 -and -not $Force -and -not $AutoStart) {
+        $response = Read-Host "Some ports are in use. Continue anyway? (y/n)"
+        if ($response -ne "y" -and $response -ne "Y") {
+            Write-Host "Start cancelled." -ForegroundColor Yellow
+            exit 0
+        }
+    }
+    
+    # Show access URLs
+    Show-AccessURLs -SystemIP $systemIP -SSLEnabled $sslEnabled
+    
+    # Ask for confirmation (only if not Force or AutoStart)
+    if (-not $Force -and -not $AutoStart) {
+        $response = Read-Host "Start the server now? (y/n)"
+        if ($response -ne "y" -and $response -ne "Y") {
+            Write-Host "Start cancelled." -ForegroundColor Yellow
+            exit 0
+        }
+    }
+    
+    # Start the server
+    if (Start-Server -SSLEnabled $sslEnabled) {
+        Write-Host ""
+        Write-Success "Server stopped successfully"
+    } else {
+        Write-Host ""
+        Write-Error "Server encountered an error"
+    }
+    
+    Write-Host ""
+    Write-Status "Thank you for using Student Lab System v2"
+    Write-Host ""
 }
 catch {
     Write-Host ""

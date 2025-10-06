@@ -183,9 +183,13 @@
     ws.addEventListener('message', (evt) => {
       try {
         const data = JSON.parse(evt.data);
+        console.log('Exit Validator received message:', data.type, data);
+        
         if (data.type === 'receive_student_record') {
           const record = data.record;
           const day = todayKey();
+          
+          console.log(`Processing student registration: ${record.student_name} (ID: ${record.student_id})`);
           
           if (!registeredByDate[day]) {
             registeredByDate[day] = {};
@@ -194,7 +198,7 @@
           registeredByDate[day][record.student_id] = record;
           localStorage.setItem('exitValidatorToday', JSON.stringify(registeredByDate[day]));
           
-          console.log(`Received registration for student ${record.student_id}: ${record.student_name}`);
+          console.log(`✅ Successfully registered student ${record.student_id}: ${record.student_name}`);
           showNotification(`✅ Student ${record.student_name} registered for exit validation`);
           updateStudentsTable();
         }

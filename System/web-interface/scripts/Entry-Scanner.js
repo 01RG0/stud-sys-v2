@@ -953,7 +953,8 @@
           if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ 
               type: 'student_registered', 
-              record: queuedRecord 
+              record: queuedRecord,
+              fromOfflineSync: true
             }));
             
             // Mark as sent to prevent duplicates
@@ -1022,7 +1023,8 @@
           if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ 
               type: 'student_registered', 
-              record: offlineRecord 
+              record: offlineRecord,
+              fromOfflineSync: true
             }));
             
             // Mark as sent to prevent duplicates

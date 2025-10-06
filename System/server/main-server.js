@@ -25,20 +25,42 @@ const ZERO_DATA_LOSS = process.env.ZERO_DATA_LOSS || true; // Enable zero data l
 // Manual operation tracking to prevent Excel file interference
 let manualOperationInProgress = false;
 
-// Function to get real IP address
+// Function to get real IP address (Enhanced)
 function getRealIP() {
   const os = require('os');
   const interfaces = os.networkInterfaces();
+  
+  console.log('🔍 Detecting system IP address...');
+  
+  // Try to find the best IP address
+  let bestIP = null;
+  let fallbackIP = null;
   
   for (const name of Object.keys(interfaces)) {
     for (const iface of interfaces[name]) {
       // Skip internal (loopback) addresses and IPv6
       if (iface.family === 'IPv4' && !iface.internal) {
-        return iface.address;
+        const ip = iface.address;
+        console.log(`📡 Found network interface: ${name} - ${ip}`);
+        
+        // Prefer common local network ranges
+        if (ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')) {
+          if (!bestIP) {
+            bestIP = ip;
+            console.log(`✅ Selected best IP: ${ip} (from ${name})`);
+          }
+        } else if (!fallbackIP) {
+          fallbackIP = ip;
+          console.log(`🔄 Fallback IP: ${ip} (from ${name})`);
+        }
       }
     }
   }
-  return 'localhost';
+  
+  const finalIP = bestIP || fallbackIP || 'localhost';
+  console.log(`🌐 Final IP address: ${finalIP}`);
+  
+  return finalIP;
 }
 
 const REAL_IP = getRealIP();
@@ -1441,7 +1463,7 @@ function broadcastDeviceDiscovery() {
   const discoveryMessage = {
     type: 'device_discovery',
     serverInfo: {
-      host: 'localhost',
+      host: REAL_IP,
       httpPort: HTTP_PORT,
       httpsPort: HTTPS_PORT,
       wsPort: WS_PORT,
@@ -1477,6 +1499,38 @@ function broadcastToAdmins(message) {
         console.error('Failed to send to admin:', error);
       }
     }
+  }
+}
+
+// Broadcast to all exit validators
+async function broadcastToAllExitValidators(record) {
+  let exitValidatorsFound = 0;
+  let sentCount = 0;
+  
+  for (const [client, info] of devices.entries()) {
+    if (info.role === 'last_scan') {
+      exitValidatorsFound++;
+      if (client.readyState === WebSocket.OPEN) {
+        try {
+          client.send(JSON.stringify({ 
+            type: 'receive_student_record', 
+            record: record 
+          }));
+          sentCount++;
+          logToSystem('info', `Offline sync: Student record sent to exit validator: ${info.name} (${record.student_name})`);
+        } catch (error) {
+          logToSystem('error', `Failed to send offline sync to exit validator ${info.name}: ${error.message}`);
+        }
+      } else {
+        logToSystem('warning', `Exit validator ${info.name} WebSocket not open during offline sync (state: ${client.readyState})`);
+      }
+    }
+  }
+  
+  if (exitValidatorsFound === 0) {
+    logToSystem('warning', 'No exit validators connected during offline sync');
+  } else {
+    logToSystem('info', `Offline sync: Found ${exitValidatorsFound} exit validator(s), sent to ${sentCount} device(s)`);
   }
 }
 
@@ -2595,6 +2649,39 @@ function handleWebSocketConnection(ws, source) {
           logToSystem('success', `Device registered: ${data.name} (${data.role})`);
         }
         
+        // If this is an exit validator, send all today's students immediately
+        if (data.role === 'last_scan') {
+          setTimeout(async () => {
+            try {
+              const today = new Date().toISOString().split('T')[0];
+              const registrations = await Database.getEntryRegistrationsByDate(today);
+              
+              logToSystem('info', `Sending ${registrations.length} today's students to newly connected exit validator: ${data.name}`);
+              
+              for (const record of registrations) {
+                if (ws.readyState === WebSocket.OPEN) {
+                  try {
+                    ws.send(JSON.stringify({
+                      type: 'receive_student_record',
+                      record: record
+                    }));
+                  } catch (error) {
+                    logToSystem('error', `Failed to send student record to exit validator: ${error.message}`);
+                    break;
+                  }
+                } else {
+                  logToSystem('warning', `Exit validator disconnected while sending student records`);
+                  break;
+                }
+              }
+              
+              logToSystem('info', `Completed sending today's students to exit validator: ${data.name}`);
+            } catch (error) {
+              logToSystem('error', `Failed to send today's students to exit validator: ${error.message}`);
+            }
+          }, 2000); // Wait 2 seconds after connection
+        }
+        
         // AUTO-PUSH: Send student cache to Entry Scanner devices only
         const deviceInfo = devices.get(ws);
         if (data.role === 'first_scan' && deviceInfo && !deviceInfo.initialDataPushed) {
@@ -2712,6 +2799,24 @@ function handleWebSocketConnection(ws, source) {
           const deviceInfo = devices.get(ws);
           const deviceName = deviceInfo ? deviceInfo.name : 'Unknown';
           logToSystem('info', `Sent ${Object.keys(todaysStudents).length} today's students to ${deviceName} for offline scanning`);
+          
+          // If this is an exit validator, also send individual receive_student_record messages
+          if (deviceInfo && deviceInfo.role === 'last_scan') {
+            logToSystem('info', `Sending individual student records to exit validator: ${deviceName}`);
+            let sentCount = 0;
+            for (const [studentId, studentData] of Object.entries(todaysStudents)) {
+              try {
+                ws.send(JSON.stringify({
+                  type: 'receive_student_record',
+                  record: studentData
+                }));
+                sentCount++;
+              } catch (error) {
+                logToSystem('error', `Failed to send student record ${studentId} to exit validator: ${error.message}`);
+              }
+            }
+            logToSystem('info', `Sent ${sentCount} individual student records to exit validator: ${deviceName}`);
+          }
         } catch (error) {
           logToSystem('error', `Failed to get today's students: ${error.message}`);
           ws.send(JSON.stringify({
@@ -2805,13 +2910,30 @@ function handleWebSocketConnection(ws, source) {
         }
         
         // Forward to all exit validator devices
+        let exitValidatorsFound = 0;
         for (const [client, info] of devices.entries()) {
-          if (info.role === 'last_scan' && client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ 
-              type: 'receive_student_record', 
-              record: data.record 
-            }));
+          if (info.role === 'last_scan') {
+            exitValidatorsFound++;
+            if (client.readyState === WebSocket.OPEN) {
+              try {
+                client.send(JSON.stringify({ 
+                  type: 'receive_student_record', 
+                  record: data.record 
+                }));
+                logToSystem('info', `Student registration sent to exit validator: ${info.name} (${record.student_name})`);
+              } catch (error) {
+                logToSystem('error', `Failed to send to exit validator ${info.name}: ${error.message}`);
+              }
+            } else {
+              logToSystem('warning', `Exit validator ${info.name} WebSocket not open (state: ${client.readyState})`);
+            }
           }
+        }
+        
+        if (exitValidatorsFound === 0) {
+          logToSystem('warning', 'No exit validators connected to receive student registration');
+        } else {
+          logToSystem('info', `Found ${exitValidatorsFound} exit validator(s), sent to ${exitValidatorsFound} device(s)`);
         }
         
         // Notify admins
@@ -2823,6 +2945,13 @@ function handleWebSocketConnection(ws, source) {
         
         // Broadcast updated stats to all admin dashboards
         await broadcastUpdatedStats();
+        
+        // If this is from offline sync, also broadcast to all connected exit validators
+        // to ensure they get the student record even if they connected before the sync
+        if (data.fromOfflineSync) {
+          logToSystem('info', 'Offline sync detected - broadcasting to all connected exit validators');
+          await broadcastToAllExitValidators(data.record);
+        }
         
         return;
       }
