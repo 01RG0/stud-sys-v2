@@ -55,7 +55,7 @@ if "%choice%"=="1" (
     echo.
     echo Starting server with live logs and real IP detection...
     echo.
-    powershell -ExecutionPolicy Bypass -Command "& '.\Batch-Files\START-SIMPLE.ps1' -AutoStart"
+    powershell -ExecutionPolicy Bypass -File "Batch-Files\START-SIMPLE.ps1" -AutoStart
     goto :end
 )
 

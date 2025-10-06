@@ -49,14 +49,16 @@ if ! command -v npm &> /dev/null; then
 fi
 
 # Check if dependencies are installed
-if [ ! -d "node_modules" ]; then
+if [ ! -d "System/server/node_modules" ]; then
     print_warning "Dependencies not installed"
     print_status "Installing dependencies..."
+    cd System/server
     npm install
     if [ $? -ne 0 ]; then
         print_error "Failed to install dependencies"
         exit 1
     fi
+    cd ../..
 fi
 
 # Check if .env file exists
@@ -67,7 +69,7 @@ if [ ! -f ".env" ]; then
 # Database Configuration
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=student_management
+DB_NAME=student_lab_system
 DB_USER=root
 DB_PASSWORD=
 
