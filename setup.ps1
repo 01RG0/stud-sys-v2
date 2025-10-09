@@ -278,17 +278,33 @@ function Test-MySQLConnection {
     )
     
     try {
-        if ([string]::IsNullOrEmpty($Password)) {
-            $result = & mysql -u $User -e "SELECT 1 as test;" 2>&1
-        } else {
-            $result = & mysql -u $User -p$Password -e "SELECT 1 as test;" 2>&1
+        # First try with --skip-password
+        $result = & mysql -u $User --skip-password -e "SELECT 1 as test;" 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            return $true
         }
         
-        if ($ShowErrors -and $LASTEXITCODE -ne 0) {
+        # Try with no password option
+        $result = & mysql -u $User -e "SELECT 1 as test;" 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            return $true
+        }
+        
+        # Finally try with password if provided
+        if (-not [string]::IsNullOrEmpty($Password)) {
+            $env:MYSQL_PWD = $Password
+            $result = & mysql -u $User -e "SELECT 1 as test;" 2>&1
+            $env:MYSQL_PWD = ""
+            if ($LASTEXITCODE -eq 0) {
+                return $true
+            }
+        }
+        
+        if ($ShowErrors) {
             Write-Status "MySQL connection test failed for user '$User': $result"
         }
         
-        return ($LASTEXITCODE -eq 0)
+        return $false
     }
     catch {
         if ($ShowErrors) {
@@ -299,16 +315,167 @@ function Test-MySQLConnection {
 }
 
 # Function to setup MySQL database and user
+# Function to setup MySQL database and user
 function Setup-MySQLDatabase {
     param(
         [string]$RootUser = "root",
-        [string]$RootPassword = "",
+        [string]$RootPassword = "root",
         [string]$ProjectUser = $script:ProjectUser,
         [string]$ProjectPassword = $script:ProjectPassword,
         [string]$DatabaseName = $script:DatabaseName
     )
     
-    Write-Status "Setting up MySQL database and user..."
+    Write-Status "Setting up MySQL database and user with root password..."
+    
+    try {
+        # Create database
+        Write-Status "Creating database..."
+        & mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS $DatabaseName CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to create database"
+            return $false
+        }
+        Write-Success "Database created successfully"
+        
+        # Create user
+        Write-Status "Creating database user..."
+        & mysql -u root -proot -e "CREATE USER IF NOT EXISTS '$ProjectUser'@'localhost' IDENTIFIED BY '$ProjectPassword';" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to create user"
+            return $false
+        }
+        Write-Success "User created successfully"
+        
+        # Grant privileges
+        Write-Status "Granting privileges..."
+        & mysql -u root -proot -e "GRANT ALL PRIVILEGES ON $DatabaseName.* TO '$ProjectUser'@'localhost';" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to grant privileges"
+            return $false
+        }
+        Write-Success "Privileges granted successfully"
+        
+        # Flush privileges
+        Write-Status "Flushing privileges..."
+        & mysql -u root -proot -e "FLUSH PRIVILEGES;" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to flush privileges"
+            return $false
+        }
+        Write-Success "Privileges flushed successfully"
+        
+        return $true
+    }
+    catch {
+        Write-Error "Error setting up database: $($_.Exception.Message)"
+        return $false
+    }
+    
+    # Try to use Windows authentication
+    Write-Status "Attempting to connect using Windows authentication..."
+    
+    # Look for MySQL installation path
+    $mysqlPath = "C:\Program Files\MySQL\MySQL Server 8.0\bin"
+    if (-not (Test-Path $mysqlPath)) {
+        $mysqlPath = "C:\Program Files (x86)\MySQL\MySQL Server 8.0\bin"
+    }
+    
+    if (Test-Path $mysqlPath) {
+        $env:Path = "$mysqlPath;$env:Path"
+    }
+    
+    Write-Status "Creating database and user with root password..."
+    
+    # Use direct MySQL commands with known root password
+    try {
+        # Create database
+        Write-Status "Creating database..."
+        $result = & mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS $DatabaseName CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Success "Database created successfully"
+            
+            # Create user and grant privileges
+            Write-Status "Creating user and granting privileges..."
+            $commands = @(
+                "CREATE USER IF NOT EXISTS '$ProjectUser'@'localhost' IDENTIFIED BY '$ProjectPassword';",
+                "GRANT ALL PRIVILEGES ON $DatabaseName.* TO '$ProjectUser'@'localhost';",
+                "FLUSH PRIVILEGES;"
+            )
+            
+            $success = $true
+            foreach ($cmd in $commands) {
+                $result = & mysql -u root -proot -e $cmd 2>$null
+                if ($LASTEXITCODE -ne 0) {
+                    $success = $false
+                    break
+                }
+            }
+            
+            if ($success) {
+                Write-Success "Database user created and configured successfully"
+                return $true
+            } else {
+                Write-Error "Failed to configure database user"
+                return $false
+            }
+        }
+        catch {
+            Write-Error "Error setting up database: $($_.Exception.Message)"
+            return $false
+        }
+            
+            foreach ($method in $methods) {
+                Write-Status "Trying connection method: $($method.args -join ' ')"
+                
+                # Execute each query separately
+                $queries = @($createDbQuery, $createUserQuery, $grantQuery, $flushQuery)
+                $success = $true
+                
+                foreach ($query in $queries) {
+                    $output = & $mysqlExe $method.args -e $query 2>&1
+                    if ($LASTEXITCODE -ne 0) {
+                        $success = $false
+                        break
+                    }
+                }
+                
+                if ($success) {
+                    Write-Success "Database and user created successfully!"
+                    return $true
+                }
+            }
+        }
+        catch {
+            Write-Warning "Error executing MySQL commands: $($_.Exception.Message)"
+        }
+    }
+    try {
+        # Try to create temp user with --skip-password first
+        $createTempUser = @"
+CREATE USER IF NOT EXISTS '$tempUser'@'localhost' IDENTIFIED BY '$tempPass';
+GRANT ALL PRIVILEGES ON *.* TO '$tempUser'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+"@
+        $result = & mysql -u $RootUser --skip-password -e $createTempUser 2>$null
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Success "Temporary user created successfully"
+            
+            # Now use the temp user to create our database and final user
+            $createDbQuery = "CREATE DATABASE IF NOT EXISTS $DatabaseName CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+            $createUserQuery = "CREATE USER IF NOT EXISTS '$ProjectUser'@'localhost' IDENTIFIED BY '$ProjectPassword';"
+            $grantQuery = "GRANT ALL PRIVILEGES ON $DatabaseName.* TO '$ProjectUser'@'localhost';"
+            $flushQuery = "FLUSH PRIVILEGES;"
+            
+            $result = & mysql -u $RootUser -e "$createUserQuery $grantQuery $flushQuery" 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Success "User created successfully without password"
+                return $true
+            }
+        }
+    } catch {
+        Write-Warning "Could not create database/user without password. Trying alternative method..."
+    }
     
     # Try different connection methods
     $connected = $false
